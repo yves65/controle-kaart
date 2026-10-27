@@ -448,7 +448,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
         <input type="file" id="fileImport" accept=".geojson,.json,application/geo+json,application/json" hidden>
         <button class="btn btn-ghost" id="btnClearDemo" type="button">Wis voorbeelden</button>
       </div>
-      <p class="label" style="margin-top:10px">Versie 6</p>
+      <p class="label" style="margin-top:10px">Versie 7</p>
     </details>
   </section>
 
@@ -789,7 +789,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     } catch { /* compass unavailable */ }
   }
   // first tap anywhere enables compass (iOS requirement) and wake lock
-  addEventListener('pointerdown', () => { startCompass(); if (follow) keepAwake(true); }, { once: true });
+  addEventListener('pointerdown', () => { startCompass(); startMotion(); if (follow) keepAwake(true); }, { once: true });
 
   // item markers
   const markerLayer = L.layerGroup().addTo(map);
@@ -941,9 +941,52 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       f.ownSpeed = d / 9.5;
     }
     f.moving = fast ?? slow;
+    // The accelerometer has the last word, like in Google Maps: a phone that isn't moving
+    // isn't walking (unless GPS clearly shows vehicle speed), and real steps mean we move.
+    // On foot you always make steps, so without steps only a bike or vehicle (> 9 km/u) counts as moving.
+    f.body = bodyMotion();
+    if (f.body === 'steps') { if (f.acc <= 20) f.moving = true; }
+    else if (f.body && !(fast && f.speed > 2.5)) f.moving = false;
     if (f.moving) { still = null; return { lat: f.lat, lng: f.lng }; }
     return settle(f, mean(0, 5000));
   }
+
+  // Motion sensor: tells whether the phone is really lying/held still or the user is stepping.
+  // Android gives it to web pages without asking; iOS asks once (from a tap).
+  const accBuf = [];             // {t, a}: linear acceleration size (m/s²), last 2 s
+  let motionAt = -1e9, motionOn = false;
+  function onMotion(e) {
+    const t = performance.now(), la = e.acceleration;
+    let a;
+    if (la && Number.isFinite(la.x)) a = Math.hypot(la.x, la.y, la.z);
+    else {
+      const g = e.accelerationIncludingGravity; if (!g || !Number.isFinite(g.x)) return;
+      a = Math.abs(Math.hypot(g.x, g.y, g.z) - 9.81);
+    }
+    accBuf.push({ t, a }); motionAt = t;
+    while (t - accBuf[0].t > 2000) accBuf.shift();
+  }
+  // 'still' | 'steps' | 'other' (e.g. fiddling with the phone, riding a bike) | null (no sensor)
+  function bodyMotion() {
+    if (performance.now() - motionAt > 1000 || accBuf.length < 15) return null;
+    const rms = Math.sqrt(accBuf.reduce((s, p) => s + p.a * p.a, 0) / accBuf.length);
+    if (rms < 0.35) return 'still';
+    let peaks = 0, lastPeak = -1e9;   // footfalls: clear peaks at least 0.3 s apart
+    for (let i = 1; i < accBuf.length - 1; i++) {
+      const p = accBuf[i];
+      if (p.a > 1.5 && p.a >= accBuf[i - 1].a && p.a >= accBuf[i + 1].a && p.t - lastPeak > 300) { peaks++; lastPeak = p.t; }
+    }
+    return rms > 0.8 && peaks >= 3 ? 'steps' : 'other';
+  }
+  async function startMotion() {
+    if (motionOn || typeof DeviceMotionEvent === 'undefined') return;
+    try {
+      if (typeof DeviceMotionEvent.requestPermission === 'function' && await DeviceMotionEvent.requestPermission() !== 'granted') return;
+      motionOn = true;
+      addEventListener('devicemotion', onMotion);
+    } catch { /* iOS without a tap yet: retried on the first tap */ }
+  }
+  startMotion();
 
   // While standing still, blend each fix in by how trustworthy it is (a small Kalman filter):
   // a ±30 m indoor fix barely nudges the dot, a ±4 m fix moves it more.
@@ -955,7 +998,10 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     if (still && dist(still, recentMean) > Math.max(15, 1.5 * f.acc)) still = null;
     if (!still) still = { lat: recentMean.lat, lng: recentMean.lng, P: R, t: f.t };
     else {
-      const P = still.P + STILL_Q * Math.max(0, f.t - still.t) / 1000, k = P / (P + R);
+      // phone not moving: no drift at all, the dot just averages all fixes since you stopped and settles.
+      // stepping on bad (indoor) GPS: let the dot follow, but slowly.
+      const q = f.body === 'still' ? 0 : f.body === 'steps' ? 2 : STILL_Q;
+      const P = still.P + q * Math.max(0, f.t - still.t) / 1000, k = P / (P + R);
       still = { lat: still.lat + k * (f.lat - still.lat), lng: still.lng + k * (f.lng - still.lng), P: (1 - k) * P, t: f.t };
     }
     return still;
