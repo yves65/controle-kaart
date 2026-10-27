@@ -1,0 +1,1602 @@
+<!doctype html>
+<html lang="nl-BE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Controle Kaart</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap">
+<style>
+/* Layout: full-bleed map, floating top bar, bottom sheet on phone / left panel on desktop. */
+:root {
+  --bg: #eef1f0;
+  --surface: #ffffff;
+  --surface-2: #f1f4f3;
+  --fg: #17201c;
+  --muted: #5a6762;
+  --line: #d3dbd8;
+  --accent: #c8102e;
+  --accent-fg: #ffffff;
+  --gps: #1d63d8;
+  --st-todo: #7b8782;
+  --st-ok: #23854f;
+  --st-afwijking: #c98200;
+  --st-defect: #c8102e;
+  --shadow: 0 6px 24px rgba(16, 28, 24, .16), 0 1px 3px rgba(16, 28, 24, .12);
+  --font-ui: "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 10px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1412; --surface: #171e1b; --surface-2: #1f2825; --fg: #e5ebe8; --muted: #98a59f;
+    --line: #2d3834; --accent: #ff5165; --accent-fg: #1a0005; --gps: #5b9bff;
+    --st-todo: #8d9a95; --st-ok: #3fbf78; --st-afwijking: #f0a92a; --st-defect: #ff5165;
+    --shadow: 0 6px 24px rgba(0, 0, 0, .5), 0 1px 3px rgba(0, 0, 0, .4);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1412; --surface: #171e1b; --surface-2: #1f2825; --fg: #e5ebe8; --muted: #98a59f;
+  --line: #2d3834; --accent: #ff5165; --accent-fg: #1a0005; --gps: #5b9bff;
+  --st-todo: #8d9a95; --st-ok: #3fbf78; --st-afwijking: #f0a92a; --st-defect: #ff5165;
+  --shadow: 0 6px 24px rgba(0, 0, 0, .5), 0 1px 3px rgba(0, 0, 0, .4);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.4 var(--font-ui); -webkit-text-size-adjust: 100%; }
+[hidden] { display: none !important; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--gps); outline-offset: 2px; }
+
+#app { position: fixed; inset: 0; overflow: hidden; }
+#map { position: absolute; inset: 0; background: var(--surface-2); }
+#map.dark-osm .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(.92) contrast(.88) saturate(.7); }
+.leaflet-container { font-family: var(--font-ui); }
+.leaflet-control-attribution { font-size: 11px; }
+
+/* ---------- top bar ---------- */
+.topbar {
+  position: absolute; z-index: 1000; top: 0; left: 0; right: 0;
+  padding-top: calc(10px + env(safe-area-inset-top, 0px));
+  padding-left: max(12px, env(safe-area-inset-left, 0px));
+  padding-right: max(12px, env(safe-area-inset-right, 0px));
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap; pointer-events: none;
+}
+.topbar > * { pointer-events: auto; }
+.brand {
+  display: flex; align-items: center; gap: 8px; background: var(--surface); border-radius: var(--radius);
+  padding: 6px 12px 6px 6px; box-shadow: var(--shadow); margin-right: auto;
+}
+.brand-mark {
+  width: 30px; height: 30px; border-radius: 7px; background: var(--accent); color: var(--accent-fg);
+  display: grid; place-items: center; font: 700 18px/1 var(--font-display);
+}
+.brand strong { display: block; font: 700 17px/1 var(--font-display); letter-spacing: .02em; text-transform: uppercase; }
+.brand small { display: block; color: var(--muted); font-size: 12px; line-height: 1.2; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 7px; border: 0; border-radius: 999px; background: var(--surface);
+  box-shadow: var(--shadow); padding: 8px 13px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.chip .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--st-todo); }
+.gps-chip[data-q="good"] .dot { background: var(--st-ok); }
+.gps-chip[data-q="ok"] .dot { background: var(--st-afwijking); }
+.gps-chip[data-q="poor"] .dot, .gps-chip[data-q="err"] .dot { background: var(--st-defect); }
+.gps-chip[data-q="none"] .dot { animation: pulse 1.2s ease-in-out infinite; }
+.gps-chip[data-sim="1"]::after { content: "SIM"; font: 700 11px/1 var(--font-mono); background: var(--gps); color: #fff; padding: 3px 5px; border-radius: 4px; }
+@keyframes pulse { 50% { opacity: .25; } }
+
+.seg { display: inline-flex; background: var(--surface); border-radius: 999px; box-shadow: var(--shadow); padding: 3px; }
+.seg button { border: 0; background: transparent; border-radius: 999px; padding: 6px 12px; font-weight: 600; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+
+/* ---------- floating map buttons ---------- */
+.fab-col {
+  position: absolute; z-index: 1000; right: max(12px, env(safe-area-inset-right, 0px)); top: 50%;
+  transform: translateY(-75%); display: flex; flex-direction: column; gap: 8px;
+}
+.fab {
+  width: 44px; height: 44px; border-radius: 12px; border: 0; background: var(--surface); box-shadow: var(--shadow);
+  display: grid; place-items: center; font: 600 20px/1 var(--font-ui);
+}
+.fab svg { width: 22px; height: 22px; }
+.fab[aria-pressed="true"] { background: var(--gps); color: #fff; }
+.fab.small-text { font: 700 12px/1 var(--font-mono); }
+
+/* ---------- panels (sheet + editor) ---------- */
+.panel {
+  position: absolute; z-index: 1001; left: 0; right: 0; bottom: 0; max-height: 52%;
+  overflow-y: auto; overscroll-behavior: contain; background: var(--surface); color: var(--fg);
+  border-radius: 16px 16px 0 0; box-shadow: var(--shadow);
+  padding-block: 8px calc(14px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 12px;
+}
+.grip { width: 44px; height: 5px; border-radius: 3px; background: var(--line); }
+.grip-zone {
+  flex: none; display: flex; justify-content: center; align-items: center; margin: -8px 0 -6px; padding: 10px 0 10px;
+  cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; border-radius: 16px 16px 0 0;
+}
+.grip-zone:hover .grip, .panel.dragging .grip { background: var(--muted); }
+.panel.dragging .grip-zone { cursor: grabbing; }
+@media (max-width: 899px) {
+  .panel { max-height: none; height: var(--sheet-h, 52%); transition: height .28s cubic-bezier(.2, .8, .2, 1); will-change: height; }
+  .panel.dragging { transition: none; overflow: hidden; }
+  .panel.peek { overflow: hidden; }
+}
+@media (min-width: 900px) {
+  .panel {
+    left: max(12px, env(safe-area-inset-left, 0px)); right: auto; top: calc(74px + env(safe-area-inset-top, 0px));
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px)); width: 380px; max-height: none; border-radius: 14px;
+    padding-block: 14px;
+  }
+  .grip-zone { display: none; }
+  .fab-col { transform: translateY(-50%); }
+}
+
+.label { font: 600 12px/1 var(--font-ui); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+
+.type-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: thin; flex: none; }
+.type-btn {
+  flex: none; display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--line); background: var(--surface);
+  border-radius: 999px; padding: 5px 12px 5px 5px; font-weight: 600; font-size: 14px; white-space: nowrap;
+}
+.type-btn[aria-pressed="true"] { border-color: var(--fg); background: var(--surface-2); }
+.glyph {
+  flex: none; display: grid; place-items: center; min-width: 26px; height: 26px; padding: 0 4px; border-radius: 13px;
+  background: var(--c); color: #fff; font: 700 13px/1 var(--font-display); letter-spacing: .02em;
+}
+
+.action-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.btn {
+  border: 0; border-radius: var(--radius); padding: 12px 14px; font-weight: 600; display: inline-flex; align-items: center;
+  justify-content: center; gap: 8px; min-height: 46px;
+}
+.btn-primary { background: var(--accent); color: var(--accent-fg); font: 700 17px/1 var(--font-display); letter-spacing: .03em; text-transform: uppercase; }
+.btn-primary:disabled { opacity: .5; cursor: progress; }
+.btn-secondary { background: var(--surface-2); border: 1.5px solid var(--line); }
+.btn-secondary[aria-pressed="true"] { background: var(--gps); border-color: var(--gps); color: #fff; }
+.btn-ghost { background: transparent; border: 1.5px solid var(--line); min-height: 38px; padding: 8px 12px; font-size: 14px; }
+.btn-danger { background: transparent; border: 1.5px solid var(--st-defect); color: var(--st-defect); }
+.btn-danger.armed { background: var(--st-defect); color: #fff; }
+
+.settings-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; color: var(--muted); }
+.settings-row select { background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 4px 8px; font-variant-numeric: tabular-nums; }
+
+/* capture + duplicate notices */
+.notice { border-radius: var(--radius); background: var(--surface-2); border: 1.5px solid var(--line); padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.notice.warn { border-color: var(--st-afwijking); }
+.notice p { margin: 0; }
+.notice .row { display: flex; gap: 8px; flex-wrap: wrap; }
+.notice strong { font-variant-numeric: tabular-nums; }
+.meter { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.meter > i { display: block; height: 100%; width: 0; background: var(--gps); transition: width .2s; }
+.samples { display: flex; gap: 4px; flex-wrap: wrap; font: 12px/1 var(--font-mono); }
+.samples span { padding: 3px 5px; border-radius: 4px; background: var(--surface); border: 1px solid var(--line); }
+.samples span.hit { border-color: var(--st-ok); color: var(--st-ok); }
+
+/* list */
+details.list > summary { list-style: none; display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 4px 0; }
+details.list > summary::-webkit-details-marker { display: none; }
+details.list > summary::after { content: "▾"; color: var(--muted); }
+details.list:not([open]) > summary::after { content: "▸"; }
+.counts { display: flex; gap: 10px; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.counts b { color: var(--fg); }
+ul.items { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; }
+ul.items li + li { border-top: 1px solid var(--line); }
+.item-btn {
+  width: 100%; border: 0; background: transparent; text-align: left; display: grid; grid-template-columns: auto 1fr auto;
+  gap: 10px; align-items: center; padding: 9px 2px;
+}
+.item-btn:hover { background: var(--surface-2); }
+.item-main { min-width: 0; }
+.item-main .code { font: 700 16px/1.1 var(--font-display); letter-spacing: .03em; }
+.item-main .sub { color: var(--muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.item-side { text-align: right; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pill { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; color: var(--st); border: 1.5px solid var(--st); }
+.demo-tag { font: 600 10px/1 var(--font-mono); text-transform: uppercase; color: var(--muted); border: 1px dashed var(--muted); border-radius: 3px; padding: 2px 3px; margin-left: 6px; vertical-align: 2px; }
+.io { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.empty { color: var(--muted); font-size: 14px; padding: 10px 0; }
+
+/* editor */
+.ed-head { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; }
+.ed-head h2 { margin: 0; font: 700 24px/1 var(--font-display); letter-spacing: .03em; }
+.ed-head p { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+.ed-head .glyph { min-width: 36px; height: 36px; border-radius: 18px; font-size: 16px; }
+.icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--line); background: var(--surface); font-size: 20px; line-height: 1; }
+.field-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; }
+.field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.field input, .field select, .field textarea {
+  width: 100%; background: var(--surface-2); border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; resize: vertical;
+}
+.field input.bad { border-color: var(--st-defect); }
+.field .err { color: var(--st-defect); font-size: 12px; }
+.status-seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; border: 0; padding: 0; margin: 0; }
+.status-seg legend { margin-bottom: 5px; padding: 0; }
+.status-seg button {
+  border: 1.5px solid var(--line); background: var(--surface); border-radius: 8px; padding: 8px 4px; font-size: 13px; font-weight: 600;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.status-seg button i { width: 10px; height: 10px; border-radius: 50%; background: var(--st); }
+.status-seg button[aria-pressed="true"] { border-color: var(--st); background: var(--surface-2); color: var(--st); }
+dl.meta { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin: 0; font-size: 14px; }
+dl.meta dt { color: var(--muted); }
+dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overflow-wrap: anywhere; }
+.mono { font-family: var(--font-mono); font-size: 13px; }
+.hint { margin: 0; font-size: 13px; color: var(--muted); }
+.ed-actions { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+
+/* ---------- markers ---------- */
+.mk-wrap { background: none; border: 0; }
+.mk {
+  width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: var(--c);
+  box-shadow: 0 0 0 3px var(--st), 0 2px 6px rgba(0,0,0,.45); display: grid; place-items: center; transition: transform .15s;
+}
+.mk span { transform: rotate(45deg); color: #fff; font: 700 12px/1 var(--font-display); letter-spacing: .02em; }
+.mk[data-st="todo"] { --st: #ffffff; }
+.mk[data-st="ok"] { --st: #2fb36a; }
+.mk[data-st="afwijking"] { --st: #f0a92a; }
+.mk[data-st="defect"] { --st: #ffd400; }
+.mk.sel { transform: rotate(-45deg) scale(1.3); box-shadow: 0 0 0 3px var(--st), 0 0 0 6px var(--gps), 0 2px 8px rgba(0,0,0,.5); }
+.mk.demo { opacity: .8; }
+
+/* address search */
+.icon-chip { padding: 8px 11px; }
+.icon-chip svg { width: 20px; height: 20px; }
+.icon-chip[aria-expanded="true"] { background: var(--fg); color: var(--bg); }
+.searchbar {
+  position: absolute; z-index: 1002; left: 0; right: 0; top: var(--sb-top, 70px);
+  padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 6px; pointer-events: none;
+}
+.searchbar > * { pointer-events: auto; }
+.sb-form { display: flex; gap: 6px; align-items: center; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 6px; }
+.sb-form input { flex: 1; min-width: 0; border: 0; background: transparent; padding: 8px 10px; font-size: 16px; outline-offset: 0; }
+.sb-form .btn { min-height: 40px; padding: 8px 14px; }
+.sb-results { list-style: none; margin: 0; padding: 4px; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); max-height: 50vh; overflow-y: auto; }
+.sb-results li + li { border-top: 1px solid var(--line); }
+.sb-results button {
+  width: 100%; border: 0; background: transparent; text-align: left; padding: 10px; display: grid; grid-template-columns: 1fr auto; gap: 2px 10px;
+  border-radius: 6px;
+}
+.sb-results button:hover { background: var(--surface-2); }
+.sb-results strong { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.sb-results span { color: var(--muted); font-size: 13px; grid-column: 1; min-width: 0; }
+.sb-results em { font-style: normal; color: var(--muted); font-size: 13px; grid-row: 1; grid-column: 2; font-variant-numeric: tabular-nums; }
+.sb-msg { padding: 10px; color: var(--muted); font-size: 14px; }
+.sb-attr { font-size: 11px; color: var(--muted); padding: 4px 10px 2px; }
+@media (min-width: 900px) {
+  .searchbar { left: calc(max(12px, env(safe-area-inset-left, 0px)) + 392px); right: auto; width: 440px; padding: 0; }
+}
+.sp-wrap { background: none; border: 0; }
+.sp { width: 22px; height: 22px; border-radius: 50%; border: 3px solid var(--fg); background: var(--surface); position: relative; box-shadow: 0 2px 6px rgba(0,0,0,.4); }
+.sp::after { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: var(--fg); }
+.leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--surface); color: var(--fg); box-shadow: var(--shadow); }
+.leaflet-popup-content { margin: 12px; font: 14px/1.35 var(--font-ui); }
+.sp-pop { display: flex; flex-direction: column; gap: 4px; min-width: 200px; }
+.sp-pop span { color: var(--muted); font-size: 13px; }
+.sp-pop .row { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.sp-pop button { border: 1.5px solid var(--line); background: var(--surface-2); border-radius: 8px; padding: 7px 10px; font-weight: 600; font-size: 13px; }
+.sp-pop button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+
+/* photos */
+.photos-head { display: flex; justify-content: space-between; align-items: baseline; }
+.photos-head small { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 6px; }
+.ph {
+  position: relative; aspect-ratio: 1; max-width: 100%; border: 0; padding: 0; border-radius: 8px; overflow: hidden;
+  background: var(--surface-2); display: block;
+}
+.ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ph-busy { display: grid; place-items: center; font-size: 12px; color: var(--muted); border: 1.5px dashed var(--line); animation: pulse 1.2s ease-in-out infinite; }
+.ph-missing::after { content: "Ontbreekt"; position: absolute; inset: 0; display: grid; place-items: center; font-size: 11px; color: var(--muted); }
+.photo-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.photo-actions .btn { flex: 1 1 140px; min-height: 42px; }
+.photo-actions svg { width: 18px; height: 18px; }
+.mk-ph {
+  position: absolute; top: -7px; right: -10px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 9px;
+  background: #ffffff; color: #17201c; font: 700 10px/17px var(--font-mono); text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,.45);
+}
+/* lightbox: deliberately always dark, photos read best on black */
+.lightbox { position: fixed; inset: 0; z-index: 1200; background: #0b0d0c; color: #eef1f0; display: flex; flex-direction: column; }
+.lb-bar {
+  display: flex; align-items: center; gap: 8px; flex: none;
+  padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px));
+}
+.lb-top { padding-top: calc(10px + env(safe-area-inset-top, 0px)); padding-bottom: 8px; }
+.lb-bottom { padding-top: 8px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); justify-content: space-between; }
+.lb-info { flex: 1; min-width: 0; font-size: 14px; color: #b9c2be; font-variant-numeric: tabular-nums; }
+.lb-info strong { color: #ffffff; font: 700 17px/1.2 var(--font-display); letter-spacing: .03em; display: block; }
+.lb-stage { flex: 1; min-height: 0; display: grid; place-items: center; touch-action: pan-y pinch-zoom; overflow: hidden; }
+.lb-stage img { max-width: 100%; max-height: 100%; object-fit: contain; user-select: none; -webkit-user-drag: none; }
+.lb-btn { border: 1.5px solid #3a4440; background: #171d1b; color: #eef1f0; border-radius: 8px; padding: 8px 14px; font-weight: 600; min-height: 42px; }
+.lb-btn.danger { border-color: #ff5165; color: #ff5165; }
+.lb-btn.danger.armed { background: #ff5165; color: #1a0005; }
+.lb-btn[disabled] { opacity: .35; }
+
+/* own position */
+.me-wrap { background: none; border: 0; }
+.me { position: relative; width: 22px; height: 22px; transform: rotate(var(--hd, 0deg)); transition: transform .3s linear; }
+.me i {
+  position: absolute; left: calc(50% - 22px); bottom: 50%; width: 44px; height: 48px;
+  background: linear-gradient(to top, var(--gps), transparent); opacity: .55;
+  clip-path: polygon(50% 100%, 0 0, 100% 0); display: none;
+}
+.me.has-hd i { display: block; }
+.me b {
+  position: absolute; inset: 0; border-radius: 50%; background: var(--gps); border: 3px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.2), 0 2px 6px rgba(0,0,0,.4);
+}
+.me.live b::after {
+  content: ""; position: absolute; inset: -9px; border-radius: 50%; border: 2px solid var(--gps);
+  animation: ping 1.8s ease-out infinite;
+}
+.me.stale b { background: var(--st-todo); }
+@keyframes ping { from { transform: scale(.5); opacity: .9; } to { transform: scale(1.4); opacity: 0; } }
+
+/* toast */
+.toast {
+  position: absolute; z-index: 1300; left: 50%; top: calc(70px + env(safe-area-inset-top, 0px)); transform: translate(-50%, -8px);
+  max-width: min(92vw, 440px); background: var(--fg); color: var(--bg); padding: 10px 14px; border-radius: var(--radius);
+  font-weight: 500; box-shadow: var(--shadow); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="map" role="application" aria-label="Kaart met controle-items"></div>
+
+  <header class="topbar" id="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">C</span>
+      <div><strong>Kaartpreview</strong><small>ControleApp · prototype</small></div>
+    </div>
+    <button class="chip icon-chip" id="btnSearch" type="button" aria-label="Zoek adres" aria-expanded="false" aria-controls="searchBar" title="Zoek adres of coördinaten">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>
+    </button>
+    <button class="chip gps-chip" id="gpsChip" data-q="none" type="button" title="GPS-status"><span class="dot"></span><span id="gpsText">GPS zoeken…</span></button>
+    <div class="seg" role="group" aria-label="Kaartachtergrond">
+      <button type="button" data-layer="osm" aria-pressed="true">Kaart</button>
+      <button type="button" data-layer="sat" aria-pressed="false">Luchtfoto</button>
+    </div>
+  </header>
+
+  <div class="searchbar" id="searchBar" hidden>
+    <form class="sb-form" id="sbForm" role="search" autocomplete="off">
+      <label for="sbInput" class="label" hidden>Adres</label>
+      <input id="sbInput" type="search" enterkeyhint="search" placeholder="Adres, plaats of 51.0543, 3.7215" spellcheck="false">
+      <button class="btn btn-primary" type="submit">Zoek</button>
+      <button class="icon-btn" id="sbClose" type="button" aria-label="Sluit zoeken">×</button>
+    </form>
+    <ul class="sb-results" id="sbResults" hidden></ul>
+  </div>
+
+  <div class="fab-col">
+    <button class="fab" id="btnZoomIn" type="button" aria-label="Inzoomen">+</button>
+    <button class="fab" id="btnZoomOut" type="button" aria-label="Uitzoomen">−</button>
+    <button class="fab" id="btnCenter" type="button" aria-pressed="true" aria-label="Volg mijn positie" title="Volg mijn positie (live)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+    </button>
+    <button class="fab small-text" id="btnSim" type="button" aria-pressed="false" title="Simuleer GPS rond het kaartmidden (voor desktop)">SIM</button>
+  </div>
+
+  <!-- main sheet -->
+  <section class="panel" id="sheet" aria-label="Items plaatsen">
+    <div class="grip-zone" role="button" tabindex="0" aria-label="Paneel groter of kleiner maken"><div class="grip"></div></div>
+    <div class="notice warn" id="storageWarn" hidden role="alert">
+      <p><strong id="storageWarnTitle">Wijzigingen worden niet bewaard.</strong><br><span id="storageWarnText"></span></p>
+    </div>
+    <div class="label">Type item</div>
+    <div class="type-row" id="typeRow" role="group" aria-label="Type item"></div>
+
+    <div class="action-row" data-peek>
+      <button class="btn btn-primary" id="btnCapture" type="button">Plaats op GPS-positie</button>
+      <button class="btn btn-secondary" id="btnTap" type="button" aria-pressed="false">Tik op kaart</button>
+    </div>
+
+    <div class="notice" id="capturePanel" hidden>
+      <p><strong id="capTitle">Positie meten…</strong><br><span id="capText">Blijf stilstaan bij het item.</span></p>
+      <div class="meter"><i id="capBar"></i></div>
+      <div class="samples" id="capSamples"></div>
+      <div class="row" id="capActions">
+        <button class="btn btn-ghost" id="capCancel" type="button">Annuleer</button>
+      </div>
+    </div>
+
+    <div class="notice warn" id="dupPanel" hidden>
+      <p id="dupText"></p>
+      <div class="row">
+        <button class="btn btn-ghost" id="dupAdd" type="button">Toch toevoegen</button>
+        <button class="btn btn-ghost" id="dupOpen" type="button">Open bestaand item</button>
+        <button class="btn btn-ghost" id="dupCancel" type="button">Annuleer</button>
+      </div>
+    </div>
+
+    <div class="settings-row">
+      <label for="accSel">Vereiste GPS-nauwkeurigheid</label>
+      <select id="accSel">
+        <option value="3">≤ 3 m</option>
+        <option value="5" selected>≤ 5 m</option>
+        <option value="10">≤ 10 m</option>
+        <option value="20">≤ 20 m</option>
+      </select>
+    </div>
+
+    <details class="list" id="listWrap" open>
+      <summary><span class="label">Items op de kaart</span><span class="counts" id="counts"></span></summary>
+      <ul class="items" id="itemList"></ul>
+      <div class="io">
+        <button class="btn btn-ghost" id="btnExport" type="button">Exporteer GeoJSON</button>
+        <label class="btn btn-ghost" for="fileImport">Importeer</label>
+        <input type="file" id="fileImport" accept=".geojson,.json,application/geo+json,application/json" hidden>
+        <button class="btn btn-ghost" id="btnClearDemo" type="button">Wis voorbeelden</button>
+      </div>
+    </details>
+  </section>
+
+  <!-- item editor -->
+  <section class="panel" id="editor" hidden aria-labelledby="edTitle">
+    <div class="grip-zone" role="button" tabindex="0" aria-label="Paneel groter of kleiner maken"><div class="grip"></div></div>
+    <div class="ed-head" data-peek>
+      <span class="glyph" id="edGlyph"></span>
+      <div><h2 id="edTitle"></h2><p id="edSub"></p></div>
+      <button class="icon-btn" id="edClose" type="button" aria-label="Sluit">×</button>
+    </div>
+    <div class="field-grid">
+      <div class="field"><label class="label" for="edCode">Code</label><input id="edCode" autocomplete="off" spellcheck="false"><span class="err" id="edCodeErr" hidden></span></div>
+      <div class="field"><label class="label" for="edType">Type</label><select id="edType"></select></div>
+    </div>
+    <fieldset class="status-seg" id="edStatus"><legend class="label">Status</legend></fieldset>
+    <div class="field"><label class="label" for="edNote">Notitie</label><textarea id="edNote" rows="2" placeholder="bv. deksel vastgeroest, aanduidingsbord ontbreekt"></textarea></div>
+    <div class="field">
+      <div class="photos-head"><span class="label">Foto's</span><small id="phCount"></small></div>
+      <div class="photo-grid" id="phGrid" hidden></div>
+      <div class="photo-actions">
+        <label class="btn btn-secondary" for="phCamera">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+          Foto nemen
+        </label>
+        <input type="file" id="phCamera" accept="image/*" capture="environment" hidden>
+        <label class="btn btn-ghost" for="phGallery">Uit galerij</label>
+        <input type="file" id="phGallery" accept="image/*" multiple hidden>
+      </div>
+    </div>
+    <dl class="meta">
+      <dt>Positie</dt><dd class="mono" id="edPos"></dd>
+      <dt>Nauwkeurigheid</dt><dd id="edAcc"></dd>
+      <dt>Bron</dt><dd id="edSrc"></dd>
+      <dt>Geplaatst</dt><dd id="edDate"></dd>
+    </dl>
+    <p class="hint">Sleep de marker op de kaart om de positie te corrigeren.</p>
+    <div class="ed-actions">
+      <button class="btn btn-secondary" id="edRegps" type="button">Herpositioneer via GPS</button>
+      <button class="btn btn-danger" id="edDelete" type="button">Verwijder</button>
+    </div>
+  </section>
+
+  <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Foto bekijken">
+    <div class="lb-bar lb-top">
+      <div class="lb-info" id="lbInfo"></div>
+      <button class="lb-btn" id="lbClose" type="button" aria-label="Sluit foto">Sluit</button>
+    </div>
+    <div class="lb-stage" id="lbStage"><img id="lbImg" alt=""></div>
+    <div class="lb-bar lb-bottom">
+      <button class="lb-btn" id="lbPrev" type="button" aria-label="Vorige foto">‹ Vorige</button>
+      <button class="lb-btn danger" id="lbDel" type="button">Verwijder</button>
+      <button class="lb-btn" id="lbNext" type="button" aria-label="Volgende foto">Volgende ›</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+(() => {
+  'use strict';
+
+  /* ================= config ================= */
+  const STORE_KEY = 'controleapp.kaartpreview.v1';
+  const CAPTURE_NEED = 5;          // samples within threshold needed
+  const CAPTURE_MAX_MS = 25000;    // give up waiting after this
+  const MAX_SAMPLE_ACC = 60;       // ignore samples worse than this (m)
+  const STALE_MS = 10000;          // fix older than this = stale
+  const DEMO_CENTER = { lat: 51.05430, lng: 3.72150 }; // fictief voorbeeldterrein
+
+  const TYPES = [
+    { id: 'hydrant_boven', label: 'Bovengrondse hydrant', short: 'Hydrant boven', prefix: 'HB', glyph: 'H',  color: '#c8102e' },
+    { id: 'hydrant_onder', label: 'Ondergrondse hydrant', short: 'Hydrant onder', prefix: 'HO', glyph: 'HO', color: '#d9541a' },
+    { id: 'brandhaspel',   label: 'Brandhaspel',          short: 'Haspel',        prefix: 'BH', glyph: 'BH', color: '#7a2c8f' },
+    { id: 'blustoestel',   label: 'Blustoestel',          short: 'Blustoestel',   prefix: 'BT', glyph: 'B',  color: '#0b7a75' },
+    { id: 'droge_leiding', label: 'Droge stijgleiding',   short: 'Droge leiding', prefix: 'DL', glyph: 'DL', color: '#2a5bb0' },
+    { id: 'afsluiter',     label: 'Afsluiter',            short: 'Afsluiter',     prefix: 'AF', glyph: 'A',  color: '#5d6b22' },
+    { id: 'overig',        label: 'Overig',               short: 'Overig',        prefix: 'OV', glyph: '?',  color: '#4a4f4d' },
+  ];
+  const TYPE = Object.fromEntries(TYPES.map(t => [t.id, t]));
+  const STATUSES = [
+    { id: 'todo',      label: 'Te controleren' },
+    { id: 'ok',        label: 'In orde' },
+    { id: 'afwijking', label: 'Afwijking' },
+    { id: 'defect',    label: 'Defect' },
+  ];
+  const STATUS = Object.fromEntries(STATUSES.map(s => [s.id, s]));
+  const SOURCE_LABEL = { gps: 'GPS', manueel: 'Manueel op kaart', versleept: 'GPS, manueel gecorrigeerd', import: 'Import', voorbeeld: 'Voorbeelddata', adres: 'Adres (zoekresultaat)' };
+
+  /* ================= helpers ================= */
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const nf1 = new Intl.NumberFormat('nl-BE', { maximumFractionDigits: 1 });
+  const nf0 = new Intl.NumberFormat('nl-BE', { maximumFractionDigits: 0 });
+  const fmtDist = m => m == null ? '' : m < 1000 ? `${nf0.format(m)} m` : `${nf1.format(m / 1000)} km`;
+  const fmtAcc = a => a == null ? 'onbekend' : `±${nf1.format(a)} m`;
+  const fmtDate = iso => { try { return new Date(iso).toLocaleString('nl-BE', { dateStyle: 'short', timeStyle: 'short' }); } catch { return iso; } };
+  const uid = () => (crypto.randomUUID ? crypto.randomUUID() : 'id-' + Date.now().toString(36) + Math.random().toString(36).slice(2));
+  const offset = (c, dx, dy) => ({ lat: c.lat + dy / 111320, lng: c.lng + dx / (111320 * Math.cos(c.lat * Math.PI / 180)) });
+  const dist = (a, b) => L.latLng(a.lat, a.lng).distanceTo(L.latLng(b.lat, b.lng));
+  const round = (n, d) => Math.round(n * 10 ** d) / 10 ** d;
+
+  let toastTimer;
+  function toast(msg, ms = 2800) {
+    const t = $('toast'); t.textContent = msg;
+    t.style.top = `${Math.round($('topbar').getBoundingClientRect().bottom + 8)}px`;
+    t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), ms);
+  }
+
+  /* ================= state ================= */
+  let items = [];
+  let selType = TYPES[0].id;
+  let tapMode = false;
+  let selectedId = null;
+  let lastFix = null;            // {lat,lng,acc,t}
+  let capture = null;            // active GPS capture
+  let pending = null;            // placement waiting on duplicate decision
+  let sim = null;                // simulated GPS
+  let watchId = null;
+  let follow = true;             // map tracks live position
+  let centeredOnFirstFix = false;
+  let compassHd = null;          // degrees, from device orientation
+  let wakeLock = null;
+  let minAcc = 5;
+
+  const isLocalFile = !/^https?:$/.test(location.protocol);
+  let storageProblem = '';
+  function showStorageProblem(msg, title = 'Wijzigingen worden niet bewaard.') {
+    if (storageProblem) return;
+    storageProblem = msg;
+    $('storageWarnTitle').textContent = title;
+    $('storageWarnText').textContent = msg;
+    $('storageWarn').hidden = false;
+    toast(`Let op: ${msg}`, 6000);
+  }
+  function storageWorks() {
+    try {
+      const k = `${STORE_KEY}.probe`;
+      localStorage.setItem(k, '1'); const ok = localStorage.getItem(k) === '1'; localStorage.removeItem(k);
+      return ok;
+    } catch { return false; }
+  }
+  function save() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ v: 1, items, selType, minAcc })); }
+    catch (e) {
+      showStorageProblem(e?.name === 'QuotaExceededError'
+        ? 'De browseropslag is vol. Exporteer je items en verwijder oude foto\'s.'
+        : 'De browser weigert opslag voor deze pagina. Open de pagina via de https-link.');
+    }
+  }
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (!raw) return false;
+      const d = JSON.parse(raw);
+      if (!d || !Array.isArray(d.items)) return false;
+      items = d.items.filter(validItem);
+      items.forEach(i => { i.photos = Array.isArray(i.photos) ? i.photos.filter(x => typeof x === 'string') : []; });
+      if (TYPE[d.selType]) selType = d.selType;
+      if ([3, 5, 10, 20].includes(d.minAcc)) minAcc = d.minAcc;
+      return true;
+    } catch { return false; }
+  }
+  function validItem(i) {
+    return i && typeof i.id === 'string' && TYPE[i.type] && Number.isFinite(i.lat) && Number.isFinite(i.lng) &&
+      Math.abs(i.lat) <= 90 && Math.abs(i.lng) <= 180;
+  }
+  function seedDemo() {
+    const now = Date.now();
+    const rows = [
+      ['hydrant_boven', 'HB-001', 'ok',        -42,  18, 3.8, ''],
+      ['hydrant_boven', 'HB-002', 'todo',       55, -30, 4.6, ''],
+      ['hydrant_onder', 'HO-001', 'afwijking',  12,  48, 6.2, 'Deksel vastgeroest, aanduidingsbord vervaagd'],
+      ['hydrant_onder', 'HO-002', 'todo',      -70, -45, 4.1, ''],
+      ['brandhaspel',   'BH-001', 'ok',         -8,  -6, 9.5, 'Gevel magazijn, naast poort 3'],
+      ['blustoestel',   'BT-001', 'defect',      6,  -9, 11.0, 'Manometer in rode zone'],
+      ['droge_leiding', 'DL-001', 'todo',       28,   4, 5.0, 'Inlaat voorgevel'],
+      ['afsluiter',     'AF-001', 'ok',         80,  22, 3.2, ''],
+    ];
+    items = rows.map(([type, code, status, dx, dy, acc, note], k) => {
+      const p = offset(DEMO_CENTER, dx, dy);
+      return { id: uid(), type, code, status, lat: p.lat, lng: p.lng, acc, src: 'voorbeeld', n: 5,
+        createdAt: new Date(now - (k + 1) * 3600e3).toISOString(), note, demo: true, photos: [] };
+    });
+  }
+
+  /* ================= map ================= */
+  const map = L.map('map', { zoomControl: false, maxZoom: 21, attributionControl: true })
+    .setView([DEMO_CENTER.lat, DEMO_CENTER.lng], 18);
+
+  const layers = {
+    osm: L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxNativeZoom: 19, maxZoom: 21,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>-bijdragers',
+    }),
+    sat: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxNativeZoom: 19, maxZoom: 21, attribution: 'Luchtfoto &copy; Esri, Maxar, Earthstar Geographics',
+    }),
+  };
+  let activeLayer = 'osm';
+  layers.osm.addTo(map);
+
+  function isDark() {
+    const t = document.documentElement.getAttribute('data-theme');
+    if (t === 'dark') return true;
+    if (t === 'light') return false;
+    return matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function applyMapTheme() { $('map').classList.toggle('dark-osm', activeLayer === 'osm' && isDark()); }
+  matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', applyMapTheme);
+  new MutationObserver(applyMapTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  document.querySelectorAll('[data-layer]').forEach(b => b.addEventListener('click', () => {
+    const id = b.dataset.layer; if (id === activeLayer) return;
+    map.removeLayer(layers[activeLayer]); layers[id].addTo(map); activeLayer = id;
+    document.querySelectorAll('[data-layer]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.layer === id)));
+    applyMapTheme();
+  }));
+
+  $('btnZoomIn').addEventListener('click', () => map.zoomIn());
+  $('btnZoomOut').addEventListener('click', () => map.zoomOut());
+  map.on('dragstart', () => { if (follow) { setFollow(false); toast('Volgen gepauzeerd. Tik op ◎ om weer live te volgen.'); } });
+  addEventListener('resize', () => map.invalidateSize());
+
+  // Centre a point in the part of the map NOT covered by the top bar and the panel.
+  function visibleOffset() {
+    const W = innerWidth, H = innerHeight;
+    const panel = !$('editor').hidden ? $('editor') : $('sheet');
+    const r = panel.getBoundingClientRect();
+    const top = $('topbar').getBoundingClientRect().bottom;
+    if (r.width >= W * 0.9) return [0, (top + r.top) / 2 - H / 2];       // bottom sheet (phone)
+    return [(r.right + W) / 2 - W / 2, (top + H) / 2 - H / 2];           // side panel (desktop)
+  }
+  function centerOn(ll, zoom, opts = {}) {
+    const z = zoom ?? map.getZoom();
+    const [dx, dy] = visibleOffset();
+    const c = map.unproject(map.project(L.latLng(ll), z).subtract([dx, dy]), z);
+    if (opts.fly) map.flyTo(c, z, { duration: .6 });
+    else if (z !== map.getZoom()) map.setView(c, z, { animate: opts.animate !== false });
+    else map.panTo(c, { animate: opts.animate !== false, duration: .6, easeLinearity: .5 });
+  }
+
+  // own position
+  const accCircle = L.circle([0, 0], { radius: 1, weight: 1, color: '#1d63d8', fillColor: '#1d63d8', fillOpacity: .12, interactive: false });
+  const posMarker = L.marker([0, 0], {
+    interactive: false, keyboard: false, zIndexOffset: 2000,
+    icon: L.divIcon({ className: 'me-wrap', iconSize: [22, 22], iconAnchor: [11, 11], html: '<div class="me live"><i></i><b></b></div>' }),
+  });
+  let posShown = false;
+  const meEl = () => posMarker.getElement()?.querySelector('.me');
+
+  function updateHeading() {
+    const el = meEl(); if (!el) return;
+    const f = lastFix;
+    // GPS course is reliable only while moving; otherwise fall back to the compass.
+    const hd = f && Number.isFinite(f.heading) && f.speed > 1 ? f.heading : compassHd;
+    el.classList.toggle('has-hd', hd != null);
+    if (hd != null) el.style.setProperty('--hd', `${Math.round(hd)}deg`);
+  }
+
+  function setFollow(on) {
+    follow = on;
+    $('btnCenter').setAttribute('aria-pressed', String(on));
+    keepAwake(on);
+  }
+
+  async function keepAwake(on) {
+    try {
+      if (on && !wakeLock && 'wakeLock' in navigator && document.visibilityState === 'visible') {
+        wakeLock = await navigator.wakeLock.request('screen');
+        wakeLock.addEventListener('release', () => { wakeLock = null; });
+      } else if (!on && wakeLock) { await wakeLock.release(); wakeLock = null; }
+    } catch { /* not supported or refused: screen may dim, not fatal */ }
+  }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && follow) keepAwake(true); });
+
+  // Compass. iOS needs an explicit permission request from a tap.
+  let compassOn = false;
+  function onOrientation(e) {
+    let hd = null;
+    if (Number.isFinite(e.webkitCompassHeading)) hd = e.webkitCompassHeading;                // iOS
+    else if (e.absolute && Number.isFinite(e.alpha)) hd = 360 - e.alpha;                       // Android absolute
+    if (hd == null) return;
+    const scr = (screen.orientation && Number.isFinite(screen.orientation.angle)) ? screen.orientation.angle : (window.orientation || 0);
+    compassHd = (hd + scr + 360) % 360;
+    requestAnimationFrame(updateHeading);
+  }
+  async function startCompass() {
+    if (compassOn || typeof DeviceOrientationEvent === 'undefined') return;
+    compassOn = true;
+    try {
+      if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+        const r = await DeviceOrientationEvent.requestPermission();
+        if (r !== 'granted') return;
+      }
+      if ('ondeviceorientationabsolute' in window) addEventListener('deviceorientationabsolute', onOrientation);
+      else addEventListener('deviceorientation', onOrientation);
+    } catch { /* compass unavailable */ }
+  }
+  // first tap anywhere enables compass (iOS requirement) and wake lock
+  addEventListener('pointerdown', () => { startCompass(); if (follow) keepAwake(true); }, { once: true });
+
+  // item markers
+  const markerLayer = L.layerGroup().addTo(map);
+  const markers = new Map();
+
+  function markerIcon(it) {
+    const t = TYPE[it.type];
+    const cls = ['mk', it.id === selectedId ? 'sel' : '', it.demo ? 'demo' : ''].join(' ');
+    return L.divIcon({
+      className: 'mk-wrap', iconSize: [30, 30], iconAnchor: [15, 36], popupAnchor: [0, -34],
+      html: `<div class="${cls}" style="--c:${t.color}" data-st="${esc(it.status)}"><span>${esc(t.glyph)}</span></div>`
+        + (it.photos?.length ? `<b class="mk-ph" title="${it.photos.length} foto's">${it.photos.length}</b>` : ''),
+    });
+  }
+  function renderMarkers() {
+    const seen = new Set();
+    for (const it of items) {
+      seen.add(it.id);
+      let m = markers.get(it.id);
+      if (!m) {
+        m = L.marker([it.lat, it.lng], { icon: markerIcon(it), draggable: false, keyboard: true, title: it.code, riseOnHover: true });
+        m.on('click', () => { if (!tapMode) select(it.id, false); });
+        m.on('dragend', () => onMarkerDragged(it.id, m.getLatLng()));
+        m.addTo(markerLayer); markers.set(it.id, m);
+      } else {
+        m.setLatLng([it.lat, it.lng]); m.setIcon(markerIcon(it)); m.options.title = it.code;
+      }
+      if (it.id === selectedId) { m.dragging?.enable(); m.setZIndexOffset(1000); }
+      else { m.dragging?.disable(); m.setZIndexOffset(0); }
+    }
+    for (const [id, m] of markers) if (!seen.has(id)) { markerLayer.removeLayer(m); markers.delete(id); }
+  }
+
+  /* ================= type picker ================= */
+  function renderTypes() {
+    $('typeRow').innerHTML = TYPES.map(t =>
+      `<button type="button" class="type-btn" data-type="${t.id}" aria-pressed="${t.id === selType}" title="${esc(t.label)}">
+        <span class="glyph" style="--c:${t.color}">${esc(t.glyph)}</span>${esc(t.short)}</button>`).join('');
+  }
+  $('typeRow').addEventListener('click', e => {
+    const b = e.target.closest('[data-type]'); if (!b) return;
+    selType = b.dataset.type; save(); renderTypes();
+  });
+
+  /* ================= list ================= */
+  function renderList() {
+    const byStatus = Object.fromEntries(STATUSES.map(s => [s.id, 0]));
+    items.forEach(i => { byStatus[i.status] = (byStatus[i.status] || 0) + 1; });
+    $('counts').innerHTML = `<span><b>${items.length}</b> totaal</span><span><b>${byStatus.todo}</b> te doen</span><span><b>${byStatus.afwijking + byStatus.defect}</b> probleem</span>`;
+    $('btnClearDemo').hidden = !items.some(i => i.demo);
+
+    if (!items.length) {
+      $('itemList').innerHTML = `<li class="empty">Nog geen items. Kies een type en druk op <b>Plaats op GPS-positie</b>, of tik op de kaart.</li>`;
+      return;
+    }
+    const fix = lastFix && Date.now() - lastFix.t < 60000 ? lastFix : null;
+    const rows = items.map(i => ({ i, d: fix ? dist(fix, i) : null }));
+    rows.sort((a, b) => (a.d != null && b.d != null) ? a.d - b.d : a.i.code.localeCompare(b.i.code, 'nl', { numeric: true }));
+
+    $('itemList').innerHTML = rows.map(({ i, d }) => {
+      const t = TYPE[i.type];
+      return `<li><button type="button" class="item-btn" data-id="${esc(i.id)}">
+        <span class="glyph" style="--c:${t.color}">${esc(t.glyph)}</span>
+        <span class="item-main"><span class="code">${esc(i.code)}</span>${i.demo ? '<span class="demo-tag">voorbeeld</span>' : ''}
+          <div class="sub">${esc(t.label)}${i.photos?.length ? ` · ${i.photos.length === 1 ? '1 foto' : i.photos.length + ' foto\'s'}` : ''}${i.note ? ' · ' + esc(i.note) : ''}</div></span>
+        <span class="item-side"><span class="pill" style="--st:var(--st-${esc(i.status)})">${esc(STATUS[i.status]?.label ?? i.status)}</span>
+          <div>${d != null ? fmtDist(d) + ' · ' : ''}${fmtAcc(i.acc)}</div></span>
+      </button></li>`;
+    }).join('');
+  }
+  $('itemList').addEventListener('click', e => {
+    const b = e.target.closest('[data-id]'); if (b) select(b.dataset.id, true);
+  });
+
+  function renderAll() { renderMarkers(); renderList(); if (selectedId) renderEditor(); }
+
+  /* ================= GPS ================= */
+  function setGps(q, text) { const c = $('gpsChip'); c.dataset.q = q; $('gpsText').textContent = text; }
+  function qualityOf(acc) { return acc <= 5 ? 'good' : acc <= 15 ? 'ok' : 'poor'; }
+
+  function startGps() {
+    if (!('geolocation' in navigator)) { setGps('err', 'Geen GPS beschikbaar'); return; }
+    // Files opened from a file manager (content://, file://) never get location permission in Chrome.
+    if (!/^https?:$/.test(location.protocol)) {
+      setGps('err', 'Open via https-link');
+      toast('Lokaal geopend bestand: Chrome geeft hier geen GPS. Open de pagina via een https-link. Gebruik SIM om te testen.', 7000);
+      return;
+    }
+    if (!window.isSecureContext) { setGps('err', 'GPS vereist https'); toast('Locatie werkt alleen via https of localhost. Gebruik SIM om te testen.', 5000); return; }
+    watchId = navigator.geolocation.watchPosition(
+      p => {
+        if (sim) return;
+        const c = p.coords;
+        handleFix({ lat: c.latitude, lng: c.longitude, acc: c.accuracy, t: Date.now(),
+          heading: Number.isFinite(c.heading) ? c.heading : null, speed: Number.isFinite(c.speed) ? c.speed : null });
+      },
+      err => {
+        if (sim) return;
+        if (err.code === 1) { setGps('err', 'Locatie geweigerd'); toast('Locatietoegang geweigerd. Sta locatie toe in de browser, of gebruik SIM.', 5000); }
+        else if (err.code === 2) setGps('err', 'Geen GPS-signaal');
+        else setGps(lastFix ? qualityOf(lastFix.acc) : 'none', lastFix ? `GPS ${fmtAcc(lastFix.acc)}` : 'GPS zoeken…');
+      },
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 }
+    );
+  }
+
+  function handleFix(f) {
+    lastFix = f;
+    const ll = [f.lat, f.lng];
+    accCircle.setLatLng(ll).setRadius(f.acc);
+    posMarker.setLatLng(ll);
+    if (!posShown) { accCircle.addTo(map); posMarker.addTo(map); posShown = true; }
+    meEl()?.classList.remove('stale');
+    updateHeading();
+    const kmh = f.speed != null && f.speed > 0.5 ? ` · ${nf0.format(f.speed * 3.6)} km/u` : '';
+    setGps(qualityOf(f.acc), `GPS ${fmtAcc(f.acc)}${kmh}`);
+    // In simulation the position is derived from the map centre, so following would make it drift.
+    if (follow && !sim) {
+      if (!centeredOnFirstFix) { centerOn(ll, 19, { animate: false }); centeredOnFirstFix = true; }
+      else if (!map._animatingZoom) centerOn(ll);
+    }
+    if (capture) { if (f.acc <= MAX_SAMPLE_ACC) capture.samples.push(f); renderCapture(); }
+    throttledList();
+  }
+  let listTimer = null;
+  function throttledList() { if (listTimer) return; listTimer = setTimeout(() => { listTimer = null; renderList(); }, 2000); }
+
+  setInterval(() => {
+    if (lastFix && Date.now() - lastFix.t > STALE_MS && !sim) {
+      setGps('poor', `GPS verouderd (${fmtAcc(lastFix.acc)})`);
+      meEl()?.classList.add('stale');
+    }
+  }, 2000);
+
+  $('btnCenter').addEventListener('click', () => {
+    startCompass();
+    if (sim) { toast('In simulatie volgt je positie al het kaartmidden.'); return; }
+    if (follow && lastFix) { setFollow(false); toast('Live volgen uit.'); return; }
+    setFollow(true);
+    if (!lastFix) {
+      toast($('gpsChip').dataset.q === 'err' ? `Live volgen aan, maar GPS werkt niet: ${$('gpsText').textContent}.` : 'Live volgen aan. Wachten op eerste GPS-positie…', 4500);
+      return;
+    }
+    centerOn([lastFix.lat, lastFix.lng], Math.max(map.getZoom(), 18));
+    toast('Live volgen aan.');
+  });
+  $('gpsChip').addEventListener('click', () => { if (!follow || !lastFix) $('btnCenter').click(); });
+
+  // Simulation: position follows the map centre with realistic phone-GPS noise.
+  function gauss() { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+  function simTick() {
+    const c = map.getCenter();
+    const acc = 2.5 + Math.random() * 10;
+    const p = offset({ lat: c.lat, lng: c.lng }, gauss() * acc / 2, gauss() * acc / 2);
+    handleFix({ lat: p.lat, lng: p.lng, acc, t: Date.now() });
+  }
+  $('btnSim').addEventListener('click', () => {
+    if (sim) {
+      clearInterval(sim); sim = null; $('btnSim').setAttribute('aria-pressed', 'false'); $('gpsChip').dataset.sim = '0';
+      lastFix = null; setGps('none', 'GPS zoeken…'); toast('Simulatie uit, echte GPS actief.');
+    } else {
+      sim = setInterval(simTick, 1000); simTick();
+      $('btnSim').setAttribute('aria-pressed', 'true'); $('gpsChip').dataset.sim = '1';
+      toast('Simulatie aan: je positie volgt het midden van de kaart.', 4000);
+    }
+  });
+
+  /* ================= capture ================= */
+  function startCapture(targetId = null) {
+    if (capture) return;
+    clearPending(); setTapMode(false);
+    capture = { samples: [], start: Date.now(), targetId, type: targetId ? null : selType, done: false };
+    if (lastFix && Date.now() - lastFix.t < 1500 && lastFix.acc <= MAX_SAMPLE_ACC) capture.samples.push(lastFix);
+    capture.timer = setInterval(captureTick, 250);
+    $('btnCapture').disabled = true;
+    $('capturePanel').hidden = false;
+    renderCapture();
+    ensureSheetOpen();
+    $('capturePanel').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+  function stopCapture() {
+    if (!capture) return;
+    clearInterval(capture.timer); capture = null;
+    $('capturePanel').hidden = true; $('btnCapture').disabled = false;
+  }
+  function captureTick() {
+    if (!capture || capture.done) return;
+    const good = capture.samples.filter(s => s.acc <= minAcc);
+    if (good.length >= CAPTURE_NEED) { finishCapture(good); return; }
+    if (Date.now() - capture.start > CAPTURE_MAX_MS) { capture.done = true; renderCapture(); return; }
+    renderCapture();
+  }
+  function bestSamples() { return [...capture.samples].sort((a, b) => a.acc - b.acc).slice(0, CAPTURE_NEED); }
+
+  function renderCapture() {
+    if (!capture) return;
+    const good = capture.samples.filter(s => s.acc <= minAcc);
+    const secs = Math.floor((Date.now() - capture.start) / 1000);
+    $('capBar').style.width = `${Math.min(100, good.length / CAPTURE_NEED * 100)}%`;
+    $('capSamples').innerHTML = capture.samples.slice(-12).map(s => `<span class="${s.acc <= minAcc ? 'hit' : ''}">${nf1.format(s.acc)}</span>`).join('');
+    const label = capture.targetId ? items.find(i => i.id === capture.targetId)?.code : TYPE[capture.type].label;
+    if (!capture.done) {
+      $('capTitle').textContent = `${label}: positie meten…`;
+      $('capText').innerHTML = `Blijf stilstaan bij het item. <strong>${good.length}/${CAPTURE_NEED}</strong> metingen ≤ ${minAcc} m · ${secs} s`;
+      $('capActions').innerHTML = `<button class="btn btn-ghost" type="button" data-cap="cancel">Annuleer</button>`;
+    } else if (capture.samples.length) {
+      const b = bestSamples(); const med = median(b.map(s => s.acc));
+      $('capTitle').textContent = 'Vereiste nauwkeurigheid niet gehaald';
+      $('capText').innerHTML = `Beste metingen zitten rond <strong>${fmtAcc(med)}</strong> (vereist ≤ ${minAcc} m). Ga naar open lucht, weg van gevels, of plaats manueel.`;
+      $('capActions').innerHTML = `<button class="btn btn-ghost" type="button" data-cap="accept">Toch plaatsen (${fmtAcc(med)})</button>
+        <button class="btn btn-ghost" type="button" data-cap="retry">Opnieuw meten</button>
+        <button class="btn btn-ghost" type="button" data-cap="cancel">Annuleer</button>`;
+    } else {
+      $('capTitle').textContent = 'Geen GPS-positie ontvangen';
+      $('capText').textContent = 'Controleer of locatie aan staat en toegestaan is voor deze pagina. Binnen of in een kelder is GPS meestal onbruikbaar.';
+      $('capActions').innerHTML = `<button class="btn btn-ghost" type="button" data-cap="retry">Opnieuw</button>
+        <button class="btn btn-ghost" type="button" data-cap="cancel">Annuleer</button>`;
+    }
+  }
+  $('capActions').addEventListener('click', e => {
+    const a = e.target.closest('[data-cap]')?.dataset.cap; if (!a || !capture) return;
+    if (a === 'cancel') stopCapture();
+    else if (a === 'accept') finishCapture(bestSamples());
+    else if (a === 'retry') { const t = capture.targetId; stopCapture(); startCapture(t); }
+  });
+
+  function median(arr) { const s = [...arr].sort((a, b) => a - b); const m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; }
+
+  function finishCapture(samples) {
+    // Inverse-variance weighted mean. Reported accuracy = median of used samples:
+    // successive GPS fixes are strongly correlated, so averaging does not shrink error by sqrt(n).
+    let sw = 0, sl = 0, sg = 0;
+    for (const s of samples) { const w = 1 / (s.acc * s.acc); sw += w; sl += s.lat * w; sg += s.lng * w; }
+    const pos = { lat: sl / sw, lng: sg / sw, acc: round(median(samples.map(s => s.acc)), 1), n: samples.length, src: 'gps' };
+    const { targetId, type } = capture;
+    stopCapture();
+    if (targetId) {
+      const it = items.find(i => i.id === targetId); if (!it) return;
+      const moved = dist(it, pos);
+      Object.assign(it, { lat: pos.lat, lng: pos.lng, acc: pos.acc, n: pos.n, src: 'gps', demo: false });
+      save(); select(it.id, true);
+      toast(`${it.code} herpositioneerd (${fmtDist(moved)} verschoven, ${fmtAcc(pos.acc)})`);
+    } else {
+      placeNew(type, pos);
+    }
+  }
+
+  /* ================= placing ================= */
+  function nextCode(typeId) {
+    const p = TYPE[typeId].prefix; const re = new RegExp(`^${p}-(\\d+)$`);
+    const max = items.reduce((m, i) => { const r = re.exec(i.code); return r ? Math.max(m, +r[1]) : m; }, 0);
+    return `${p}-${String(max + 1).padStart(3, '0')}`;
+  }
+  function placeNew(typeId, pos) {
+    const radius = Math.max(3, pos.acc || 0);
+    const near = items
+      .filter(i => i.type === typeId)
+      .map(i => ({ i, d: dist(i, pos) }))
+      .filter(x => x.d <= radius)
+      .sort((a, b) => a.d - b.d)[0];
+    if (near) {
+      pending = { typeId, pos, nearId: near.i.id };
+      $('dupText').innerHTML = `Er staat al <strong>${esc(near.i.code)}</strong> (${esc(TYPE[typeId].label.toLowerCase())}) op <strong>${fmtDist(near.d)}</strong>, binnen de meetonzekerheid van ${fmtDist(radius)}. Is dit hetzelfde item?`;
+      $('dupPanel').hidden = false;
+      ensureSheetOpen();
+      $('dupPanel').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      return;
+    }
+    commitNew(typeId, pos);
+  }
+  function clearPending() { pending = null; $('dupPanel').hidden = true; }
+  $('dupAdd').addEventListener('click', () => { if (pending) { const p = pending; clearPending(); commitNew(p.typeId, p.pos); } });
+  $('dupOpen').addEventListener('click', () => { if (pending) { const id = pending.nearId; clearPending(); select(id, true); } });
+  $('dupCancel').addEventListener('click', clearPending);
+
+  function commitNew(typeId, pos) {
+    const it = {
+      id: uid(), type: typeId, code: nextCode(typeId), status: 'todo',
+      lat: pos.lat, lng: pos.lng, acc: pos.acc ?? null, src: pos.src, n: pos.n ?? 0,
+      createdAt: new Date().toISOString(), note: '', demo: false, photos: [],
+    };
+    items.push(it); save();
+    select(it.id, true);
+    toast(`${it.code} geplaatst${it.acc != null ? ` (${fmtAcc(it.acc)})` : ''}`);
+  }
+
+  $('btnCapture').addEventListener('click', () => startCapture(null));
+
+  function setTapMode(on) {
+    tapMode = on;
+    $('btnTap').setAttribute('aria-pressed', String(on));
+    $('map').style.cursor = on ? 'crosshair' : '';
+  }
+  $('btnTap').addEventListener('click', () => {
+    setTapMode(!tapMode);
+    if (tapMode) toast(`Tik op de kaart om een ${TYPE[selType].label.toLowerCase()} te plaatsen.`);
+  });
+  map.on('click', e => {
+    if (!$('searchBar').hidden) closeSearch();
+    if (!tapMode) { if (selectedId) closeEditor(); return; }
+    setTapMode(false);
+    placeNew(selType, { lat: e.latlng.lat, lng: e.latlng.lng, acc: null, src: 'manueel', n: 0 });
+  });
+
+  function onMarkerDragged(id, ll) {
+    const it = items.find(i => i.id === id); if (!it) return;
+    const moved = dist(it, ll);
+    it.lat = ll.lat; it.lng = ll.lng; it.demo = false;
+    if (it.src === 'gps' || it.src === 'voorbeeld') it.src = 'versleept';
+    save(); renderAll();
+    toast(`${it.code} ${fmtDist(moved)} verplaatst`);
+  }
+
+  /* ================= editor ================= */
+  $('edType').innerHTML = TYPES.map(t => `<option value="${t.id}">${esc(t.label)}</option>`).join('');
+  $('edStatus').insertAdjacentHTML('beforeend', STATUSES.map(s =>
+    `<button type="button" data-status="${s.id}" style="--st:var(--st-${s.id})" aria-pressed="false"><i></i>${esc(s.label)}</button>`).join(''));
+
+  function select(id, fly) {
+    selectedId = id; clearPending();
+    const it = items.find(i => i.id === id); if (!it) return;
+    const wasOpen = !$('editor').hidden;
+    $('sheet').hidden = true; $('editor').hidden = false;
+    $('edDelete').classList.remove('armed'); $('edDelete').textContent = 'Verwijder';
+    renderAll();
+    if (!wasOpen) { editorState = sheetState === 'full' ? 'full' : 'half'; applyPanel($('editor'), editorState); }
+    if (fly) {
+      // looking at an item that may be elsewhere: stop tracking so the map doesn't jump back
+      if (follow && lastFix && dist(lastFix, it) > 30) setFollow(false);
+      if (!follow) centerOn([it.lat, it.lng], Math.max(map.getZoom(), 19), { fly: true });
+    }
+  }
+  function closeEditor() {
+    selectedId = null; $('editor').hidden = true; $('sheet').hidden = false; renderAll();
+    applyPanel($('sheet'), sheetState);
+  }
+  function renderEditor() {
+    const it = items.find(i => i.id === selectedId); if (!it) { closeEditor(); return; }
+    const t = TYPE[it.type];
+    $('edGlyph').style.setProperty('--c', t.color); $('edGlyph').textContent = t.glyph;
+    $('edTitle').textContent = it.code;
+    $('edSub').textContent = t.label + (it.demo ? ' · voorbeeld' : '');
+    if (document.activeElement !== $('edCode')) $('edCode').value = it.code;
+    $('edType').value = it.type;
+    if (document.activeElement !== $('edNote')) $('edNote').value = it.note || '';
+    $('edStatus').querySelectorAll('[data-status]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.status === it.status)));
+    $('edPos').textContent = `${it.lat.toFixed(6)}, ${it.lng.toFixed(6)}`;
+    $('edAcc').textContent = it.acc != null ? `${fmtAcc(it.acc)}${it.n ? ` (${it.n} metingen)` : ''}` : 'onbekend';
+    $('edSrc').textContent = SOURCE_LABEL[it.src] || it.src;
+    $('edDate').textContent = fmtDate(it.createdAt);
+    renderPhotos();
+  }
+  const cur = () => items.find(i => i.id === selectedId);
+
+  $('edClose').addEventListener('click', closeEditor);
+  $('edStatus').addEventListener('click', e => {
+    const b = e.target.closest('[data-status]'); const it = cur(); if (!b || !it) return;
+    it.status = b.dataset.status; save(); renderAll();
+  });
+  $('edNote').addEventListener('input', () => { const it = cur(); if (!it) return; it.note = $('edNote').value; save(); throttledList(); });
+  $('edType').addEventListener('change', () => {
+    const it = cur(); if (!it) return;
+    const oldPrefix = TYPE[it.type].prefix;
+    it.type = $('edType').value;
+    if (it.code.startsWith(oldPrefix + '-')) it.code = nextCode(it.type);
+    save(); renderAll();
+  });
+  $('edCode').addEventListener('input', () => {
+    const it = cur(); if (!it) return;
+    const v = $('edCode').value.trim().toUpperCase();
+    const clash = items.some(i => i.id !== it.id && i.code.toUpperCase() === v);
+    const err = !v ? 'Code is verplicht' : clash ? 'Deze code bestaat al' : '';
+    $('edCode').classList.toggle('bad', !!err); $('edCodeErr').hidden = !err; $('edCodeErr').textContent = err;
+    if (!err) { it.code = v; save(); renderMarkers(); $('edTitle').textContent = v; throttledList(); }
+  });
+  $('edCode').addEventListener('blur', () => { const it = cur(); if (it) { $('edCode').value = it.code; $('edCode').classList.remove('bad'); $('edCodeErr').hidden = true; } });
+  $('edRegps').addEventListener('click', () => {
+    const it = cur(); if (!it) return;
+    const id = it.id; closeEditor(); startCapture(id);
+  });
+  $('edDelete').addEventListener('click', () => {
+    const b = $('edDelete'); const it = cur(); if (!it) return;
+    if (!b.classList.contains('armed')) { b.classList.add('armed'); b.textContent = 'Bevestig verwijderen'; return; }
+    deletePhotosOf([it]);
+    items = items.filter(i => i.id !== it.id); save(); closeEditor();
+    toast(`${it.code} verwijderd${it.photos?.length ? ` (met ${it.photos.length} foto${it.photos.length > 1 ? "'s" : ''})` : ''}`);
+  });
+  addEventListener('keydown', e => {
+    if (lb) {
+      if (e.key === 'Escape') closeLb();
+      else if (e.key === 'ArrowLeft') { lb.k--; showLb(); }
+      else if (e.key === 'ArrowRight') { lb.k++; showLb(); }
+      return;
+    }
+    if (e.key !== 'Escape') return;
+    if (!$('searchBar').hidden) closeSearch();
+    else if (selectedId) closeEditor();
+    else if (tapMode) setTapMode(false);
+  });
+
+  /* ================= photos (IndexedDB) ================= */
+  // Item metadata stays in localStorage; image blobs go to IndexedDB (localStorage is ~5 MB and string-only).
+  const DB_NAME = 'controleapp-kaartpreview', PHOTO_STORE = 'photos';
+  const PHOTO_MAX = 1600, THUMB_MAX = 360;
+  let dbPromise = null;
+  function db() {
+    if (dbPromise) return dbPromise;
+    dbPromise = new Promise((res, rej) => {
+      let r;
+      try { r = indexedDB.open(DB_NAME, 1); } catch (e) { rej(e); return; }
+      r.onupgradeneeded = () => { const s = r.result.createObjectStore(PHOTO_STORE, { keyPath: 'id' }); s.createIndex('itemId', 'itemId'); };
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error || new Error('IndexedDB niet beschikbaar'));
+    });
+    dbPromise.catch(() => { dbPromise = null; });
+    return dbPromise;
+  }
+  const txDone = t => new Promise((res, rej) => { t.oncomplete = () => res(); t.onerror = t.onabort = () => rej(t.error || new Error('Opslaan mislukt')); });
+  const reqP = r => new Promise((res, rej) => { r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+  async function photoPut(rec) { const t = (await db()).transaction(PHOTO_STORE, 'readwrite'); t.objectStore(PHOTO_STORE).put(rec); return txDone(t); }
+  async function photoGet(id) { return reqP((await db()).transaction(PHOTO_STORE).objectStore(PHOTO_STORE).get(id)); }
+  async function photosDelete(ids) {
+    if (!ids?.length) return;
+    const t = (await db()).transaction(PHOTO_STORE, 'readwrite'); const s = t.objectStore(PHOTO_STORE);
+    ids.forEach(id => s.delete(id)); return txDone(t);
+  }
+
+  const thumbUrls = new Map();
+  function forgetThumbs(ids) { for (const id of ids || []) { const u = thumbUrls.get(id); if (u) URL.revokeObjectURL(u); thumbUrls.delete(id); } }
+  async function thumbUrl(id) {
+    if (thumbUrls.has(id)) return thumbUrls.get(id);
+    const r = await photoGet(id); if (!r) return null;
+    const u = URL.createObjectURL(r.thumb || r.blob); thumbUrls.set(id, u); return u;
+  }
+  function deletePhotosOf(list) {
+    const ids = list.flatMap(i => i.photos || []);
+    forgetThumbs(ids); photosDelete(ids).catch(() => { /* orphaned blobs are harmless */ });
+  }
+
+  function loadImg(file) {
+    return new Promise((res, rej) => {
+      const u = URL.createObjectURL(file); const i = new Image();
+      i.onload = () => { URL.revokeObjectURL(u); res(i); };
+      i.onerror = () => { URL.revokeObjectURL(u); rej(new Error('bestandsformaat niet ondersteund')); };
+      i.src = u;
+    });
+  }
+  function toJpeg(src, w0, h0, max, q) {
+    const s = Math.min(1, max / Math.max(w0, h0));
+    const w = Math.round(w0 * s), h = Math.round(h0 * s);
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const g = c.getContext('2d'); g.imageSmoothingQuality = 'high'; g.drawImage(src, 0, 0, w, h);
+    return new Promise((res, rej) => c.toBlob(b => (b ? res({ blob: b, w, h }) : rej(new Error('omzetten mislukt'))), 'image/jpeg', q));
+  }
+  async function processImage(file) {
+    let src;
+    try { src = await createImageBitmap(file, { imageOrientation: 'from-image' }); } // applies EXIF rotation
+    catch { src = await loadImg(file); }
+    const w0 = src.width, h0 = src.height;
+    if (!w0 || !h0) throw new Error('lege afbeelding');
+    const full = await toJpeg(src, w0, h0, PHOTO_MAX, 0.82);
+    const thumb = await toJpeg(src, w0, h0, THUMB_MAX, 0.72);
+    src.close?.();
+    return { blob: full.blob, w: full.w, h: full.h, thumb: thumb.blob };
+  }
+
+  let processing = 0, persistAsked = false;
+  async function addPhotos(fileList) {
+    const it = cur(); if (!it) return;
+    const files = [...fileList].filter(f => f.type.startsWith('image/') || /\.(jpe?g|png|webp|heic|heif)$/i.test(f.name));
+    if (!files.length) return;
+    const itemId = it.id;
+    const fix = lastFix && Date.now() - lastFix.t < 30000 ? lastFix : null;
+    processing += files.length; renderPhotos(true);
+    let ok = 0, failMsg = '';
+    for (const f of files) {
+      try {
+        const img = await processImage(f);
+        const rec = { id: uid(), itemId, ...img, createdAt: new Date().toISOString(), name: f.name,
+          lat: fix?.lat ?? null, lng: fix?.lng ?? null, acc: fix?.acc ?? null };
+        await photoPut(rec);
+        const target = items.find(i => i.id === itemId);
+        if (!target) { photosDelete([rec.id]).catch(() => {}); continue; }   // item deleted meanwhile
+        (target.photos ||= []).push(rec.id); target.demo = false;
+        save(); ok++;
+      } catch (e) {
+        failMsg = e?.name === 'QuotaExceededError' ? 'opslag van de browser is vol'
+          : e?.name === 'SecurityError' || e?.name === 'InvalidStateError' ? 'foto-opslag niet beschikbaar in deze browsercontext (open via https-link)'
+          : /heic|heif/i.test(f.name) ? 'HEIC-foto\'s kan Chrome niet lezen' : (e?.message || 'onbekende fout');
+      } finally { processing--; renderPhotos(true); }
+    }
+    renderAll();
+    if (ok && !persistAsked) { persistAsked = true; navigator.storage?.persist?.().catch(() => {}); }
+    if (failMsg) toast(`${ok ? `${ok} foto('s) bewaard, ` : ''}${files.length - ok} mislukt: ${failMsg}.`, 5000);
+    else toast(ok === 1 ? 'Foto bewaard' : `${ok} foto's bewaard`);
+  }
+  ['phCamera', 'phGallery'].forEach(id => $(id).addEventListener('change', e => {
+    const files = e.target.files; if (files?.length) addPhotos(files); e.target.value = '';
+  }));
+
+  let photoKey = '';
+  function renderPhotos(force = false) {
+    const it = cur(); if (!it) return;
+    const ids = it.photos || [];
+    const key = `${it.id}|${ids.join(',')}|${processing}`;
+    if (!force && key === photoKey) return;
+    photoKey = key;
+    $('phCount').textContent = ids.length ? (ids.length === 1 ? '1 foto' : `${ids.length} foto's`) : 'nog geen foto\'s';
+    const grid = $('phGrid');
+    grid.hidden = !ids.length && !processing;
+    grid.innerHTML = ids.map((id, k) => `<button type="button" class="ph" data-k="${k}" aria-label="Foto ${k + 1} bekijken"><img alt="" data-ph="${esc(id)}"></button>`).join('')
+      + Array.from({ length: processing }, () => '<div class="ph ph-busy">Verwerken…</div>').join('');
+    grid.querySelectorAll('img[data-ph]').forEach(img => {
+      thumbUrl(img.dataset.ph)
+        .then(u => { if (u) img.src = u; else img.parentElement.classList.add('ph-missing'); })
+        .catch(() => img.parentElement.classList.add('ph-missing'));
+    });
+  }
+  $('phGrid').addEventListener('click', e => { const b = e.target.closest('[data-k]'); if (b) openLightbox(+b.dataset.k); });
+
+  // lightbox
+  let lb = null; // { itemId, k, url }
+  function openLightbox(k) { const it = cur(); if (!it) return; lb = { itemId: it.id, k, url: '' }; $('lightbox').hidden = false; showLb(); $('lbClose').focus(); }
+  function closeLb() { if (lb?.url) URL.revokeObjectURL(lb.url); lb = null; $('lightbox').hidden = true; $('lbImg').removeAttribute('src'); }
+  async function showLb() {
+    if (!lb) return;
+    const it = items.find(i => i.id === lb.itemId); const n = it?.photos?.length || 0;
+    if (!n) { closeLb(); return; }
+    lb.k = ((lb.k % n) + n) % n;
+    const id = it.photos[lb.k];
+    $('lbDel').classList.remove('armed'); $('lbDel').textContent = 'Verwijder';
+    $('lbPrev').disabled = $('lbNext').disabled = n < 2;
+    let r = null; try { r = await photoGet(id); } catch { /* shown as missing */ }
+    if (!lb || it.photos[lb.k] !== id) return;   // navigated away meanwhile
+    if (lb.url) URL.revokeObjectURL(lb.url);
+    lb.url = r ? URL.createObjectURL(r.blob) : '';
+    if (lb.url) $('lbImg').src = lb.url; else $('lbImg').removeAttribute('src');
+    const where = r && r.lat != null ? ` · genomen op ${fmtDist(dist(r, it))} van het item (${fmtAcc(r.acc)})` : '';
+    $('lbInfo').innerHTML = `<strong>${esc(it.code)} · foto ${lb.k + 1}/${n}</strong>${r ? esc(fmtDate(r.createdAt)) + esc(where) : 'Foto niet gevonden in de opslag'}`;
+  }
+  $('lbClose').addEventListener('click', closeLb);
+  $('lbPrev').addEventListener('click', () => { if (lb) { lb.k--; showLb(); } });
+  $('lbNext').addEventListener('click', () => { if (lb) { lb.k++; showLb(); } });
+  $('lbDel').addEventListener('click', () => {
+    const b = $('lbDel'); if (!lb) return;
+    if (!b.classList.contains('armed')) { b.classList.add('armed'); b.textContent = 'Bevestig verwijderen'; return; }
+    const it = items.find(i => i.id === lb.itemId); if (!it) return;
+    const [id] = it.photos.splice(lb.k, 1);
+    forgetThumbs([id]); photosDelete([id]).catch(() => {});
+    save(); renderMarkers(); renderPhotos(true); throttledList();
+    toast('Foto verwijderd');
+    showLb();
+  });
+  { // swipe left/right
+    let sx = null;
+    $('lbStage').addEventListener('pointerdown', e => { if (e.isPrimary) sx = e.clientX; });
+    $('lbStage').addEventListener('pointerup', e => {
+      if (sx == null || !lb) return; const dx = e.clientX - sx; sx = null;
+      if (Math.abs(dx) > 50) { lb.k += dx < 0 ? 1 : -1; showLb(); }
+    });
+    $('lbStage').addEventListener('pointercancel', () => { sx = null; });
+  }
+
+  /* ================= draggable bottom sheet (phone) ================= */
+  const SHEET_KEY = 'controleapp.kaartpreview.sheet';
+  const mqPhone = matchMedia('(max-width: 899px)');
+  const SNAPS = ['peek', 'half', 'full'];
+  let sheetState = 'half';
+  let editorState = 'half';
+  try { const s = localStorage.getItem(SHEET_KEY); if (SNAPS.includes(s)) sheetState = s; } catch { /* no storage */ }
+
+  const visiblePanel = () => (!$('editor').hidden ? $('editor') : $('sheet'));
+
+  function snapHeights(panel) {
+    const H = $('app').getBoundingClientRect().height;
+    const top = $('topbar').getBoundingClientRect().bottom;
+    const pr = panel.getBoundingClientRect();
+    const peekEl = panel.querySelector('[data-peek]');
+    const padB = parseFloat(getComputedStyle(panel).paddingBottom) || 14;
+    const peek = peekEl ? Math.ceil(peekEl.getBoundingClientRect().bottom - pr.top + panel.scrollTop + padB) : 150;
+    const full = Math.max(peek, Math.round(H - top - 8));
+    const half = Math.min(full, Math.max(peek + 60, Math.round(H * 0.5)));
+    return { peek, half, full };
+  }
+
+  function applyPanel(panel, state, animate = true) {
+    if (!mqPhone.matches) { panel.style.height = ''; panel.classList.remove('peek', 'dragging'); return; }
+    if (panel.hidden) return;
+    const h = snapHeights(panel)[state];
+    panel.classList.toggle('dragging', !animate);
+    panel.style.height = `${h}px`;
+    panel.classList.toggle('peek', state === 'peek');
+    if (state === 'peek') panel.scrollTop = 0;
+    if (!animate) requestAnimationFrame(() => panel.classList.remove('dragging'));
+    // keep own position in the visible part of the map
+    setTimeout(() => { if (follow && lastFix && !sim) centerOn([lastFix.lat, lastFix.lng]); }, animate ? 300 : 0);
+  }
+
+  function setPanelState(panel, state) {
+    if (panel === $('editor')) editorState = state;
+    else { sheetState = state; try { localStorage.setItem(SHEET_KEY, state); } catch { /* no storage */ } }
+    applyPanel(panel, state);
+  }
+  const stateOf = panel => (panel === $('editor') ? editorState : sheetState);
+  // Expand the main sheet when something important appears below the peek line.
+  function ensureSheetOpen() { if (sheetState === 'peek' && !$('sheet').hidden) setPanelState($('sheet'), 'half'); }
+
+  function bindSheetDrag(panel) {
+    const zone = panel.querySelector('.grip-zone');
+    let startY = null, startH = 0, lastY = 0, lastT = 0, vel = 0, moved = false;
+
+    zone.addEventListener('pointerdown', e => {
+      if (!mqPhone.matches) return;
+      zone.setPointerCapture(e.pointerId);
+      startY = lastY = e.clientY; lastT = performance.now();
+      startH = panel.getBoundingClientRect().height; vel = 0; moved = false;
+      panel.classList.add('dragging');
+    });
+    zone.addEventListener('pointermove', e => {
+      if (startY == null) return;
+      const dy = e.clientY - startY;
+      if (Math.abs(dy) > 5) moved = true;
+      const s = snapHeights(panel);
+      panel.style.height = `${Math.min(s.full, Math.max(s.peek, startH - dy))}px`;
+      const now = performance.now();
+      vel = (e.clientY - lastY) / Math.max(1, now - lastT);   // px/ms, positive = downward
+      lastY = e.clientY; lastT = now;
+    });
+    const end = () => {
+      if (startY == null) return;
+      startY = null;
+      panel.classList.remove('dragging');
+      const cur = stateOf(panel);
+      if (!moved) { setPanelState(panel, cur === 'peek' ? 'half' : 'peek'); return; }  // tap toggles
+      const s = snapHeights(panel);
+      const h = panel.getBoundingClientRect().height;
+      let target;
+      if (vel > 0.45) target = h > s.half + 10 ? 'half' : 'peek';         // flick down
+      else if (vel < -0.45) target = h < s.half - 10 ? 'half' : 'full';   // flick up
+      else target = SNAPS.reduce((a, b) => (Math.abs(s[b] - h) < Math.abs(s[a] - h) ? b : a));
+      setPanelState(panel, target);
+    };
+    zone.addEventListener('pointerup', end);
+    zone.addEventListener('pointercancel', end);
+    zone.addEventListener('keydown', e => {
+      const i = SNAPS.indexOf(stateOf(panel));
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setPanelState(panel, stateOf(panel) === 'peek' ? 'half' : 'peek'); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); setPanelState(panel, SNAPS[Math.min(2, i + 1)]); }
+      else if (e.key === 'ArrowDown') { e.preventDefault(); setPanelState(panel, SNAPS[Math.max(0, i - 1)]); }
+    });
+  }
+  bindSheetDrag($('sheet'));
+  bindSheetDrag($('editor'));
+  const reapply = () => { const p = visiblePanel(); applyPanel(p, stateOf(p), false); if (!mqPhone.matches) applyPanel(p === $('sheet') ? $('editor') : $('sheet'), 'half', false); };
+  mqPhone.addEventListener?.('change', reapply);
+  let resizeTimer; addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(reapply, 150); });
+
+  /* ================= address search ================= */
+  // Nominatim (OSM). Policy: max 1 request/s and no search-as-you-type, so we only search on submit.
+  const NOMINATIM = 'https://nominatim.openstreetmap.org/search';
+  let searchCtl = null, lastSearchAt = 0, searchPin = null, results = [];
+
+  function openSearch() {
+    const sb = $('searchBar');
+    sb.style.setProperty('--sb-top', `${Math.round($('topbar').getBoundingClientRect().bottom + 8)}px`);
+    sb.hidden = false; $('btnSearch').setAttribute('aria-expanded', 'true');
+    $('sbInput').focus(); $('sbInput').select();
+  }
+  function closeSearch() {
+    $('searchBar').hidden = true; $('btnSearch').setAttribute('aria-expanded', 'false');
+    searchCtl?.abort(); $('sbInput').blur();
+  }
+  $('btnSearch').addEventListener('click', () => ($('searchBar').hidden ? openSearch() : closeSearch()));
+  $('sbClose').addEventListener('click', closeSearch);
+  $('sbForm').addEventListener('submit', e => { e.preventDefault(); runSearch($('sbInput').value); });
+
+  function parseCoords(q) {
+    const s = q.trim();
+    // "51.0543, 3.7215" / "51.0543 3.7215" / "51,0543 3,7215" (Belgian decimal comma, space-separated)
+    const m = s.match(/^(-?\d{1,2}(?:\.\d+)?)\s*[,;\s]\s*(-?\d{1,3}(?:\.\d+)?)$/) ||
+              s.match(/^(-?\d{1,2}(?:,\d+)?)\s*[;\s]\s*(-?\d{1,3}(?:,\d+)?)$/);
+    if (!m) return null;
+    const lat = +m[1].replace(',', '.'), lng = +m[2].replace(',', '.');
+    return Math.abs(lat) <= 90 && Math.abs(lng) <= 180 ? { lat, lng } : null;
+  }
+
+  function setResultsMsg(html) { const ul = $('sbResults'); ul.hidden = false; ul.innerHTML = `<li class="sb-msg">${html}</li>`; }
+
+  async function runSearch(raw) {
+    const q = raw.trim(); if (!q) return;
+    const c = parseCoords(q);
+    if (c) { goToResult({ label: `${c.lat.toFixed(6)}, ${c.lng.toFixed(6)}`, sub: 'Coördinaten', lat: c.lat, lng: c.lng }); return; }
+
+    searchCtl?.abort(); const ctl = searchCtl = new AbortController();
+    const wait = Math.max(0, 1100 - (Date.now() - lastSearchAt));
+    setResultsMsg('Zoeken…');
+    if (wait) await new Promise(r => setTimeout(r, wait));
+    if (ctl.signal.aborted) return;
+    lastSearchAt = Date.now();
+
+    const b = map.getBounds();
+    const params = new URLSearchParams({
+      q, format: 'jsonv2', addressdetails: '1', limit: '6', countrycodes: 'be,nl', 'accept-language': 'nl',
+      viewbox: `${b.getWest()},${b.getNorth()},${b.getEast()},${b.getSouth()}`, bounded: '0',
+    });
+    try {
+      const r = await fetch(`${NOMINATIM}?${params}`, { signal: ctl.signal, headers: { Accept: 'application/json' } });
+      if (!r.ok) throw new Error(r.status === 429 ? 'te veel zoekopdrachten, wacht even' : `HTTP ${r.status}`);
+      const data = await r.json();
+      if (!Array.isArray(data) || !data.length) { setResultsMsg(`Geen resultaten voor <b>${esc(q)}</b> in België of Nederland.`); return; }
+      results = data.map(fromNominatim).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lng));
+      renderResults();
+    } catch (err) {
+      if (err.name === 'AbortError') return;
+      setResultsMsg(navigator.onLine === false ? 'Geen internetverbinding. Zoeken werkt alleen online.' : `Zoeken mislukt: ${esc(err.message)}.`);
+    }
+  }
+
+  function fromNominatim(d) {
+    const a = d.address || {};
+    const road = a.road || a.pedestrian || a.footway || a.square || a.industrial || '';
+    const line1 = [road, a.house_number].filter(Boolean).join(' ') || d.name || String(d.display_name || '').split(',')[0];
+    const city = a.city || a.town || a.village || a.municipality || '';
+    const line2 = [a.postcode, city].filter(Boolean).join(' ') || String(d.display_name || '').split(',').slice(1, 3).join(',').trim();
+    return { label: line1, sub: line2 + (a.country_code === 'nl' ? ' · NL' : ''), lat: +d.lat, lng: +d.lon };
+  }
+
+  function renderResults() {
+    const fix = lastFix && Date.now() - lastFix.t < 60000 ? lastFix : null;
+    $('sbResults').hidden = false;
+    $('sbResults').innerHTML = results.map((r, i) =>
+      `<li><button type="button" data-i="${i}"><strong>${esc(r.label)}</strong><span>${esc(r.sub)}</span>${fix ? `<em>${fmtDist(dist(fix, r))}</em>` : ''}</button></li>`
+    ).join('') + `<li class="sb-attr">Zoekresultaten © OpenStreetMap-bijdragers (Nominatim)</li>`;
+  }
+  $('sbResults').addEventListener('click', e => {
+    const b = e.target.closest('[data-i]'); if (b) goToResult(results[+b.dataset.i]);
+  });
+
+  function goToResult(r) {
+    closeSearch(); $('sbResults').hidden = true;
+    setFollow(false);
+    if (selectedId) closeEditor();
+    if (searchPin) map.removeLayer(searchPin);
+
+    const box = document.createElement('div');
+    box.className = 'sp-pop';
+    box.innerHTML = `<strong>${esc(r.label)}</strong><span>${esc(r.sub)}</span>
+      <div class="row"><button type="button" class="primary" data-a="place"></button><button type="button" data-a="clear">Wis pin</button></div>`;
+    box.addEventListener('click', e => {
+      const a = e.target.closest('[data-a]')?.dataset.a; if (!a || !searchPin) return;
+      const ll = searchPin.getLatLng();
+      map.removeLayer(searchPin); searchPin = null;
+      if (a === 'place') placeNew(selType, { lat: ll.lat, lng: ll.lng, acc: null, src: 'adres', n: 0 });
+    });
+
+    searchPin = L.marker([r.lat, r.lng], {
+      keyboard: false, zIndexOffset: 1500,
+      icon: L.divIcon({ className: 'sp-wrap', iconSize: [22, 22], iconAnchor: [11, 11], popupAnchor: [0, -10], html: '<div class="sp"></div>' }),
+    }).bindPopup(box, { closeButton: false, autoPan: false });
+    searchPin.on('popupopen', () => { box.querySelector('[data-a="place"]').textContent = `Plaats ${TYPE[selType].short.toLowerCase()} hier`; });
+    searchPin.addTo(map);
+    centerOn([r.lat, r.lng], Math.max(map.getZoom(), 18), { fly: true });
+    map.once('moveend', () => searchPin?.openPopup());
+  }
+
+  /* ================= settings / io ================= */
+  $('accSel').value = String(minAcc);
+  $('accSel').addEventListener('change', () => { minAcc = +$('accSel').value; save(); });
+
+  $('btnClearDemo').addEventListener('click', () => {
+    const demo = items.filter(i => i.demo); const n = demo.length;
+    deletePhotosOf(demo);
+    items = items.filter(i => !i.demo); save(); if (selectedId && !cur()) closeEditor(); renderAll();
+    toast(`${n} voorbeelditems verwijderd`);
+  });
+
+  $('btnExport').addEventListener('click', () => {
+    if (!items.length) { toast('Geen items om te exporteren.'); return; }
+    const fc = {
+      type: 'FeatureCollection',
+      features: items.map(i => ({
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [round(i.lng, 7), round(i.lat, 7)] }, // GeoJSON = [lng, lat]
+        properties: {
+          id: i.id, code: i.code, type: i.type, type_label: TYPE[i.type].label, status: i.status,
+          notitie: i.note || null, nauwkeurigheid_m: i.acc, bron: i.src, metingen: i.n,
+          aangemaakt: i.createdAt, voorbeeld: !!i.demo, fotos: i.photos?.length || 0, // blobs blijven lokaal
+        },
+      })),
+    };
+    const blob = new Blob([JSON.stringify(fc, null, 2)], { type: 'application/geo+json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `controle-items-${new Date().toISOString().slice(0, 10)}.geojson`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    toast(`${items.length} items geëxporteerd`);
+  });
+
+  $('fileImport').addEventListener('change', async e => {
+    const f = e.target.files?.[0]; e.target.value = ''; if (!f) return;
+    try {
+      const d = JSON.parse(await f.text());
+      const feats = d?.type === 'FeatureCollection' ? d.features : Array.isArray(d) ? d : null;
+      if (!Array.isArray(feats)) throw new Error('Geen GeoJSON FeatureCollection');
+      let added = 0, updated = 0, skipped = 0;
+      for (const ft of feats) {
+        const c = ft?.geometry?.type === 'Point' ? ft.geometry.coordinates : null;
+        const p = ft?.properties || {};
+        const it = {
+          id: typeof p.id === 'string' ? p.id : uid(),
+          type: TYPE[p.type] ? p.type : 'overig',
+          code: '', status: STATUS[p.status] ? p.status : 'todo',
+          lat: c ? +c[1] : NaN, lng: c ? +c[0] : NaN,
+          acc: Number.isFinite(+p.nauwkeurigheid_m) && p.nauwkeurigheid_m !== null ? +p.nauwkeurigheid_m : null,
+          src: typeof p.bron === 'string' ? p.bron : 'import', n: +p.metingen || 0,
+          createdAt: typeof p.aangemaakt === 'string' ? p.aangemaakt : new Date().toISOString(),
+          note: typeof p.notitie === 'string' ? p.notitie : '', demo: !!p.voorbeeld,
+        };
+        if (!validItem(it)) { skipped++; continue; }
+        const idx = items.findIndex(x => x.id === it.id);
+        it.code = typeof p.code === 'string' && p.code.trim() ? p.code.trim().toUpperCase() : (idx >= 0 ? items[idx].code : nextCode(it.type));
+        it.photos = idx >= 0 ? (items[idx].photos || []) : [];   // keep locally stored photos of existing items
+        if (idx >= 0) { items[idx] = it; updated++; } else { items.push(it); added++; }
+      }
+      save(); renderAll();
+      if (items.length) map.fitBounds(L.latLngBounds(items.map(i => [i.lat, i.lng])).pad(.2), { maxZoom: 19 });
+      toast(`Import: ${added} nieuw, ${updated} bijgewerkt${skipped ? `, ${skipped} overgeslagen` : ''}`, 4000);
+    } catch (err) {
+      toast(`Import mislukt: ${err.message}`, 5000);
+    }
+  });
+
+  /* ================= boot ================= */
+  if (isLocalFile) {
+    showStorageProblem('Deze pagina is geopend als lokaal bestand. Chrome bewaart dan niets na het sluiten, en GPS werkt niet. Open de pagina via de https-link.');
+  } else if (!storageWorks()) {
+    showStorageProblem('De browser weigert opslag voor deze pagina (incognito of sitegegevens geblokkeerd?).');
+  } else {
+    db().catch(() => showStorageProblem('Items worden wel bewaard, foto\'s niet (IndexedDB niet beschikbaar in deze browser).', 'Foto\'s worden niet bewaard.'));
+  }
+  if (!load()) { seedDemo(); save(); }
+  renderTypes();
+  renderAll();
+  applyPanel($('sheet'), sheetState, false);
+  applyMapTheme();
+  if (items.length) map.fitBounds(L.latLngBounds(items.map(i => [i.lat, i.lng])).pad(.25), { maxZoom: 19 });
+  startGps();
+})();
+</script>
+</body>
+</html>
