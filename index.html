@@ -911,15 +911,35 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       }
       return n ? { lat: lat / w, lng: lng / w, acc: acc / n } : null;
     };
-    // Compare where we were ~8-11 s ago with where we are now, both averaged so single jumps don't count.
+    // Fast check (2-3 s): while really walking, the last few fixes report a speed, point the same
+    // way, and actually cover that distance. Standing still, the fake speed comes with random directions.
+    const recent = fixHist.filter(p => f.t - p.t <= 2500);
+    const withHd = recent.filter(p => p.speed > 0.6 && Number.isFinite(p.heading));
     const was = lastFix?.moving || false;
+    let fast = null;             // null = phone gives no usable speed/direction, use the slow check
+    if (recent.length >= 3) {
+      if (withHd.length === recent.length) {
+        const x = withHd.reduce((s, p) => s + Math.cos(p.heading * Math.PI / 180), 0) / withHd.length;
+        const y = withHd.reduce((s, p) => s + Math.sin(p.heading * Math.PI / 180), 0) / withHd.length;
+        const R = Math.hypot(x, y);                 // 1 = all the same direction, ~0 = random
+        if (was) fast = R > 0.8;                    // keep going unless directions scatter
+        else {
+          // averaged spot a few seconds ago -> averaged spot now must lie in the reported direction
+          const a = mean(3500, 6000) || fixHist[0], b = mean(0, 1500);
+          const brg = Math.atan2((b.lng - a.lng) * Math.cos(b.lat * Math.PI / 180), b.lat - a.lat);
+          fast = R > 0.95 && dist(a, b) > 1.5 && Math.cos(brg - Math.atan2(y, x)) > 0.5;   // within ±60°
+        }
+      } else if (recent.slice(-2).every(p => !(p.speed > 0.6))) fast = false;  // phone itself says slow
+    }
+    // Slow check: where we were ~8-11 s ago vs now, both averaged so single jumps don't count.
     const then = mean(8000, 11000), now = mean(0, 2500);
-    f.moving = was;
+    let slow = was;
     if (then && now) {
       const d = dist(then, now), noise = Math.max(4, (then.acc + now.acc) / 2);
-      f.moving = d > (was ? 0.8 : 1.4) * noise;   // hysteresis against flapping
+      slow = d > (was ? 0.8 : 1.4) * noise;   // hysteresis against flapping
       f.ownSpeed = d / 9.5;
     }
+    f.moving = fast ?? slow;
     return f.moving ? { lat: f.lat, lng: f.lng } : mean(0, 10000);
   }
 
