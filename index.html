@@ -711,7 +711,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   function updateHeading() {
     const f = lastFix;
     // GPS course is reliable only while moving; otherwise fall back to the compass.
-    const hd = f && Number.isFinite(f.heading) && f.speed > 1 ? f.heading : compassHd;
+    const hd = f && f.moving && Number.isFinite(f.heading) ? f.heading : compassHd;
     if (hd != null && rotMode === 'heading') turnMap(-hd);
     const el = meEl(); if (!el) return;
     el.classList.toggle('has-hd', hd != null);
@@ -727,7 +727,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     const d = ((b - map.getBearing()) % 360 + 540) % 360 - 180;
     if (Math.abs(d) < 1.5) return;              // ignore compass jitter
     ownRotate = true; map.setBearing(b); ownRotate = false;
-    if (follow && lastFix && !sim) centerOn([lastFix.lat, lastFix.lng], undefined, { animate: false });
+    if (follow && shownPos && !sim) centerOn([shownPos.lat, shownPos.lng], undefined, { animate: false });
   }
   function setRotMode(m) {
     rotMode = m;
@@ -744,7 +744,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     if (rotMode !== 'north') { setRotMode('north'); toast('Noorden boven.'); return; }
     startCompass();
     setRotMode('heading');
-    const moving = lastFix && Number.isFinite(lastFix.heading) && lastFix.speed > 1;
+    const moving = lastFix && lastFix.moving && Number.isFinite(lastFix.heading);
     toast(compassHd != null || moving ? 'Kaart draait mee met je kijkrichting.' : 'Kaart draait mee zodra het kompas een richting geeft.');
   });
 
@@ -895,15 +895,45 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     );
   }
 
+  // Phone fixes jump a few metres every second even when standing still, and the phone then
+  // reports a fake walking speed. So judge movement ourselves from real displacement.
+  const fixHist = [];            // recent raw fixes, last 15 s
+  let shownPos = null;           // blue dot: raw fix while moving, averaged while standing still
+  function judgeMotion(f) {
+    fixHist.push(f);
+    while (f.t - fixHist[0].t > 15000) fixHist.shift();
+    // accuracy-weighted mean of the fixes whose age (ms) lies in [from, to]
+    const mean = (from, to) => {
+      let w = 0, lat = 0, lng = 0, acc = 0, n = 0;
+      for (const p of fixHist) {
+        const age = f.t - p.t; if (age < from || age > to) continue;
+        const k = 1 / (p.acc * p.acc); w += k; lat += p.lat * k; lng += p.lng * k; acc += p.acc; n++;
+      }
+      return n ? { lat: lat / w, lng: lng / w, acc: acc / n } : null;
+    };
+    // Compare where we were ~8-11 s ago with where we are now, both averaged so single jumps don't count.
+    const was = lastFix?.moving || false;
+    const then = mean(8000, 11000), now = mean(0, 2500);
+    f.moving = was;
+    if (then && now) {
+      const d = dist(then, now), noise = Math.max(4, (then.acc + now.acc) / 2);
+      f.moving = d > (was ? 0.8 : 1.4) * noise;   // hysteresis against flapping
+      f.ownSpeed = d / 9.5;
+    }
+    return f.moving ? { lat: f.lat, lng: f.lng } : mean(0, 10000);
+  }
+
   function handleFix(f) {
+    shownPos = judgeMotion(f);
     lastFix = f;
-    const ll = [f.lat, f.lng];
+    const ll = [shownPos.lat, shownPos.lng];
     accCircle.setLatLng(ll).setRadius(f.acc);
     posMarker.setLatLng(ll);
     if (!posShown) { accCircle.addTo(map); posMarker.addTo(map); posShown = true; }
     meEl()?.classList.remove('stale');
     updateHeading();
-    const kmh = f.speed != null && f.speed > 0.5 ? ` · ${nf0.format(f.speed * 3.6)} km/u` : '';
+    const sp = !f.moving ? 0 : f.speed > 0 ? f.speed : f.ownSpeed || 0;
+    const kmh = sp > 0.5 ? ` · ${nf0.format(sp * 3.6)} km/u` : '';
     setGps(qualityOf(f.acc), `GPS ${fmtAcc(f.acc)}${kmh}`);
     // In simulation the position is derived from the map centre, so following would make it drift.
     if (follow && !sim) {
@@ -932,7 +962,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       toast($('gpsChip').dataset.q === 'err' ? `Live volgen aan, maar GPS werkt niet: ${$('gpsText').textContent}.` : 'Live volgen aan. Wachten op eerste GPS-positie…', 4500);
       return;
     }
-    centerOn([lastFix.lat, lastFix.lng], Math.max(map.getZoom(), 18));
+    centerOn([shownPos.lat, shownPos.lng], Math.max(map.getZoom(), 18));
     toast('Live volgen aan.');
   });
   $('gpsChip').addEventListener('click', () => { if (!follow || !lastFix) $('btnCenter').click(); });
@@ -948,7 +978,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   $('btnSim').addEventListener('click', () => {
     if (sim) {
       clearInterval(sim); sim = null; $('btnSim').setAttribute('aria-pressed', 'false'); $('gpsChip').dataset.sim = '0';
-      lastFix = null; setGps('none', 'GPS zoeken…'); toast('Simulatie uit, echte GPS actief.');
+      lastFix = null; fixHist.length = 0; setGps('none', 'GPS zoeken…'); toast('Simulatie uit, echte GPS actief.');
     } else {
       sim = setInterval(simTick, 1000); simTick();
       $('btnSim').setAttribute('aria-pressed', 'true'); $('gpsChip').dataset.sim = '1';
@@ -1384,7 +1414,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     if (state === 'peek') panel.scrollTop = 0;
     if (!animate) requestAnimationFrame(() => panel.classList.remove('dragging'));
     // keep own position in the visible part of the map
-    setTimeout(() => { if (follow && lastFix && !sim) centerOn([lastFix.lat, lastFix.lng]); }, animate ? 300 : 0);
+    setTimeout(() => { if (follow && shownPos && !sim) centerOn([shownPos.lat, shownPos.lng]); }, animate ? 300 : 0);
   }
 
   function setPanelState(panel, state) {
