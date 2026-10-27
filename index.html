@@ -110,6 +110,7 @@ button { cursor: pointer; }
 .fab svg { width: 22px; height: 22px; }
 .fab[aria-pressed="true"] { background: var(--gps); color: #fff; }
 .fab.small-text { font: 700 12px/1 var(--font-mono); }
+.fab .needle { transform: rotate(var(--b, 0deg)); }
 
 /* ---------- panels (sheet + editor) ---------- */
 .panel {
@@ -362,7 +363,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   <header class="topbar" id="topbar">
     <div class="brand">
       <span class="brand-mark" aria-hidden="true">C</span>
-      <div><strong>Kaartpreview</strong><small>ControleApp · prototype</small></div>
+      <div><strong>ControleApp</strong></div>
     </div>
     <button class="chip icon-chip" id="btnSearch" type="button" aria-label="Zoek adres" aria-expanded="false" aria-controls="searchBar" title="Zoek adres of coördinaten">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>
@@ -387,6 +388,9 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   <div class="fab-col">
     <button class="fab" id="btnZoomIn" type="button" aria-label="Inzoomen">+</button>
     <button class="fab" id="btnZoomOut" type="button" aria-label="Uitzoomen">−</button>
+    <button class="fab" id="btnNorth" type="button" aria-pressed="false" aria-label="Kaartrichting" title="Noorden boven / meedraaien met kijkrichting. Draai de kaart met twee vingers.">
+      <svg class="needle" viewBox="0 0 24 24"><path d="M12 2.5 16.5 12h-9z" fill="#e5484d"/><path d="M12 21.5 7.5 12h9z" fill="currentColor" opacity=".55"/></svg>
+    </button>
     <button class="fab" id="btnCenter" type="button" aria-pressed="true" aria-label="Volg mijn positie" title="Volg mijn positie (live)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
     </button>
@@ -504,6 +508,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate.js"></script>
 <script>
 (() => {
   'use strict';
@@ -634,7 +639,9 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   }
 
   /* ================= map ================= */
-  const map = L.map('map', { zoomControl: false, maxZoom: 21, attributionControl: true })
+  // leaflet-rotate: two-finger twist on phones, shift + scroll wheel on desktop
+  const map = L.map('map', { zoomControl: false, maxZoom: 21, attributionControl: true,
+    rotate: true, touchRotate: true, rotateControl: false })
     .setView([DEMO_CENTER.lat, DEMO_CENTER.lng], 18);
 
   const layers = {
@@ -682,7 +689,10 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   }
   function centerOn(ll, zoom, opts = {}) {
     const z = zoom ?? map.getZoom();
-    const [dx, dy] = visibleOffset();
+    const [sx, sy] = visibleOffset();
+    // The offset is in screen pixels; turn it back into unrotated map pixels.
+    const b = map.getBearing() * Math.PI / 180, cos = Math.cos(b), sin = Math.sin(b);
+    const dx = sx * cos + sy * sin, dy = -sx * sin + sy * cos;
     const c = map.unproject(map.project(L.latLng(ll), z).subtract([dx, dy]), z);
     if (opts.fly) map.flyTo(c, z, { duration: .6 });
     else if (z !== map.getZoom()) map.setView(c, z, { animate: opts.animate !== false });
@@ -699,13 +709,44 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   const meEl = () => posMarker.getElement()?.querySelector('.me');
 
   function updateHeading() {
-    const el = meEl(); if (!el) return;
     const f = lastFix;
     // GPS course is reliable only while moving; otherwise fall back to the compass.
     const hd = f && Number.isFinite(f.heading) && f.speed > 1 ? f.heading : compassHd;
+    if (hd != null && rotMode === 'heading') turnMap(-hd);
+    const el = meEl(); if (!el) return;
     el.classList.toggle('has-hd', hd != null);
-    if (hd != null) el.style.setProperty('--hd', `${Math.round(hd)}deg`);
+    if (hd == null) return;
+    // markers stay upright on screen, so add the map rotation to the cone
+    el.style.setProperty('--hd', `${Math.round(hd + map.getBearing())}deg`);
   }
+
+  // Map rotation: 'north' (north up), 'heading' (map turns with you), 'free' (turned by hand).
+  let rotMode = 'north';
+  let ownRotate = false;
+  function turnMap(b) {
+    const d = ((b - map.getBearing()) % 360 + 540) % 360 - 180;
+    if (Math.abs(d) < 1.5) return;              // ignore compass jitter
+    ownRotate = true; map.setBearing(b); ownRotate = false;
+    if (follow && lastFix && !sim) centerOn([lastFix.lat, lastFix.lng], undefined, { animate: false });
+  }
+  function setRotMode(m) {
+    rotMode = m;
+    $('btnNorth').setAttribute('aria-pressed', String(m === 'heading'));
+    if (m === 'north') turnMap(0);
+    updateHeading();
+  }
+  map.on('rotate', () => {
+    $('btnNorth').style.setProperty('--b', `${map.getBearing()}deg`);
+    if (ownRotate) return;
+    if (rotMode !== 'free') setRotMode('free'); else updateHeading();
+  });
+  $('btnNorth').addEventListener('click', () => {
+    if (rotMode !== 'north') { setRotMode('north'); toast('Noorden boven.'); return; }
+    startCompass();
+    setRotMode('heading');
+    const moving = lastFix && Number.isFinite(lastFix.heading) && lastFix.speed > 1;
+    toast(compassHd != null || moving ? 'Kaart draait mee met je kijkrichting.' : 'Kaart draait mee zodra het kompas een richting geeft.');
+  });
 
   function setFollow(on) {
     follow = on;
