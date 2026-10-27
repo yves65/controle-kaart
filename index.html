@@ -448,6 +448,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
         <input type="file" id="fileImport" accept=".geojson,.json,application/geo+json,application/json" hidden>
         <button class="btn btn-ghost" id="btnClearDemo" type="button">Wis voorbeelden</button>
       </div>
+      <p class="label" style="margin-top:10px">Versie 5</p>
     </details>
   </section>
 
@@ -917,18 +918,18 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     const withHd = recent.filter(p => p.speed > 0.6 && Number.isFinite(p.heading));
     const was = lastFix?.moving || false;
     let fast = null;             // null = phone gives no usable speed/direction, use the slow check
-    if (recent.length >= 3) {
+    // Above ~20 m the phone is on wifi/cell positioning (indoors): its speed and direction are made up.
+    if (recent.length >= 3 && f.acc <= 20) {
       if (withHd.length === recent.length) {
         const x = withHd.reduce((s, p) => s + Math.cos(p.heading * Math.PI / 180), 0) / withHd.length;
         const y = withHd.reduce((s, p) => s + Math.sin(p.heading * Math.PI / 180), 0) / withHd.length;
         const R = Math.hypot(x, y);                 // 1 = all the same direction, ~0 = random
-        if (was) fast = R > 0.8;                    // keep going unless directions scatter
-        else {
-          // averaged spot a few seconds ago -> averaged spot now must lie in the reported direction
-          const a = mean(3500, 6000) || fixHist[0], b = mean(0, 1500);
-          const brg = Math.atan2((b.lng - a.lng) * Math.cos(b.lat * Math.PI / 180), b.lat - a.lat);
-          fast = R > 0.95 && dist(a, b) > 1.5 && Math.cos(brg - Math.atan2(y, x)) > 0.5;   // within ±60°
-        }
+        // averaged spot a few seconds ago -> averaged spot now must lie in the reported direction
+        const a = mean(3500, 6000) || fixHist[0], b = mean(0, 1500);
+        const brg = Math.atan2((b.lng - a.lng) * Math.cos(b.lat * Math.PI / 180), b.lat - a.lat);
+        // once moving, keep going while directions agree AND the position really keeps changing
+        if (was) fast = R > 0.8 && dist(a, b) > 1;
+        else fast = R > 0.95 && dist(a, b) > 1.5 && Math.cos(brg - Math.atan2(y, x)) > 0.5;   // within ±60°
       } else if (recent.slice(-2).every(p => !(p.speed > 0.6))) fast = false;  // phone itself says slow
     }
     // Slow check: where we were ~8-11 s ago vs now, both averaged so single jumps don't count.
@@ -967,6 +968,12 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   function throttledList() { if (listTimer) return; listTimer = setTimeout(() => { listTimer = null; renderList(); }, 2000); }
 
   setInterval(() => {
+    // no new fix for a few seconds: don't keep showing the last speed
+    if (lastFix?.moving && Date.now() - lastFix.t > 3000 && !sim) {
+      lastFix.moving = false;
+      setGps(qualityOf(lastFix.acc), `GPS ${fmtAcc(lastFix.acc)}`);
+      updateHeading();
+    }
     if (lastFix && Date.now() - lastFix.t > STALE_MS && !sim) {
       setGps('poor', `GPS verouderd (${fmtAcc(lastFix.acc)})`);
       meEl()?.classList.add('stale');
