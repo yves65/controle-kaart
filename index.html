@@ -448,7 +448,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
         <input type="file" id="fileImport" accept=".geojson,.json,application/geo+json,application/json" hidden>
         <button class="btn btn-ghost" id="btnClearDemo" type="button">Wis voorbeelden</button>
       </div>
-      <p class="label" style="margin-top:10px">Versie 7</p>
+      <p class="label" style="margin-top:10px">Versie 8</p>
     </details>
   </section>
 
@@ -804,6 +804,13 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
         + (it.photos?.length ? `<b class="mk-ph" title="${it.photos.length} foto's">${it.photos.length}</b>` : ''),
     });
   }
+  // Where the pin's tip sits on screen after dragging. Leaflet's own drag maths ignores the map
+  // rotation (and the rotate plugin's pane offset), which could throw a pin kilometres away.
+  function droppedLatLng(m) {
+    const r = m.getElement().getBoundingClientRect(), c = map.getContainer().getBoundingClientRect();
+    const [ax, ay] = m.options.icon.options.iconAnchor;
+    return map.containerPointToLatLng([r.left - c.left + ax, r.top - c.top + ay]);
+  }
   function renderMarkers() {
     const seen = new Set();
     for (const it of items) {
@@ -812,7 +819,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       if (!m) {
         m = L.marker([it.lat, it.lng], { icon: markerIcon(it), draggable: false, keyboard: true, title: it.code, riseOnHover: true });
         m.on('click', () => { if (!tapMode) select(it.id, false); });
-        m.on('dragend', () => onMarkerDragged(it.id, m.getLatLng()));
+        m.on('dragend', () => onMarkerDragged(it.id, droppedLatLng(m)));
         m.addTo(markerLayer); markers.set(it.id, m);
       } else {
         m.setLatLng([it.lat, it.lng]); m.setIcon(markerIcon(it)); m.options.title = it.code;
