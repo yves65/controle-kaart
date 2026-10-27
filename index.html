@@ -448,7 +448,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
         <input type="file" id="fileImport" accept=".geojson,.json,application/geo+json,application/json" hidden>
         <button class="btn btn-ghost" id="btnClearDemo" type="button">Wis voorbeelden</button>
       </div>
-      <p class="label" style="margin-top:10px">Versie 5</p>
+      <p class="label" style="margin-top:10px">Versie 6</p>
     </details>
   </section>
 
@@ -941,7 +941,24 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       f.ownSpeed = d / 9.5;
     }
     f.moving = fast ?? slow;
-    return f.moving ? { lat: f.lat, lng: f.lng } : mean(0, 10000);
+    if (f.moving) { still = null; return { lat: f.lat, lng: f.lng }; }
+    return settle(f, mean(0, 5000));
+  }
+
+  // While standing still, blend each fix in by how trustworthy it is (a small Kalman filter):
+  // a ±30 m indoor fix barely nudges the dot, a ±4 m fix moves it more.
+  const STILL_Q = 0.3;           // m²/s: how far a standing person can really drift
+  let still = null;              // {lat, lng, P (m²), t}
+  function settle(f, recentMean) {
+    const R = f.acc * f.acc;
+    // safety net: if the recent fixes clearly sit elsewhere, we did move after all
+    if (still && dist(still, recentMean) > Math.max(15, 1.5 * f.acc)) still = null;
+    if (!still) still = { lat: recentMean.lat, lng: recentMean.lng, P: R, t: f.t };
+    else {
+      const P = still.P + STILL_Q * Math.max(0, f.t - still.t) / 1000, k = P / (P + R);
+      still = { lat: still.lat + k * (f.lat - still.lat), lng: still.lng + k * (f.lng - still.lng), P: (1 - k) * P, t: f.t };
+    }
+    return still;
   }
 
   function handleFix(f) {
@@ -1005,7 +1022,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   $('btnSim').addEventListener('click', () => {
     if (sim) {
       clearInterval(sim); sim = null; $('btnSim').setAttribute('aria-pressed', 'false'); $('gpsChip').dataset.sim = '0';
-      lastFix = null; fixHist.length = 0; setGps('none', 'GPS zoeken…'); toast('Simulatie uit, echte GPS actief.');
+      lastFix = null; fixHist.length = 0; still = null; setGps('none', 'GPS zoeken…'); toast('Simulatie uit, echte GPS actief.');
     } else {
       sim = setInterval(simTick, 1000); simTick();
       $('btnSim').setAttribute('aria-pressed', 'true'); $('gpsChip').dataset.sim = '1';
