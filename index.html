@@ -233,7 +233,10 @@ dl.meta dt { color: var(--muted); }
 dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overflow-wrap: anywhere; }
 .mono { font-family: var(--font-mono); font-size: 13px; }
 .hint { margin: 0; font-size: 13px; color: var(--muted); }
-.ed-actions { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.ed-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.ed-actions > .btn { flex: 1 1 auto; }
+.btn-secondary:disabled { opacity: .55; cursor: not-allowed; }
+.btn-ghost.armed { border-color: var(--st-defect); color: var(--st-defect); }
 
 /* ---------- markers ---------- */
 .mk-wrap { background: none; border: 0; }
@@ -242,12 +245,76 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   box-shadow: 0 0 0 3px var(--st), 0 2px 6px rgba(0,0,0,.45); display: grid; place-items: center; transition: transform .15s;
 }
 .mk span { transform: rotate(45deg); color: #fff; font: 700 12px/1 var(--font-display); letter-spacing: .02em; }
-.mk[data-st="todo"] { --st: #ffffff; }
-.mk[data-st="ok"] { --st: #2fb36a; }
-.mk[data-st="afwijking"] { --st: #f0a92a; }
-.mk[data-st="defect"] { --st: #ffd400; }
+.mk[data-st="todo"], .gmk[data-st="todo"] { --st: #ffffff; }
+.mk[data-st="ok"], .gmk[data-st="ok"] { --st: #2fb36a; }
+.mk[data-st="afwijking"], .gmk[data-st="afwijking"] { --st: #f0a92a; }
+.mk[data-st="defect"], .gmk[data-st="defect"] { --st: #ffd400; }
 .mk.sel { transform: rotate(-45deg) scale(1.3); box-shadow: 0 0 0 3px var(--st), 0 0 0 6px var(--gps), 0 2px 8px rgba(0,0,0,.5); }
 .mk.demo { opacity: .8; }
+/* group marker: two stacked squares, ring = worst status of its items */
+.gmk {
+  position: relative; width: 34px; height: 34px; border-radius: 9px; background: #1d2622; color: #ffffff;
+  display: grid; place-items: center; transition: transform .15s;
+  box-shadow: 0 0 0 3px var(--st), 5px -5px 0 0 #1d2622, 5px -5px 0 3px var(--st), 0 3px 8px rgba(0,0,0,.45);
+}
+.gmk span { font: 700 17px/1 var(--font-display); margin-top: -5px; }
+.gmk u { position: absolute; left: 0; right: 0; bottom: 4px; display: flex; justify-content: center; gap: 2px; text-decoration: none; }
+.gmk u i { width: 5px; height: 5px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 1px rgba(255,255,255,.75); }
+.gmk.sel { transform: scale(1.2); outline: 3px solid var(--gps); outline-offset: 5px; }
+.gmk.demo { opacity: .85; }
+
+/* group glyph in lists and headers */
+.stack {
+  flex: none; display: grid; place-items: center; min-width: 26px; height: 26px; padding: 0 4px; border-radius: 7px;
+  background: var(--fg); color: var(--bg); font: 700 15px/1 var(--font-display);
+  box-shadow: 3px -3px 0 -1px var(--surface), 3px -3px 0 0 var(--fg); margin-top: 3px;
+}
+.stack-lg { min-width: 36px; height: 36px; border-radius: 9px; font-size: 19px; }
+
+/* group bar in item editor */
+.grp-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 10px;
+  border-radius: var(--radius); background: var(--surface-2); border: 1.5px solid var(--line);
+}
+.grp-bar .txt { flex: 1 1 160px; min-width: 0; font-size: 14px; line-height: 1.3; }
+.grp-bar .txt small { display: block; color: var(--muted); font-size: 13px; }
+.grp-bar .btn { min-height: 38px; padding: 7px 12px; font-size: 14px; }
+.grp-bar .type-row { flex: 1 1 100%; min-width: 0; }
+.grp-bar .near { flex: 1 1 100%; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.grp-bar .near .hint { margin-right: 2px; }
+
+/* checklist */
+.cl { display: flex; flex-direction: column; gap: 8px; }
+.cl-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.cl-head small { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.cl-meter > i { background: var(--st, var(--gps)); }
+.cl-list { list-style: none; margin: 0; padding: 0; border: 1.5px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.cl-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; align-items: center; padding: 9px 10px; background: var(--surface); }
+.cl-row + .cl-row { border-top: 1px solid var(--line); }
+.cl-row[data-r="nok"] { background: var(--surface-2); box-shadow: inset 3px 0 0 var(--st-defect); }
+.cl-q { min-width: 0; font-size: 14px; line-height: 1.3; }
+.crit {
+  font: 600 10px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--st-defect);
+  border: 1px solid currentColor; border-radius: 3px; padding: 2px 3px; margin-left: 6px; vertical-align: 1px; white-space: nowrap;
+}
+.cl-btns { display: flex; gap: 4px; }
+.cl-btns button {
+  min-width: 44px; min-height: 38px; padding: 0 8px; border: 1.5px solid var(--line); background: var(--surface);
+  border-radius: 8px; font-weight: 600; font-size: 13px;
+}
+.cl-btns button[aria-pressed="true"][data-r="ok"] { background: var(--st-ok); border-color: var(--st-ok); color: var(--surface); }
+.cl-btns button[aria-pressed="true"][data-r="nok"] { background: var(--st-defect); border-color: var(--st-defect); color: var(--surface); }
+.cl-btns button[aria-pressed="true"][data-r="nvt"] { background: var(--muted); border-color: var(--muted); color: var(--surface); }
+.cl-note {
+  grid-column: 1 / -1; width: 100%; background: var(--surface); border: 1.5px solid var(--st-defect); border-radius: 8px;
+  padding: 7px 10px; font-size: 14px;
+}
+.cl-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.cl-actions .btn { flex: 1 1 160px; }
+@media (max-width: 380px) { .cl-row { grid-template-columns: 1fr; } }
+
+.st-hint { margin: -4px 0 0; font-size: 13px; color: var(--muted); }
+.linkbtn { border: 0; background: none; padding: 0; color: var(--gps); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
 
 /* address search */
 .icon-chip { padding: 8px 11px; }
@@ -422,11 +489,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
 
     <div class="notice warn" id="dupPanel" hidden>
       <p id="dupText"></p>
-      <div class="row">
-        <button class="btn btn-ghost" id="dupAdd" type="button">Toch toevoegen</button>
-        <button class="btn btn-ghost" id="dupOpen" type="button">Open bestaand item</button>
-        <button class="btn btn-ghost" id="dupCancel" type="button">Annuleer</button>
-      </div>
+      <div class="row" id="dupActions"></div>
     </div>
 
     <div class="settings-row">
@@ -448,7 +511,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
         <input type="file" id="fileImport" accept=".geojson,.json,application/geo+json,application/json" hidden>
         <button class="btn btn-ghost" id="btnClearDemo" type="button">Wis voorbeelden</button>
       </div>
-      <p class="label" style="margin-top:10px">Versie 8</p>
+      <p class="label" style="margin-top:10px">Versie 9</p>
     </details>
   </section>
 
@@ -460,11 +523,19 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       <div><h2 id="edTitle"></h2><p id="edSub"></p></div>
       <button class="icon-btn" id="edClose" type="button" aria-label="Sluit">×</button>
     </div>
-    <div class="field-grid">
-      <div class="field"><label class="label" for="edCode">Code</label><input id="edCode" autocomplete="off" spellcheck="false"><span class="err" id="edCodeErr" hidden></span></div>
-      <div class="field"><label class="label" for="edType">Type</label><select id="edType"></select></div>
-    </div>
+    <div class="grp-bar" id="edGroupBar"></div>
     <fieldset class="status-seg" id="edStatus"><legend class="label">Status</legend></fieldset>
+    <p class="st-hint" id="edStatusHint"></p>
+    <section class="cl" aria-labelledby="clTitle">
+      <div class="cl-head"><span class="label" id="clTitle">Checklist</span><small id="clCount"></small></div>
+      <div class="meter cl-meter" id="clMeter"><i id="clBar"></i></div>
+      <ol class="cl-list" id="clList"></ol>
+      <p class="hint" id="clInfo"></p>
+      <div class="cl-actions">
+        <button class="btn btn-secondary" id="clFinish" type="button">Controle afronden</button>
+        <button class="btn btn-ghost" id="clNew" type="button">Nieuwe controle</button>
+      </div>
+    </section>
     <div class="field"><label class="label" for="edNote">Notitie</label><textarea id="edNote" rows="2" placeholder="bv. deksel vastgeroest, aanduidingsbord ontbreekt"></textarea></div>
     <div class="field">
       <div class="photos-head"><span class="label">Foto's</span><small id="phCount"></small></div>
@@ -479,16 +550,49 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
         <input type="file" id="phGallery" accept="image/*" multiple hidden>
       </div>
     </div>
+    <div class="field-grid">
+      <div class="field"><label class="label" for="edCode">Code</label><input id="edCode" autocomplete="off" spellcheck="false"><span class="err" id="edCodeErr" hidden></span></div>
+      <div class="field"><label class="label" for="edType">Type</label><select id="edType"></select></div>
+    </div>
     <dl class="meta">
       <dt>Positie</dt><dd class="mono" id="edPos"></dd>
       <dt>Nauwkeurigheid</dt><dd id="edAcc"></dd>
       <dt>Bron</dt><dd id="edSrc"></dd>
       <dt>Geplaatst</dt><dd id="edDate"></dd>
     </dl>
-    <p class="hint">Sleep de marker op de kaart om de positie te corrigeren.</p>
+    <p class="hint" id="edPosHint">Sleep de marker op de kaart om de positie te corrigeren.</p>
     <div class="ed-actions">
       <button class="btn btn-secondary" id="edRegps" type="button">Herpositioneer via GPS</button>
       <button class="btn btn-danger" id="edDelete" type="button">Verwijder</button>
+    </div>
+  </section>
+
+  <!-- group panel -->
+  <section class="panel" id="groupPanel" hidden aria-labelledby="gpTitle">
+    <div class="grip-zone" role="button" tabindex="0" aria-label="Paneel groter of kleiner maken"><div class="grip"></div></div>
+    <div class="ed-head" data-peek>
+      <span class="stack stack-lg" id="gpGlyph"></span>
+      <div><h2 id="gpTitle"></h2><p id="gpSub"></p></div>
+      <button class="icon-btn" id="gpClose" type="button" aria-label="Sluit">×</button>
+    </div>
+    <div class="field"><label class="label" for="gpName">Naam of locatie</label><input id="gpName" autocomplete="off" placeholder="bv. Brandkast gang gelijkvloers"></div>
+    <div class="field">
+      <div class="photos-head"><span class="label">Items op deze plek</span><small id="gpCount"></small></div>
+      <ul class="items" id="gpItems"></ul>
+    </div>
+    <div class="field">
+      <span class="label">Item toevoegen aan deze groep</span>
+      <div class="type-row" id="gpTypeRow" role="group" aria-label="Item toevoegen aan deze groep"></div>
+    </div>
+    <dl class="meta">
+      <dt>Positie</dt><dd class="mono" id="gpPos"></dd>
+      <dt>Nauwkeurigheid</dt><dd id="gpAcc"></dd>
+      <dt>Bron</dt><dd id="gpSrc"></dd>
+    </dl>
+    <p class="hint">Sleep de groepsmarker om alle items samen te verplaatsen.</p>
+    <div class="ed-actions">
+      <button class="btn btn-secondary" id="gpRegps" type="button">Herpositioneer via GPS</button>
+      <button class="btn btn-danger" id="gpDissolve" type="button">Groep opheffen</button>
     </div>
   </section>
 
@@ -525,7 +629,10 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   const TYPES = [
     { id: 'hydrant_boven', label: 'Bovengrondse hydrant', short: 'Hydrant boven', prefix: 'HB', glyph: 'H',  color: '#c8102e' },
     { id: 'hydrant_onder', label: 'Ondergrondse hydrant', short: 'Hydrant onder', prefix: 'HO', glyph: 'HO', color: '#d9541a' },
+    { id: 'muurhydrant',   label: 'Muurhydrant',          short: 'Muurhydrant',   prefix: 'MH', glyph: 'MH', color: '#a8336b' },
     { id: 'brandhaspel',   label: 'Brandhaspel',          short: 'Haspel',        prefix: 'BH', glyph: 'BH', color: '#7a2c8f' },
+    { id: 'brandslang',    label: 'Brandslang',           short: 'Brandslang',    prefix: 'BS', glyph: 'BS', color: '#8a6a12' },
+    { id: 'lans',          label: 'Lans / straalpijp',    short: 'Lans',          prefix: 'LA', glyph: 'L',  color: '#3a3f8f' },
     { id: 'blustoestel',   label: 'Blustoestel',          short: 'Blustoestel',   prefix: 'BT', glyph: 'B',  color: '#0b7a75' },
     { id: 'droge_leiding', label: 'Droge stijgleiding',   short: 'Droge leiding', prefix: 'DL', glyph: 'DL', color: '#2a5bb0' },
     { id: 'afsluiter',     label: 'Afsluiter',            short: 'Afsluiter',     prefix: 'AF', glyph: 'A',  color: '#5d6b22' },
@@ -539,6 +646,125 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     { id: 'defect',    label: 'Defect' },
   ];
   const STATUS = Object.fromEntries(STATUSES.map(s => [s.id, s]));
+  // Checklists per type. Third value 1 = kritiek: NOK maakt het item "Defect", andere NOK = "Afwijking".
+  const CHECKS = {
+    hydrant_boven: [
+      ['bereikbaar', 'Vrij bereikbaar, geen obstakels rondom', 1],
+      ['signalisatie', 'Signalisatie / aanduidingsbord aanwezig en leesbaar'],
+      ['schade', 'Geen aanrijdschade, scheefstand of corrosie'],
+      ['kappen', 'Kappen aanwezig en sluiten goed'],
+      ['koppelingen', 'Koppelingen in goede staat, dichtingen aanwezig'],
+      ['bediening', 'Bedieningsspil draait vlot (openen en sluiten)', 1],
+      ['spoeling', 'Gespoeld: water helder en voldoende druk', 1],
+      ['aftap', 'Aftapping werkt, geen water in de kolom (vorst)'],
+      ['verf', 'Verf en markering in orde'],
+    ],
+    hydrant_onder: [
+      ['bereikbaar', 'Deksel vrij: niet geparkeerd, overbouwd of overgeasfalteerd', 1],
+      ['deksel', 'Deksel opent vlot, niet vastgeroest of beschadigd'],
+      ['bord', 'Hydrantbord aanwezig, afstanden kloppen met de ligging'],
+      ['put', 'Put vrij van vuil, puin en water'],
+      ['klauw', 'Klauwstuk / aansluiting standpijp in goede staat'],
+      ['afsluiter', 'Afsluiter opent en sluit vlot', 1],
+      ['spoeling', 'Gespoeld: water helder en voldoende druk', 1],
+      ['aftap', 'Put loopt leeg na sluiten (aftapping werkt)'],
+    ],
+    muurhydrant: [
+      ['bereikbaar', 'Bereikbaar, niet geblokkeerd', 1],
+      ['signalisatie', 'Pictogram / signalisatie aanwezig en zichtbaar'],
+      ['kast', 'Kast of nis: deur opent vlot, ruitje en slot in orde'],
+      ['afsluiter', 'Afsluiter opent volledig en sluit dicht, geen lekkage', 1],
+      ['koppeling', 'Koppeling in goede staat, dichting aanwezig'],
+      ['druk', 'Statische druk gemeten en voldoende'],
+      ['toebehoren', 'Slang en lans aanwezig (indien voorzien)'],
+      ['leiding', 'Geen lekkage of corrosie aan de leiding'],
+    ],
+    brandhaspel: [
+      ['bereikbaar', 'Bereikbaar, niet geblokkeerd', 1],
+      ['signalisatie', 'Signalisatie aanwezig en zichtbaar'],
+      ['haspel', 'Haspel draait vlot, zwenkarm werkt'],
+      ['slang', 'Slang volledig afgerold: geen scheuren, knikken of slijtage', 1],
+      ['afsluiter', 'Toevoerafsluiter opent volledig, geen lekkage', 1],
+      ['straalpijp', 'Straalpijp: volle straal en sproeistraal werken, sluit dicht'],
+      ['druk', 'Werkdruk gemeten en voldoende'],
+      ['geleider', 'Slanggeleider en bevestiging in orde'],
+      ['klaar', 'Slang opgerold, afsluiter dicht: bedrijfsklaar achtergelaten', 1],
+      ['label', 'Onderhoudslabel bijgewerkt'],
+    ],
+    brandslang: [
+      ['aanwezig', 'Aanwezig op de voorziene plaats', 1],
+      ['slang', 'Geen scheuren, schaafplekken of schimmel'],
+      ['koppelingen', 'Koppelingen in goede staat, dichtingen aanwezig', 1],
+      ['opgeborgen', 'Droog en correct opgerold of opgeborgen'],
+      ['afmeting', 'Lengte en diameter conform de installatie'],
+      ['druktest', 'Druktest uitgevoerd (indien vereist)'],
+      ['markering', 'Markering / datum leesbaar'],
+    ],
+    lans: [
+      ['aanwezig', 'Aanwezig bij de slang', 1],
+      ['koppeling', 'Koppeling past op de slang, dichting aanwezig', 1],
+      ['bediening', 'Opent en sluit vlot'],
+      ['straal', 'Straalinstelling (vol / sproei) werkt'],
+      ['mondstuk', 'Mondstuk onbeschadigd en niet verstopt'],
+    ],
+    blustoestel: [
+      ['bereikbaar', 'Op de voorziene plaats en bereikbaar', 1],
+      ['signalisatie', 'Pictogram / signalisatie aanwezig'],
+      ['type', 'Type geschikt voor het risico (ABC, CO₂, schuim …)'],
+      ['manometer', 'Manometer in groene zone (n.v.t. bij CO₂)', 1],
+      ['zegel', 'Veiligheidspen en verzegeling intact', 1],
+      ['schade', 'Geen schade, corrosie of lekkage'],
+      ['slang', 'Slang en spuitmond in orde, niet verstopt'],
+      ['gewicht', 'Gewicht gecontroleerd (CO₂ / patroontoestel)'],
+      ['bevestiging', 'Ophanging of sokkel in orde'],
+      ['label', 'Onderhoudslabel aanwezig en bijgewerkt'],
+      ['revisie', 'Herbevulling / revisie niet over datum', 1],
+    ],
+    droge_leiding: [
+      ['inlaat', 'Inlaat bereikbaar en gesignaleerd', 1],
+      ['koppelingen', 'Voedingskoppelingen en kappen aanwezig, in goede staat'],
+      ['kast', 'Inlaatkast sluit, slot werkt'],
+      ['terugslag', 'Terugslagklep / aftapkraan werkt'],
+      ['droog', 'Leiding droog en afgetapt'],
+      ['uitlaten', 'Uitlaten per verdieping: kast en afsluiters in orde', 1],
+      ['signalisatie', 'Signalisatie op elke verdieping aanwezig'],
+      ['druktest', 'Periodieke druktest uitgevoerd'],
+    ],
+    afsluiter: [
+      ['bereikbaar', 'Bereikbaar, straatpot of kap vrij', 1],
+      ['bord', 'Aanduidingsbord aanwezig'],
+      ['bediening', 'Afsluiter bedienbaar (open en dicht)', 1],
+      ['stand', 'Staat in normale stand (open), vergrendeld of verzegeld', 1],
+      ['lekkage', 'Geen lekkage'],
+    ],
+    overig: [
+      ['aanwezig', 'Aanwezig en bereikbaar', 1],
+      ['schade', 'Geen zichtbare schade'],
+      ['signalisatie', 'Signalisatie aanwezig'],
+      ['werking', 'Werking gecontroleerd', 1],
+    ],
+  };
+  const CHECK = Object.fromEntries(Object.entries(CHECKS).map(([t, l]) => [t, l.map(([id, q, k]) => ({ id, q, k: !!k }))]));
+  const RESULTS = ['ok', 'nok', 'nvt'];
+  const STATUS_RANK = { ok: 0, todo: 1, afwijking: 2, defect: 3 };
+
+  function checkSummary(it) {
+    const list = CHECK[it.type] || [];
+    let done = 0, nok = 0, nokK = 0;
+    for (const c of list) {
+      const r = it.checks?.[c.id]?.r; if (!r) continue;
+      done++; if (r === 'nok') { nok++; if (c.k) nokK++; }
+    }
+    return { total: list.length, done, nok, nokK, complete: list.length > 0 && done === list.length };
+  }
+  const derivedStatus = s => (s.nokK ? 'defect' : s.nok ? 'afwijking' : s.complete ? 'ok' : 'todo');
+  const nokLabels = it => (CHECK[it.type] || []).filter(c => it.checks?.[c.id]?.r === 'nok').map(c => c.q);
+  const worstStatus = list => list.reduce((w, i) => (STATUS_RANK[i.status] > STATUS_RANK[w] ? i.status : w), 'ok');
+  function progressText(it) {
+    const s = checkSummary(it);
+    return s.done ? `${s.done}/${s.total}${s.nok ? ` · ${s.nok} NOK` : ''}` : '';
+  }
+
   const SOURCE_LABEL = { gps: 'GPS', manueel: 'Manueel op kaart', versleept: 'GPS, manueel gecorrigeerd', import: 'Import', voorbeeld: 'Voorbeelddata', adres: 'Adres (zoekresultaat)' };
 
   /* ================= helpers ================= */
@@ -546,7 +772,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const nf1 = new Intl.NumberFormat('nl-BE', { maximumFractionDigits: 1 });
   const nf0 = new Intl.NumberFormat('nl-BE', { maximumFractionDigits: 0 });
-  const fmtDist = m => m == null ? '' : m < 1000 ? `${nf0.format(m)} m` : `${nf1.format(m / 1000)} km`;
+  const fmtDist = m => m == null ? '' : m < 1 ? '< 1 m' : m < 1000 ? `${nf0.format(m)} m` : `${nf1.format(m / 1000)} km`;
   const fmtAcc = a => a == null ? 'onbekend' : `±${nf1.format(a)} m`;
   const fmtDate = iso => { try { return new Date(iso).toLocaleString('nl-BE', { dateStyle: 'short', timeStyle: 'short' }); } catch { return iso; } };
   const uid = () => (crypto.randomUUID ? crypto.randomUUID() : 'id-' + Date.now().toString(36) + Math.random().toString(36).slice(2));
@@ -564,9 +790,12 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
 
   /* ================= state ================= */
   let items = [];
+  let groups = [];               // several items on one spot (e.g. a fire-hose cabinet)
   let selType = TYPES[0].id;
   let tapMode = false;
   let selectedId = null;
+  let selectedGroupId = null;
+  let addHereOpen = false;
   let lastFix = null;            // {lat,lng,acc,t}
   let capture = null;            // active GPS capture
   let pending = null;            // placement waiting on duplicate decision
@@ -596,7 +825,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     } catch { return false; }
   }
   function save() {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ v: 1, items, selType, minAcc })); }
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ v: 2, items, groups, selType, minAcc })); }
     catch (e) {
       showStorageProblem(e?.name === 'QuotaExceededError'
         ? 'De browseropslag is vol. Exporteer je items en verwijder oude foto\'s.'
@@ -609,34 +838,161 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       if (!raw) return false;
       const d = JSON.parse(raw);
       if (!d || !Array.isArray(d.items)) return false;
+      groups = Array.isArray(d.groups) ? d.groups.filter(validPos) : [];
+      groups.forEach(normalizeGroup);
       items = d.items.filter(validItem);
-      items.forEach(i => { i.photos = Array.isArray(i.photos) ? i.photos.filter(x => typeof x === 'string') : []; });
+      items.forEach(normalizeItem);
+      groups.forEach(syncGroup);
+      cleanupGroups();
       if (TYPE[d.selType]) selType = d.selType;
       if ([3, 5, 10, 20].includes(d.minAcc)) minAcc = d.minAcc;
+      if ((d.v || 1) < 2 && items.some(i => i.demo)) migrateDemo();
       return true;
     } catch { return false; }
   }
-  function validItem(i) {
-    return i && typeof i.id === 'string' && TYPE[i.type] && Number.isFinite(i.lat) && Number.isFinite(i.lng) &&
-      Math.abs(i.lat) <= 90 && Math.abs(i.lng) <= 180;
+  function validPos(o) {
+    return !!o && typeof o.id === 'string' && Number.isFinite(o.lat) && Number.isFinite(o.lng) &&
+      Math.abs(o.lat) <= 90 && Math.abs(o.lng) <= 180;
+  }
+  const validItem = i => validPos(i) && !!TYPE[i.type];
+  function normalizeItem(i) {
+    i.photos = Array.isArray(i.photos) ? i.photos.filter(x => typeof x === 'string') : [];
+    const raw = i.checks && typeof i.checks === 'object' ? i.checks : {};
+    i.checks = {};
+    for (const [k, v] of Object.entries(raw)) {
+      if (v && RESULTS.includes(v.r)) i.checks[k] = { r: v.r, note: typeof v.note === 'string' ? v.note : '' };
+    }
+    i.statusManual = !!i.statusManual;
+    i.checkDone = typeof i.checkDone === 'string' ? i.checkDone : null;
+    i.history = Array.isArray(i.history) ? i.history.filter(h => h && typeof h.at === 'string' && STATUS[h.status]).slice(0, 10) : [];
+    if (!STATUS[i.status]) i.status = 'todo';
+    if (typeof i.note !== 'string') i.note = '';
+    if (typeof i.code !== 'string' || !i.code) i.code = nextCode(i.type);
+    i.groupId = typeof i.groupId === 'string' && groups.some(g => g.id === i.groupId) ? i.groupId : null;
+  }
+  function normalizeGroup(g) {
+    g.code = typeof g.code === 'string' && g.code ? g.code : nextGroupCode();
+    g.name = typeof g.name === 'string' ? g.name : '';
+    g.acc = Number.isFinite(g.acc) ? g.acc : null;
+    g.n = Number.isFinite(g.n) ? g.n : 0;
+    g.demo = !!g.demo;
+    if (typeof g.createdAt !== 'string') g.createdAt = new Date().toISOString();
+  }
+  function newItem(p) {
+    return {
+      id: uid(), type: p.type, code: p.code ?? nextCode(p.type), status: 'todo',
+      lat: p.lat, lng: p.lng, acc: p.acc ?? null, src: p.src || 'manueel', n: p.n ?? 0,
+      createdAt: p.createdAt ?? new Date().toISOString(), note: p.note ?? '', demo: !!p.demo, photos: [],
+      checks: {}, statusManual: false, checkDone: null, history: [], groupId: p.groupId ?? null,
+    };
+  }
+
+  // Example data. Codes, positions and findings are fictitious.
+  const DEMO_ROWS = [
+    // type, code, status, dx m, dy m, accuracy, note, check that failed
+    ['hydrant_boven', 'HB-001', 'ok',        -42,  18, 3.8, ''],
+    ['hydrant_boven', 'HB-002', 'todo',       55, -30, 4.6, ''],
+    ['hydrant_onder', 'HO-001', 'afwijking',  12,  48, 6.2, 'Deksel vastgeroest, aanduidingsbord vervaagd', 'deksel'],
+    ['hydrant_onder', 'HO-002', 'todo',      -70, -45, 4.1, ''],
+    ['brandhaspel',   'BH-001', 'ok',         -8,  -6, 9.5, 'Gevel magazijn, naast poort 3'],
+    ['blustoestel',   'BT-001', 'defect',      6,  -9, 11.0, 'Manometer in rode zone', 'manometer'],
+    ['droge_leiding', 'DL-001', 'todo',       28,   4, 5.0, 'Inlaat voorgevel'],
+    ['afsluiter',     'AF-001', 'ok',         80,  22, 3.2, ''],
+  ];
+  const DEMO_GROUP = {
+    name: 'Brandkast magazijn, poort 1', dx: -24, dy: -16, acc: 4.4,
+    members: [
+      // type, code, status, note, failed check, answered checks (for an unfinished one)
+      ['muurhydrant', 'MH-001', 'ok', ''],
+      ['brandslang', 'BS-001', 'afwijking', 'Schaafplek op ±3 m van de koppeling', 'slang'],
+      ['lans', 'LA-001', 'todo', '', null, 2],
+    ],
+  };
+  function fillDemoChecks(it, nokId = null, partial = 0) {
+    const list = CHECK[it.type] || [];
+    it.checks = {};
+    const target = it.status;
+    if (target === 'todo') { list.slice(0, partial).forEach(c => { it.checks[c.id] = { r: 'ok', note: '' }; }); return; }
+    list.forEach(c => { it.checks[c.id] = { r: 'ok', note: '' }; });
+    if (it.type === 'blustoestel' && it.checks.gewicht) it.checks.gewicht.r = 'nvt';
+    const bad = list.find(c => c.id === nokId) || (target === 'defect' ? list.find(c => c.k) : target === 'afwijking' ? list.find(c => !c.k) : null);
+    if (bad && target !== 'ok') it.checks[bad.id] = { r: 'nok', note: it.note || '' };
+    it.status = derivedStatus(checkSummary(it));
+    it.checkDone = it.createdAt;
+    it.history = [{ at: it.createdAt, status: it.status, nok: nokLabels(it) }];
+  }
+  function addDemoGroup() {
+    if (groups.some(g => g.demo) || items.some(i => i.type === 'muurhydrant' && i.demo)) return;
+    const p = offset(DEMO_CENTER, DEMO_GROUP.dx, DEMO_GROUP.dy);
+    const g = { id: uid(), code: nextGroupCode(), name: DEMO_GROUP.name, lat: p.lat, lng: p.lng, acc: DEMO_GROUP.acc,
+      src: 'voorbeeld', n: 5, createdAt: new Date(Date.now() - 30 * 60e3).toISOString(), demo: true };
+    groups.push(g);
+    for (const [type, code, status, note, nokId, partial] of DEMO_GROUP.members) {
+      const it = newItem({ type, code: items.some(i => i.code === code) ? undefined : code, lat: g.lat, lng: g.lng,
+        acc: g.acc, src: 'voorbeeld', n: 5, createdAt: g.createdAt, note, demo: true, groupId: g.id });
+      it.status = status;
+      fillDemoChecks(it, nokId, partial || 0);
+      items.push(it);
+    }
   }
   function seedDemo() {
     const now = Date.now();
-    const rows = [
-      ['hydrant_boven', 'HB-001', 'ok',        -42,  18, 3.8, ''],
-      ['hydrant_boven', 'HB-002', 'todo',       55, -30, 4.6, ''],
-      ['hydrant_onder', 'HO-001', 'afwijking',  12,  48, 6.2, 'Deksel vastgeroest, aanduidingsbord vervaagd'],
-      ['hydrant_onder', 'HO-002', 'todo',      -70, -45, 4.1, ''],
-      ['brandhaspel',   'BH-001', 'ok',         -8,  -6, 9.5, 'Gevel magazijn, naast poort 3'],
-      ['blustoestel',   'BT-001', 'defect',      6,  -9, 11.0, 'Manometer in rode zone'],
-      ['droge_leiding', 'DL-001', 'todo',       28,   4, 5.0, 'Inlaat voorgevel'],
-      ['afsluiter',     'AF-001', 'ok',         80,  22, 3.2, ''],
-    ];
-    items = rows.map(([type, code, status, dx, dy, acc, note], k) => {
+    items = []; groups = [];
+    DEMO_ROWS.forEach(([type, code, status, dx, dy, acc, note, nokId], k) => {
       const p = offset(DEMO_CENTER, dx, dy);
-      return { id: uid(), type, code, status, lat: p.lat, lng: p.lng, acc, src: 'voorbeeld', n: 5,
-        createdAt: new Date(now - (k + 1) * 3600e3).toISOString(), note, demo: true, photos: [] };
+      const it = newItem({ type, code, lat: p.lat, lng: p.lng, acc, src: 'voorbeeld', n: 5,
+        createdAt: new Date(now - (k + 1) * 3600e3).toISOString(), note, demo: true });
+      it.status = status;
+      fillDemoChecks(it, nokId);
+      items.push(it);
     });
+    addDemoGroup();
+  }
+  // Data saved by the previous version: give the example items a checklist and add the example group.
+  function migrateDemo() {
+    for (const it of items) {
+      if (!it.demo || Object.keys(it.checks).length) continue;
+      const row = DEMO_ROWS.find(r => r[1] === it.code && r[0] === it.type);
+      fillDemoChecks(it, row?.[7] ?? null);
+    }
+    addDemoGroup();
+  }
+
+  /* ================= groups ================= */
+  const G = id => (id ? groups.find(g => g.id === id) : undefined);
+  const membersOf = gid => items.filter(i => i.groupId === gid);
+  function nextGroupCode() {
+    const max = groups.reduce((m, g) => { const r = /^GR-(\d+)$/.exec(g.code || ''); return r ? Math.max(m, +r[1]) : m; }, 0);
+    return `GR-${String(max + 1).padStart(3, '0')}`;
+  }
+  // Items in a group share the group's position.
+  function syncGroup(g) {
+    for (const m of membersOf(g.id)) Object.assign(m, { lat: g.lat, lng: g.lng, acc: g.acc, src: g.src, n: g.n });
+  }
+  // Most accurate position wins; an unknown accuracy (placed by hand) loses to any GPS fix.
+  const bestPos = cands => cands.reduce((b, c) => ((c.acc ?? Infinity) < (b.acc ?? Infinity) ? c : b));
+  function createGroup(members, posCands) {
+    const p = bestPos(posCands);
+    const g = { id: uid(), code: nextGroupCode(), name: '', lat: p.lat, lng: p.lng, acc: p.acc ?? null,
+      src: p.src || 'manueel', n: p.n || 0, createdAt: new Date().toISOString(), demo: false };
+    groups.push(g);
+    members.forEach(m => { m.groupId = g.id; });
+    syncGroup(g);
+    return g;
+  }
+  // A group with one item left is no longer a group.
+  function cleanupGroups() {
+    for (const g of [...groups]) {
+      const mem = membersOf(g.id);
+      if (mem.length <= 1) { mem.forEach(m => { m.groupId = null; }); groups = groups.filter(x => x !== g); }
+    }
+  }
+  // Groups and loose items within `radius` metres of pos, nearest first.
+  function nearestEntity(pos, radius, exclude = {}) {
+    return [
+      ...groups.filter(g => g.id !== exclude.groupId).map(g => ({ kind: 'group', e: g, d: dist(g, pos) })),
+      ...items.filter(i => !i.groupId && i.id !== exclude.itemId).map(i => ({ kind: 'item', e: i, d: dist(i, pos) })),
+    ].filter(x => x.d <= radius).sort((a, b) => a.d - b.d);
   }
 
   /* ================= map ================= */
@@ -682,8 +1038,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   // Centre a point in the part of the map NOT covered by the top bar and the panel.
   function visibleOffset() {
     const W = innerWidth, H = innerHeight;
-    const panel = !$('editor').hidden ? $('editor') : $('sheet');
-    const r = panel.getBoundingClientRect();
+    const r = visiblePanel().getBoundingClientRect();
     const top = $('topbar').getBoundingClientRect().bottom;
     if (r.width >= W * 0.9) return [0, (top + r.top) / 2 - H / 2];       // bottom sheet (phone)
     return [(r.right + W) / 2 - W / 2, (top + H) / 2 - H / 2];           // side panel (desktop)
@@ -793,9 +1148,9 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
 
   // item markers
   const markerLayer = L.layerGroup().addTo(map);
-  const markers = new Map();
+  const markers = new Map();     // 'i:<id>' loose item, 'g:<id>' group
 
-  function markerIcon(it) {
+  function itemIcon(it) {
     const t = TYPE[it.type];
     const cls = ['mk', it.id === selectedId ? 'sel' : '', it.demo ? 'demo' : ''].join(' ');
     return L.divIcon({
@@ -811,23 +1166,51 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     const [ax, ay] = m.options.icon.options.iconAnchor;
     return map.containerPointToLatLng([r.left - c.left + ax, r.top - c.top + ay]);
   }
+  function groupIcon(g, mem) {
+    const sel = g.id === selectedGroupId || mem.some(m => m.id === selectedId);
+    const cls = ['gmk', sel ? 'sel' : '', g.demo ? 'demo' : ''].join(' ');
+    const dots = mem.slice(0, 5).map(m => `<i style="--c:${TYPE[m.type].color}"></i>`).join('');
+    const ph = mem.reduce((n, m) => n + (m.photos?.length || 0), 0);
+    return L.divIcon({
+      className: 'mk-wrap', iconSize: [34, 34], iconAnchor: [17, 17],
+      html: `<div class="${cls}" data-st="${worstStatus(mem)}"><span>${mem.length}</span><u>${dots}</u></div>`
+        + (ph ? `<b class="mk-ph" title="${ph} foto's">${ph}</b>` : ''),
+    });
+  }
+  function upsertMarker(key, ll, icon, title, onClick, onDrag, active) {
+    let m = markers.get(key);
+    if (!m) {
+      m = L.marker(ll, { icon, keyboard: true, title, riseOnHover: true });
+      m.on('click', () => {
+        if (!tapMode) { m._onClick(); return; }
+        // "Tik op kaart" on an existing marker: place on that spot, which triggers the same-spot question.
+        setTapMode(false);
+        const ll = m.getLatLng();
+        placeNew(selType, { lat: ll.lat, lng: ll.lng, acc: null, src: 'manueel', n: 0 });
+      });
+      m.on('dragend', () => m._onDrag(droppedLatLng(m)));
+      m.addTo(markerLayer); markers.set(key, m);
+    } else {
+      m.setLatLng(ll); m.setIcon(icon);
+    }
+    m._onClick = onClick; m._onDrag = onDrag; m.options.title = title;
+    if (active) { m.dragging?.enable(); m.setZIndexOffset(1000); } else { m.dragging?.disable(); m.setZIndexOffset(0); }
+  }
   function renderMarkers() {
     const seen = new Set();
-    for (const it of items) {
-      seen.add(it.id);
-      let m = markers.get(it.id);
-      if (!m) {
-        m = L.marker([it.lat, it.lng], { icon: markerIcon(it), draggable: false, keyboard: true, title: it.code, riseOnHover: true });
-        m.on('click', () => { if (!tapMode) select(it.id, false); });
-        m.on('dragend', () => onMarkerDragged(it.id, droppedLatLng(m)));
-        m.addTo(markerLayer); markers.set(it.id, m);
-      } else {
-        m.setLatLng([it.lat, it.lng]); m.setIcon(markerIcon(it)); m.options.title = it.code;
-      }
-      if (it.id === selectedId) { m.dragging?.enable(); m.setZIndexOffset(1000); }
-      else { m.dragging?.disable(); m.setZIndexOffset(0); }
+    for (const g of groups) {
+      const mem = membersOf(g.id); if (!mem.length) continue;
+      const key = 'g:' + g.id; seen.add(key);
+      upsertMarker(key, [g.lat, g.lng], groupIcon(g, mem), `${g.code}${g.name ? ' · ' + g.name : ''}`,
+        () => openGroup(g.id, false), ll => onGroupDragged(g.id, ll), g.id === selectedGroupId);
     }
-    for (const [id, m] of markers) if (!seen.has(id)) { markerLayer.removeLayer(m); markers.delete(id); }
+    for (const it of items) {
+      if (it.groupId) continue;
+      const key = 'i:' + it.id; seen.add(key);
+      upsertMarker(key, [it.lat, it.lng], itemIcon(it), it.code,
+        () => select(it.id, false), ll => onMarkerDragged(it.id, ll), it.id === selectedId);
+    }
+    for (const [k, m] of markers) if (!seen.has(k)) { markerLayer.removeLayer(m); markers.delete(k); }
   }
 
   /* ================= type picker ================= */
@@ -846,32 +1229,53 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     const byStatus = Object.fromEntries(STATUSES.map(s => [s.id, 0]));
     items.forEach(i => { byStatus[i.status] = (byStatus[i.status] || 0) + 1; });
     $('counts').innerHTML = `<span><b>${items.length}</b> totaal</span><span><b>${byStatus.todo}</b> te doen</span><span><b>${byStatus.afwijking + byStatus.defect}</b> probleem</span>`;
-    $('btnClearDemo').hidden = !items.some(i => i.demo);
+    $('btnClearDemo').hidden = !items.some(i => i.demo) && !groups.some(g => g.demo);
 
     if (!items.length) {
       $('itemList').innerHTML = `<li class="empty">Nog geen items. Kies een type en druk op <b>Plaats op GPS-positie</b>, of tik op de kaart.</li>`;
       return;
     }
     const fix = lastFix && Date.now() - lastFix.t < 60000 ? lastFix : null;
-    const rows = items.map(i => ({ i, d: fix ? dist(fix, i) : null }));
-    rows.sort((a, b) => (a.d != null && b.d != null) ? a.d - b.d : a.i.code.localeCompare(b.i.code, 'nl', { numeric: true }));
-
-    $('itemList').innerHTML = rows.map(({ i, d }) => {
-      const t = TYPE[i.type];
-      return `<li><button type="button" class="item-btn" data-id="${esc(i.id)}">
-        <span class="glyph" style="--c:${t.color}">${esc(t.glyph)}</span>
-        <span class="item-main"><span class="code">${esc(i.code)}</span>${i.demo ? '<span class="demo-tag">voorbeeld</span>' : ''}
-          <div class="sub">${esc(t.label)}${i.photos?.length ? ` · ${i.photos.length === 1 ? '1 foto' : i.photos.length + ' foto\'s'}` : ''}${i.note ? ' · ' + esc(i.note) : ''}</div></span>
-        <span class="item-side"><span class="pill" style="--st:var(--st-${esc(i.status)})">${esc(STATUS[i.status]?.label ?? i.status)}</span>
-          <div>${d != null ? fmtDist(d) + ' · ' : ''}${fmtAcc(i.acc)}</div></span>
-      </button></li>`;
-    }).join('');
+    const rows = [
+      ...groups.map(g => ({ g, mem: membersOf(g.id), code: g.code, pos: g })).filter(r => r.mem.length),
+      ...items.filter(i => !i.groupId).map(i => ({ i, code: i.code, pos: i })),
+    ].map(r => ({ ...r, d: fix ? dist(fix, r.pos) : null }));
+    rows.sort((a, b) => (a.d != null && b.d != null) ? a.d - b.d : a.code.localeCompare(b.code, 'nl', { numeric: true }));
+    $('itemList').innerHTML = rows.map(r => (r.g ? groupRowHtml(r.g, r.mem, r.d) : itemRowHtml(r.i, r.d))).join('');
+  }
+  function itemRowHtml(i, d) {
+    const t = TYPE[i.type];
+    const prog = progressText(i);
+    const n = i.photos?.length || 0;
+    const sub = [esc(t.label), prog && `checklist ${prog}`, n && (n === 1 ? '1 foto' : `${n} foto's`), i.note && esc(i.note)].filter(Boolean).join(' · ');
+    return `<li><button type="button" class="item-btn" data-id="${esc(i.id)}">
+      <span class="glyph" style="--c:${t.color}">${esc(t.glyph)}</span>
+      <span class="item-main"><span class="code">${esc(i.code)}</span>${i.demo ? '<span class="demo-tag">voorbeeld</span>' : ''}
+        <div class="sub">${sub}</div></span>
+      <span class="item-side"><span class="pill" style="--st:var(--st-${esc(i.status)})">${esc(STATUS[i.status]?.label ?? i.status)}</span>
+        ${d === undefined ? '' : `<div>${d != null ? fmtDist(d) + ' · ' : ''}${fmtAcc(i.acc)}</div>`}</span>
+    </button></li>`;
+  }
+  function groupRowHtml(g, mem, d) {
+    const w = worstStatus(mem);
+    return `<li><button type="button" class="item-btn" data-gid="${esc(g.id)}">
+      <span class="stack">${mem.length}</span>
+      <span class="item-main"><span class="code">${esc(g.code)}</span>${g.demo ? '<span class="demo-tag">voorbeeld</span>' : ''}
+        <div class="sub">${esc(g.name || 'Groep')} · ${mem.map(m => esc(m.code)).join(', ')}</div></span>
+      <span class="item-side"><span class="pill" style="--st:var(--st-${w})">${esc(STATUS[w].label)}</span>
+        <div>${d != null ? fmtDist(d) + ' · ' : ''}${fmtAcc(g.acc)}</div></span>
+    </button></li>`;
   }
   $('itemList').addEventListener('click', e => {
+    const g = e.target.closest('[data-gid]'); if (g) { openGroup(g.dataset.gid, true); return; }
     const b = e.target.closest('[data-id]'); if (b) select(b.dataset.id, true);
   });
 
-  function renderAll() { renderMarkers(); renderList(); if (selectedId) renderEditor(); }
+  function renderAll() {
+    renderMarkers(); renderList();
+    if (!$('editor').hidden) renderEditor();
+    if (!$('groupPanel').hidden) renderGroup();
+  }
 
   /* ================= GPS ================= */
   function setGps(q, text) { const c = $('gpsChip'); c.dataset.q = q; $('gpsText').textContent = text; }
@@ -1084,10 +1488,11 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   });
 
   /* ================= capture ================= */
-  function startCapture(targetId = null) {
+  // target: null = new item of selType, { kind: 'item' | 'group', id } = reposition existing
+  function startCapture(target = null) {
     if (capture) return;
     clearPending(); setTapMode(false);
-    capture = { samples: [], start: Date.now(), targetId, type: targetId ? null : selType, done: false };
+    capture = { samples: [], start: Date.now(), target, type: target ? null : selType, done: false };
     if (lastFix && Date.now() - lastFix.t < 1500 && lastFix.acc <= MAX_SAMPLE_ACC) capture.samples.push(lastFix);
     capture.timer = setInterval(captureTick, 250);
     $('btnCapture').disabled = true;
@@ -1116,7 +1521,8 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     const secs = Math.floor((Date.now() - capture.start) / 1000);
     $('capBar').style.width = `${Math.min(100, good.length / CAPTURE_NEED * 100)}%`;
     $('capSamples').innerHTML = capture.samples.slice(-12).map(s => `<span class="${s.acc <= minAcc ? 'hit' : ''}">${nf1.format(s.acc)}</span>`).join('');
-    const label = capture.targetId ? items.find(i => i.id === capture.targetId)?.code : TYPE[capture.type].label;
+    const tg = capture.target;
+    const label = !tg ? TYPE[capture.type].label : tg.kind === 'group' ? G(tg.id)?.code : items.find(i => i.id === tg.id)?.code;
     if (!capture.done) {
       $('capTitle').textContent = `${label}: positie meten…`;
       $('capText').innerHTML = `Blijf stilstaan bij het item. <strong>${good.length}/${CAPTURE_NEED}</strong> metingen ≤ ${minAcc} m · ${secs} s`;
@@ -1139,7 +1545,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     const a = e.target.closest('[data-cap]')?.dataset.cap; if (!a || !capture) return;
     if (a === 'cancel') stopCapture();
     else if (a === 'accept') finishCapture(bestSamples());
-    else if (a === 'retry') { const t = capture.targetId; stopCapture(); startCapture(t); }
+    else if (a === 'retry') { const t = capture.target; stopCapture(); startCapture(t); }
   });
 
   function median(arr) { const s = [...arr].sort((a, b) => a - b); const m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; }
@@ -1150,14 +1556,20 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     let sw = 0, sl = 0, sg = 0;
     for (const s of samples) { const w = 1 / (s.acc * s.acc); sw += w; sl += s.lat * w; sg += s.lng * w; }
     const pos = { lat: sl / sw, lng: sg / sw, acc: round(median(samples.map(s => s.acc)), 1), n: samples.length, src: 'gps' };
-    const { targetId, type } = capture;
+    const { target, type } = capture;
     stopCapture();
-    if (targetId) {
-      const it = items.find(i => i.id === targetId); if (!it) return;
+    if (target?.kind === 'item') {
+      const it = items.find(i => i.id === target.id); if (!it) return;
       const moved = dist(it, pos);
       Object.assign(it, { lat: pos.lat, lng: pos.lng, acc: pos.acc, n: pos.n, src: 'gps', demo: false });
       save(); select(it.id, true);
       toast(`${it.code} herpositioneerd (${fmtDist(moved)} verschoven, ${fmtAcc(pos.acc)})`);
+    } else if (target?.kind === 'group') {
+      const g = G(target.id); if (!g) return;
+      const moved = dist(g, pos);
+      Object.assign(g, { lat: pos.lat, lng: pos.lng, acc: pos.acc, n: pos.n, src: 'gps', demo: false });
+      syncGroup(g); save(); openGroup(g.id, true);
+      toast(`${g.code} herpositioneerd (${fmtDist(moved)} verschoven, ${fmtAcc(pos.acc)})`);
     } else {
       placeNew(type, pos);
     }
@@ -1169,37 +1581,60 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     const max = items.reduce((m, i) => { const r = re.exec(i.code); return r ? Math.max(m, +r[1]) : m; }, 0);
     return `${p}-${String(max + 1).padStart(3, '0')}`;
   }
+  // Something already within the measurement uncertainty? Ask: same item, same spot (group), or separate.
   function placeNew(typeId, pos) {
     const radius = Math.max(3, pos.acc || 0);
-    const near = items
-      .filter(i => i.type === typeId)
-      .map(i => ({ i, d: dist(i, pos) }))
-      .filter(x => x.d <= radius)
-      .sort((a, b) => a.d - b.d)[0];
-    if (near) {
-      pending = { typeId, pos, nearId: near.i.id };
-      $('dupText').innerHTML = `Er staat al <strong>${esc(near.i.code)}</strong> (${esc(TYPE[typeId].label.toLowerCase())}) op <strong>${fmtDist(near.d)}</strong>, binnen de meetonzekerheid van ${fmtDist(radius)}. Is dit hetzelfde item?`;
-      $('dupPanel').hidden = false;
-      ensureSheetOpen();
-      $('dupPanel').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-      return;
+    const near = nearestEntity(pos, radius)[0];
+    if (!near) { commitNew(typeId, pos); return; }
+    pending = { typeId, pos, near: { kind: near.kind, id: near.e.id } };
+    const tl = TYPE[typeId].label.toLowerCase();
+    let text, acts;
+    if (near.kind === 'group') {
+      const mem = membersOf(near.e.id);
+      const same = mem.find(m => m.type === typeId);
+      text = `Op <strong>${fmtDist(near.d)}</strong> staat groep <strong>${esc(near.e.code)}</strong>${near.e.name ? ` (${esc(near.e.name)})` : ''} met ${mem.length} items${same ? `, waaronder al <strong>${esc(same.code)}</strong>` : ''}. Hoort deze ${esc(tl)} erbij?`;
+      acts = [['group', 'Toevoegen aan groep'], same && ['open', `Open ${same.code}`], ['apart', 'Apart plaatsen'], ['cancel', 'Annuleer']];
+    } else {
+      const it = near.e;
+      if (it.type === typeId) {
+        text = `Er staat al <strong>${esc(it.code)}</strong> (${esc(tl)}) op <strong>${fmtDist(near.d)}</strong>, binnen de meetonzekerheid van ${fmtDist(radius)}. Is dit hetzelfde item?`;
+        acts = [['open', `Ja, open ${it.code}`], ['group', 'Nee, groepeer samen'], ['apart', 'Nee, apart plaatsen'], ['cancel', 'Annuleer']];
+      } else {
+        text = `Op <strong>${fmtDist(near.d)}</strong> staat <strong>${esc(it.code)}</strong> (${esc(TYPE[it.type].label.toLowerCase())}). Samen groeperen, bv. in dezelfde brandkast?`;
+        acts = [['group', 'Groepeer samen'], ['apart', 'Apart plaatsen'], ['cancel', 'Annuleer']];
+      }
     }
-    commitNew(typeId, pos);
+    $('dupText').innerHTML = text;
+    $('dupActions').innerHTML = acts.filter(Boolean)
+      .map(([a, l]) => `<button class="btn btn-ghost" type="button" data-dup="${a}">${esc(l)}</button>`).join('');
+    $('dupPanel').hidden = false;
+    ensureSheetOpen();
+    $('dupPanel').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }
   function clearPending() { pending = null; $('dupPanel').hidden = true; }
-  $('dupAdd').addEventListener('click', () => { if (pending) { const p = pending; clearPending(); commitNew(p.typeId, p.pos); } });
-  $('dupOpen').addEventListener('click', () => { if (pending) { const id = pending.nearId; clearPending(); select(id, true); } });
-  $('dupCancel').addEventListener('click', clearPending);
+  $('dupActions').addEventListener('click', e => {
+    const a = e.target.closest('[data-dup]')?.dataset.dup; if (!a || !pending) return;
+    const p = pending; clearPending();
+    if (a === 'apart') commitNew(p.typeId, p.pos);
+    else if (a === 'group') {
+      let g = p.near.kind === 'group' ? G(p.near.id) : null;
+      if (!g) { const other = items.find(i => i.id === p.near.id); if (!other) return; g = createGroup([other], [other, p.pos]); }
+      commitNew(p.typeId, p.pos, g.id);
+    } else if (a === 'open') {
+      const id = p.near.kind === 'item' ? p.near.id : membersOf(p.near.id).find(m => m.type === p.typeId)?.id;
+      if (id) select(id, true);
+    }
+  });
 
-  function commitNew(typeId, pos) {
-    const it = {
-      id: uid(), type: typeId, code: nextCode(typeId), status: 'todo',
-      lat: pos.lat, lng: pos.lng, acc: pos.acc ?? null, src: pos.src, n: pos.n ?? 0,
-      createdAt: new Date().toISOString(), note: '', demo: false, photos: [],
-    };
-    items.push(it); save();
+  function commitNew(typeId, pos, groupId = null) {
+    const g = G(groupId);
+    const base = g || pos;
+    const it = newItem({ type: typeId, lat: base.lat, lng: base.lng, acc: base.acc ?? null, src: base.src, n: base.n ?? 0, groupId: g?.id ?? null });
+    items.push(it);
+    if (g) syncGroup(g);
+    save();
     select(it.id, true);
-    toast(`${it.code} geplaatst${it.acc != null ? ` (${fmtAcc(it.acc)})` : ''}`);
+    toast(`${it.code} geplaatst${g ? ` in ${g.code}` : it.acc != null ? ` (${fmtAcc(it.acc)})` : ''}`);
   }
 
   $('btnCapture').addEventListener('click', () => startCapture(null));
@@ -1215,7 +1650,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   });
   map.on('click', e => {
     if (!$('searchBar').hidden) closeSearch();
-    if (!tapMode) { if (selectedId) closeEditor(); return; }
+    if (!tapMode) { if (selectedId || selectedGroupId) toSheet(); return; }
     setTapMode(false);
     placeNew(selType, { lat: e.latlng.lat, lng: e.latlng.lng, acc: null, src: 'manueel', n: 0 });
   });
@@ -1228,6 +1663,14 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     save(); renderAll();
     toast(`${it.code} ${fmtDist(moved)} verplaatst`);
   }
+  function onGroupDragged(gid, ll) {
+    const g = G(gid); if (!g) return;
+    const moved = dist(g, ll);
+    g.lat = ll.lat; g.lng = ll.lng; g.demo = false;
+    if (g.src === 'gps' || g.src === 'voorbeeld') g.src = 'versleept';
+    syncGroup(g); save(); renderAll();
+    toast(`${g.code} ${fmtDist(moved)} verplaatst, met ${membersOf(g.id).length} items`);
+  }
 
   /* ================= editor ================= */
   $('edType').innerHTML = TYPES.map(t => `<option value="${t.id}">${esc(t.label)}</option>`).join('');
@@ -1235,45 +1678,250 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     `<button type="button" data-status="${s.id}" style="--st:var(--st-${s.id})" aria-pressed="false"><i></i>${esc(s.label)}</button>`).join(''));
 
   function select(id, fly) {
-    selectedId = id; clearPending();
     const it = items.find(i => i.id === id); if (!it) return;
-    const wasOpen = !$('editor').hidden;
-    $('sheet').hidden = true; $('editor').hidden = false;
+    clearPending();
+    if (selectedId !== id) { addHereOpen = false; $('editor').scrollTop = 0; }
+    selectedId = id; selectedGroupId = null;
     $('edDelete').classList.remove('armed'); $('edDelete').textContent = 'Verwijder';
+    showPanel('editor');
     renderAll();
-    if (!wasOpen) { editorState = sheetState === 'full' ? 'full' : 'half'; applyPanel($('editor'), editorState); }
     if (fly) {
       // looking at an item that may be elsewhere: stop tracking so the map doesn't jump back
       if (follow && lastFix && dist(lastFix, it) > 30) setFollow(false);
       if (!follow) centerOn([it.lat, it.lng], Math.max(map.getZoom(), 19), { fly: true });
     }
   }
+  // Closing an item that belongs to a group goes back to that group.
   function closeEditor() {
-    selectedId = null; $('editor').hidden = true; $('sheet').hidden = false; renderAll();
-    applyPanel($('sheet'), sheetState);
+    const gid = G(cur()?.groupId)?.id;
+    selectedId = null;
+    if (gid) openGroup(gid, false); else toSheet();
+  }
+  function toSheet() {
+    selectedId = null; selectedGroupId = null; addHereOpen = false;
+    showPanel('sheet'); renderAll();
   }
   function renderEditor() {
-    const it = items.find(i => i.id === selectedId); if (!it) { closeEditor(); return; }
+    const it = items.find(i => i.id === selectedId); if (!it) { toSheet(); return; }
     const t = TYPE[it.type];
+    const g = G(it.groupId);
     $('edGlyph').style.setProperty('--c', t.color); $('edGlyph').textContent = t.glyph;
     $('edTitle').textContent = it.code;
-    $('edSub').textContent = t.label + (it.demo ? ' · voorbeeld' : '');
+    $('edSub').textContent = t.label + (g ? ` · in ${g.code}` : '') + (it.demo ? ' · voorbeeld' : '');
     if (document.activeElement !== $('edCode')) $('edCode').value = it.code;
     $('edType').value = it.type;
     if (document.activeElement !== $('edNote')) $('edNote').value = it.note || '';
     $('edStatus').querySelectorAll('[data-status]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.status === it.status)));
+    const s = checkSummary(it);
+    const der = derivedStatus(s);
+    $('edStatusHint').innerHTML = it.statusManual
+      ? `Manueel ingesteld${der !== it.status ? ` (checklist geeft: ${esc(STATUS[der].label.toLowerCase())})` : ''} · <button type="button" class="linkbtn" data-st-auto>Volg checklist</button>`
+      : 'Volgt automatisch de checklist.';
+    renderGroupBar(it);
+    renderChecklist(it, s);
     $('edPos').textContent = `${it.lat.toFixed(6)}, ${it.lng.toFixed(6)}`;
     $('edAcc').textContent = it.acc != null ? `${fmtAcc(it.acc)}${it.n ? ` (${it.n} metingen)` : ''}` : 'onbekend';
     $('edSrc').textContent = SOURCE_LABEL[it.src] || it.src;
     $('edDate').textContent = fmtDate(it.createdAt);
+    $('edPosHint').textContent = g
+      ? `Positie volgt groep ${g.code}. Sleep de groepsmarker om alles samen te verplaatsen.`
+      : 'Sleep de marker op de kaart om de positie te corrigeren.';
+    $('edRegps').hidden = !!g;
     renderPhotos();
   }
   const cur = () => items.find(i => i.id === selectedId);
 
+  /* ---------- checklist ---------- */
+  let clKey = '';
+  function renderChecklist(it, s = checkSummary(it)) {
+    const list = CHECK[it.type] || [];
+    $('clCount').textContent = `${s.done}/${s.total} beantwoord${s.nok ? ` · ${s.nok} NOK` : ''}`;
+    $('clBar').style.width = `${s.total ? (s.done / s.total) * 100 : 0}%`;
+    $('clMeter').style.setProperty('--st', s.nokK ? 'var(--st-defect)' : s.nok ? 'var(--st-afwijking)' : s.complete ? 'var(--st-ok)' : 'var(--gps)');
+
+    // Only rebuild the rows when answers change, so typing a remark keeps focus.
+    const key = `${it.id}|${it.type}|${list.map(c => it.checks?.[c.id]?.r || '-').join(',')}`;
+    if (key !== clKey) {
+      clKey = key;
+      $('clList').innerHTML = list.map(c => {
+        const a = it.checks?.[c.id];
+        const r = a?.r || '';
+        return `<li class="cl-row" data-c="${c.id}" data-r="${r}">
+          <div class="cl-q">${esc(c.q)}${c.k ? '<span class="crit" title="NOK maakt het item defect">kritiek</span>' : ''}</div>
+          <div class="cl-btns" role="group" aria-label="${esc(c.q)}">${RESULTS.map(v =>
+            `<button type="button" data-r="${v}" aria-pressed="${r === v}">${v === 'nvt' ? 'n.v.t.' : v.toUpperCase()}</button>`).join('')}</div>
+          ${r === 'nok' ? `<input class="cl-note" type="text" data-note="${c.id}" value="${esc(a.note || '')}" placeholder="Wat is er mis? Komt in het rapport." aria-label="Opmerking bij: ${esc(c.q)}">` : ''}
+        </li>`;
+      }).join('');
+    }
+
+    const last = it.history?.[0];
+    const info = it.checkDone
+      ? `Controle afgerond op ${fmtDate(it.checkDone)}. Wijzig je nog een antwoord, dan wordt ze heropend.`
+      : last ? `Vorige controle: ${fmtDate(last.at)} · ${STATUS[last.status]?.label ?? last.status}${last.nok?.length ? ` · ${last.nok.length} NOK` : ''}` : '';
+    $('clInfo').textContent = info; $('clInfo').hidden = !info;
+    $('clFinish').hidden = !!it.checkDone;
+    $('clFinish').disabled = !s.complete;
+    $('clFinish').textContent = s.complete ? 'Controle afronden' : `Nog ${s.total - s.done} te beantwoorden`;
+    $('clNew').hidden = !it.checkDone && !s.done;
+    $('clNew').classList.remove('armed');
+    $('clNew').textContent = it.checkDone ? 'Nieuwe controle starten' : 'Wis antwoorden';
+  }
+  function afterChecklistChange(it) {
+    if (!it.statusManual) it.status = derivedStatus(checkSummary(it));
+    save(); renderAll();
+  }
+  $('clList').addEventListener('click', e => {
+    const b = e.target.closest('.cl-btns [data-r]'); const it = cur(); if (!b || !it) return;
+    const id = b.closest('[data-c]').dataset.c; const r = b.dataset.r;
+    const prev = it.checks[id];
+    if (prev?.r === r) delete it.checks[id];                 // tap again to clear
+    else it.checks[id] = { r, note: prev?.note || '' };
+    if (it.checkDone) { it.checkDone = null; it.history.shift(); toast('Afgeronde controle heropend'); }
+    afterChecklistChange(it);
+    if (r === 'nok' && it.checks[id] && !it.checks[id].note) $('clList').querySelector(`[data-note="${id}"]`)?.focus();
+  });
+  $('clList').addEventListener('input', e => {
+    const inp = e.target.closest('[data-note]'); const it = cur(); if (!inp || !it) return;
+    const a = it.checks[inp.dataset.note]; if (!a) return;
+    a.note = inp.value;
+    if (it.checkDone && it.history[0]) it.history[0].nok = nokLabels(it);
+    save();
+  });
+  $('clFinish').addEventListener('click', () => {
+    const it = cur(); if (!it) return;
+    const s = checkSummary(it); if (!s.complete) return;
+    const now = new Date().toISOString();
+    if (!it.statusManual) it.status = derivedStatus(s);
+    it.checkDone = now;
+    it.history = [{ at: now, status: it.status, nok: nokLabels(it) }, ...it.history].slice(0, 10);
+    it.demo = false;
+    save(); renderAll();
+    toast(`${it.code}: controle afgerond · ${STATUS[it.status].label}`);
+  });
+  $('clNew').addEventListener('click', () => {
+    const it = cur(); const b = $('clNew'); if (!it) return;
+    if (!it.checkDone && !b.classList.contains('armed')) { b.classList.add('armed'); b.textContent = 'Bevestig: alle antwoorden wissen'; return; }
+    const started = !!it.checkDone;
+    it.checks = {}; it.checkDone = null; it.statusManual = false; it.status = 'todo';
+    save(); renderAll();
+    toast(started ? 'Nieuwe controle gestart, vorige staat in de historiek' : 'Antwoorden gewist');
+  });
+
+  /* ---------- group bar in the item editor ---------- */
+  function renderGroupBar(it) {
+    const g = G(it.groupId);
+    if (g) {
+      const n = membersOf(g.id).length;
+      $('edGroupBar').innerHTML = `<span class="stack">${n}</span>
+        <div class="txt"><b>${esc(g.code)}</b>${g.name ? ` · ${esc(g.name)}` : ''}<small>${n} items op deze plek</small></div>
+        <button type="button" class="btn btn-ghost" data-g="open">Naar groep</button>
+        <button type="button" class="btn btn-ghost" data-g="leave">Uit groep</button>`;
+      return;
+    }
+    const near = nearestEntity(it, 15, { itemId: it.id }).slice(0, 3);
+    const typeBtns = TYPES.map(t => `<button type="button" class="type-btn" data-addtype="${t.id}"><span class="glyph" style="--c:${t.color}">${esc(t.glyph)}</span>${esc(t.short)}</button>`).join('');
+    $('edGroupBar').innerHTML = `<div class="txt"><b>Meerdere items op deze plek?</b><small>bv. muurhydrant met slang en lans in één brandkast</small></div>
+      <button type="button" class="btn btn-ghost" data-g="addhere" aria-expanded="${addHereOpen}">${addHereOpen ? 'Sluit' : '+ Item op deze plek'}</button>
+      ${addHereOpen ? `<div class="type-row" role="group" aria-label="Type van het nieuwe item">${typeBtns}</div>` : ''}
+      ${near.length ? `<div class="near"><span class="hint">Of groepeer met:</span>${near.map(x =>
+        `<button type="button" class="btn btn-ghost" data-g="join" data-kind="${x.kind}" data-id="${esc(x.e.id)}">${esc(x.e.code)} · ${fmtDist(x.d)}</button>`).join('')}</div>` : ''}`;
+  }
+  $('edGroupBar').addEventListener('click', e => {
+    const it = cur(); if (!it) return;
+    const add = e.target.closest('[data-addtype]');
+    if (add) {
+      const g = createGroup([it], [it]);
+      addHereOpen = false;
+      commitNew(add.dataset.addtype, null, g.id);
+      return;
+    }
+    const b = e.target.closest('[data-g]'); if (!b) return;
+    const a = b.dataset.g;
+    if (a === 'open') openGroup(it.groupId, false);
+    else if (a === 'leave') {
+      const g = G(it.groupId);
+      it.groupId = null; cleanupGroups(); save(); renderAll();
+      toast(`${it.code} uit ${g?.code ?? 'de groep'} gehaald`);
+    } else if (a === 'addhere') {
+      addHereOpen = !addHereOpen; renderGroupBar(it);
+    } else if (a === 'join') {
+      let g;
+      if (b.dataset.kind === 'group') { g = G(b.dataset.id); if (!g) return; it.groupId = g.id; syncGroup(g); }
+      else { const other = items.find(i => i.id === b.dataset.id); if (!other) return; g = createGroup([other, it], [other, it]); }
+      save(); renderAll();
+      toast(`${it.code} gegroepeerd in ${g.code}`);
+    }
+  });
+
+  /* ---------- group panel ---------- */
+  const curGroup = () => G(selectedGroupId);
+  function openGroup(gid, fly) {
+    const g = G(gid); if (!g) { toSheet(); return; }
+    clearPending();
+    if (selectedGroupId !== gid) $('groupPanel').scrollTop = 0;
+    selectedGroupId = gid; selectedId = null;
+    $('gpDissolve').classList.remove('armed'); $('gpDissolve').textContent = 'Groep opheffen';
+    showPanel('groupPanel');
+    renderAll();
+    if (fly) {
+      if (follow && lastFix && dist(lastFix, g) > 30) setFollow(false);
+      if (!follow) centerOn([g.lat, g.lng], Math.max(map.getZoom(), 19), { fly: true });
+    }
+  }
+  function renderGroup() {
+    const g = curGroup(); if (!g) { toSheet(); return; }
+    const mem = membersOf(g.id).sort((a, b) => a.code.localeCompare(b.code, 'nl', { numeric: true }));
+    const w = worstStatus(mem);
+    $('gpGlyph').textContent = mem.length;
+    $('gpTitle').textContent = g.code;
+    $('gpSub').innerHTML = `${esc(g.name || 'Groep zonder naam')} · <span style="color:var(--st-${w})">${esc(STATUS[w].label)}</span>${g.demo ? ' · voorbeeld' : ''}`;
+    if (document.activeElement !== $('gpName')) $('gpName').value = g.name || '';
+    $('gpCount').textContent = `${mem.length} items`;
+    $('gpItems').innerHTML = mem.map(i => itemRowHtml(i)).join('');
+    $('gpTypeRow').innerHTML = TYPES.map(t => `<button type="button" class="type-btn" data-addtype="${t.id}"><span class="glyph" style="--c:${t.color}">${esc(t.glyph)}</span>${esc(t.short)}</button>`).join('');
+    $('gpPos').textContent = `${g.lat.toFixed(6)}, ${g.lng.toFixed(6)}`;
+    $('gpAcc').textContent = g.acc != null ? `${fmtAcc(g.acc)}${g.n ? ` (${g.n} metingen)` : ''}` : 'onbekend';
+    $('gpSrc').textContent = SOURCE_LABEL[g.src] || g.src;
+  }
+  $('gpClose').addEventListener('click', toSheet);
+  $('gpItems').addEventListener('click', e => { const b = e.target.closest('[data-id]'); if (b) select(b.dataset.id, false); });
+  $('gpTypeRow').addEventListener('click', e => {
+    const b = e.target.closest('[data-addtype]'); const g = curGroup(); if (!b || !g) return;
+    commitNew(b.dataset.addtype, null, g.id);
+  });
+  $('gpName').addEventListener('input', () => {
+    const g = curGroup(); if (!g) return;
+    g.name = $('gpName').value; g.demo = false; save(); renderMarkers(); throttledList();
+  });
+  $('gpName').addEventListener('blur', () => { if (curGroup()) renderGroup(); });
+  $('gpRegps').addEventListener('click', () => {
+    const g = curGroup(); if (!g) return;
+    const id = g.id; toSheet(); startCapture({ kind: 'group', id });
+  });
+  $('gpDissolve').addEventListener('click', () => {
+    const b = $('gpDissolve'); const g = curGroup(); if (!g) return;
+    if (!b.classList.contains('armed')) { b.classList.add('armed'); b.textContent = 'Bevestig: groep opheffen'; return; }
+    const mem = membersOf(g.id);
+    mem.forEach(m => { m.groupId = null; });
+    groups = groups.filter(x => x !== g);
+    save(); toSheet();
+    toast(`${g.code} opgeheven. De ${mem.length} items staan nu los op dezelfde plek.`, 4000);
+  });
+
   $('edClose').addEventListener('click', closeEditor);
   $('edStatus').addEventListener('click', e => {
     const b = e.target.closest('[data-status]'); const it = cur(); if (!b || !it) return;
-    it.status = b.dataset.status; save(); renderAll();
+    it.status = b.dataset.status; it.statusManual = true;
+    if (it.checkDone && it.history[0]) it.history[0].status = it.status;
+    save(); renderAll();
+  });
+  $('edStatusHint').addEventListener('click', e => {
+    if (!e.target.closest('[data-st-auto]')) return;
+    const it = cur(); if (!it) return;
+    it.statusManual = false; it.status = derivedStatus(checkSummary(it));
+    if (it.checkDone && it.history[0]) it.history[0].status = it.status;
+    save(); renderAll();
   });
   $('edNote').addEventListener('input', () => { const it = cur(); if (!it) return; it.note = $('edNote').value; save(); throttledList(); });
   $('edType').addEventListener('change', () => {
@@ -1281,6 +1929,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     const oldPrefix = TYPE[it.type].prefix;
     it.type = $('edType').value;
     if (it.code.startsWith(oldPrefix + '-')) it.code = nextCode(it.type);
+    if (!it.statusManual) it.status = derivedStatus(checkSummary(it));
     save(); renderAll();
   });
   $('edCode').addEventListener('input', () => {
@@ -1294,13 +1943,16 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   $('edCode').addEventListener('blur', () => { const it = cur(); if (it) { $('edCode').value = it.code; $('edCode').classList.remove('bad'); $('edCodeErr').hidden = true; } });
   $('edRegps').addEventListener('click', () => {
     const it = cur(); if (!it) return;
-    const id = it.id; closeEditor(); startCapture(id);
+    const id = it.id; toSheet(); startCapture({ kind: 'item', id });
   });
   $('edDelete').addEventListener('click', () => {
     const b = $('edDelete'); const it = cur(); if (!it) return;
     if (!b.classList.contains('armed')) { b.classList.add('armed'); b.textContent = 'Bevestig verwijderen'; return; }
     deletePhotosOf([it]);
-    items = items.filter(i => i.id !== it.id); save(); closeEditor();
+    const gid = it.groupId;
+    items = items.filter(i => i.id !== it.id); cleanupGroups(); save();
+    selectedId = null;
+    if (G(gid)) openGroup(gid, false); else toSheet();
     toast(`${it.code} verwijderd${it.photos?.length ? ` (met ${it.photos.length} foto${it.photos.length > 1 ? "'s" : ''})` : ''}`);
   });
   addEventListener('keydown', e => {
@@ -1312,7 +1964,8 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     }
     if (e.key !== 'Escape') return;
     if (!$('searchBar').hidden) closeSearch();
-    else if (selectedId) closeEditor();
+    else if (!$('editor').hidden) closeEditor();
+    else if (!$('groupPanel').hidden) toSheet();
     else if (tapMode) setTapMode(false);
   });
 
@@ -1483,11 +2136,20 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   const SHEET_KEY = 'controleapp.kaartpreview.sheet';
   const mqPhone = matchMedia('(max-width: 899px)');
   const SNAPS = ['peek', 'half', 'full'];
-  let sheetState = 'half';
-  let editorState = 'half';
-  try { const s = localStorage.getItem(SHEET_KEY); if (SNAPS.includes(s)) sheetState = s; } catch { /* no storage */ }
+  const PANELS = ['sheet', 'editor', 'groupPanel'];
+  const panelState = { sheet: 'half', editor: 'half', groupPanel: 'half' };
+  try { const s = localStorage.getItem(SHEET_KEY); if (SNAPS.includes(s)) panelState.sheet = s; } catch { /* no storage */ }
 
-  const visiblePanel = () => (!$('editor').hidden ? $('editor') : $('sheet'));
+  function visiblePanel() { return $(PANELS.find(p => !$(p).hidden) || 'sheet'); }
+  // Switch the visible panel. Item and group panels open at least half height, or full if coming from full.
+  function showPanel(id) {
+    const prev = visiblePanel();
+    if (prev.id === id) return;
+    const prevState = panelState[prev.id];
+    PANELS.forEach(p => { $(p).hidden = p !== id; });
+    if (id !== 'sheet') panelState[id] = prevState === 'full' ? 'full' : 'half';
+    applyPanel($(id), panelState[id]);
+  }
 
   function snapHeights(panel) {
     const H = $('app').getBoundingClientRect().height;
@@ -1515,13 +2177,13 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   }
 
   function setPanelState(panel, state) {
-    if (panel === $('editor')) editorState = state;
-    else { sheetState = state; try { localStorage.setItem(SHEET_KEY, state); } catch { /* no storage */ } }
+    panelState[panel.id] = state;
+    if (panel.id === 'sheet') { try { localStorage.setItem(SHEET_KEY, state); } catch { /* no storage */ } }
     applyPanel(panel, state);
   }
-  const stateOf = panel => (panel === $('editor') ? editorState : sheetState);
+  const stateOf = panel => panelState[panel.id];
   // Expand the main sheet when something important appears below the peek line.
-  function ensureSheetOpen() { if (sheetState === 'peek' && !$('sheet').hidden) setPanelState($('sheet'), 'half'); }
+  function ensureSheetOpen() { if (panelState.sheet === 'peek' && !$('sheet').hidden) setPanelState($('sheet'), 'half'); }
 
   function bindSheetDrag(panel) {
     const zone = panel.querySelector('.grip-zone');
@@ -1539,7 +2201,8 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       const dy = e.clientY - startY;
       if (Math.abs(dy) > 5) moved = true;
       const s = snapHeights(panel);
-      panel.style.height = `${Math.min(s.full, Math.max(s.peek, startH - dy))}px`;
+      const h = Math.min(s.full, Math.max(s.peek, startH - dy));
+      panel.style.height = `${h}px`;
       const now = performance.now();
       vel = (e.clientY - lastY) / Math.max(1, now - lastT);   // px/ms, positive = downward
       lastY = e.clientY; lastT = now;
@@ -1567,9 +2230,11 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       else if (e.key === 'ArrowDown') { e.preventDefault(); setPanelState(panel, SNAPS[Math.max(0, i - 1)]); }
     });
   }
-  bindSheetDrag($('sheet'));
-  bindSheetDrag($('editor'));
-  const reapply = () => { const p = visiblePanel(); applyPanel(p, stateOf(p), false); if (!mqPhone.matches) applyPanel(p === $('sheet') ? $('editor') : $('sheet'), 'half', false); };
+  PANELS.forEach(id => bindSheetDrag($(id)));
+  const reapply = () => {
+    const p = visiblePanel(); applyPanel(p, stateOf(p), false);
+    if (!mqPhone.matches) PANELS.forEach(id => { if (id !== p.id) applyPanel($(id), 'half', false); });
+  };
   mqPhone.addEventListener?.('change', reapply);
   let resizeTimer; addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(reapply, 150); });
 
@@ -1657,7 +2322,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   function goToResult(r) {
     closeSearch(); $('sbResults').hidden = true;
     setFollow(false);
-    if (selectedId) closeEditor();
+    if (selectedId || selectedGroupId) toSheet();
     if (searchPin) map.removeLayer(searchPin);
 
     const box = document.createElement('div');
@@ -1688,7 +2353,11 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   $('btnClearDemo').addEventListener('click', () => {
     const demo = items.filter(i => i.demo); const n = demo.length;
     deletePhotosOf(demo);
-    items = items.filter(i => !i.demo); save(); if (selectedId && !cur()) closeEditor(); renderAll();
+    items = items.filter(i => !i.demo);
+    groups = groups.filter(g => !g.demo);
+    items.forEach(i => { if (i.groupId && !G(i.groupId)) i.groupId = null; });
+    cleanupGroups(); save();
+    if ((selectedId && !cur()) || (selectedGroupId && !curGroup())) toSheet(); else renderAll();
     toast(`${n} voorbeelditems verwijderd`);
   });
 
@@ -1703,6 +2372,11 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
           id: i.id, code: i.code, type: i.type, type_label: TYPE[i.type].label, status: i.status,
           notitie: i.note || null, nauwkeurigheid_m: i.acc, bron: i.src, metingen: i.n,
           aangemaakt: i.createdAt, voorbeeld: !!i.demo, fotos: i.photos?.length || 0, // blobs blijven lokaal
+          groep_id: i.groupId, groep_code: G(i.groupId)?.code ?? null, groep_naam: G(i.groupId)?.name || null,
+          checklist: (CHECK[i.type] || []).map(c => ({
+            id: c.id, vraag: c.q, kritiek: c.k, resultaat: i.checks?.[c.id]?.r || null, opmerking: i.checks?.[c.id]?.note || null,
+          })),
+          controle_afgerond: i.checkDone, status_manueel: !!i.statusManual, historiek: i.history || [],
         },
       })),
     };
@@ -1734,14 +2408,34 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
           src: typeof p.bron === 'string' ? p.bron : 'import', n: +p.metingen || 0,
           createdAt: typeof p.aangemaakt === 'string' ? p.aangemaakt : new Date().toISOString(),
           note: typeof p.notitie === 'string' ? p.notitie : '', demo: !!p.voorbeeld,
+          checks: Object.fromEntries((Array.isArray(p.checklist) ? p.checklist : [])
+            .filter(c => c && typeof c.id === 'string' && RESULTS.includes(c.resultaat))
+            .map(c => [c.id, { r: c.resultaat, note: typeof c.opmerking === 'string' ? c.opmerking : '' }])),
+          statusManual: !!p.status_manueel,
+          checkDone: typeof p.controle_afgerond === 'string' ? p.controle_afgerond : null,
+          history: Array.isArray(p.historiek) ? p.historiek : [],
+          groupId: null,
         };
         if (!validItem(it)) { skipped++; continue; }
         const idx = items.findIndex(x => x.id === it.id);
         it.code = typeof p.code === 'string' && p.code.trim() ? p.code.trim().toUpperCase() : (idx >= 0 ? items[idx].code : nextCode(it.type));
         it.photos = idx >= 0 ? (items[idx].photos || []) : [];   // keep locally stored photos of existing items
+        if (typeof p.groep_id === 'string' && p.groep_id) {
+          let g = G(p.groep_id);
+          if (!g) {
+            g = { id: p.groep_id, code: typeof p.groep_code === 'string' && p.groep_code ? p.groep_code : nextGroupCode(),
+              name: typeof p.groep_naam === 'string' ? p.groep_naam : '', lat: it.lat, lng: it.lng, acc: it.acc,
+              src: it.src, n: it.n, createdAt: it.createdAt, demo: it.demo };
+            groups.push(g);
+          }
+          it.groupId = g.id;
+        }
+        normalizeItem(it);
         if (idx >= 0) { items[idx] = it; updated++; } else { items.push(it); added++; }
       }
-      save(); renderAll();
+      groups.forEach(syncGroup); cleanupGroups();
+      save();
+      if ((selectedId && !cur()) || (selectedGroupId && !curGroup())) toSheet(); else renderAll();
       if (items.length) map.fitBounds(L.latLngBounds(items.map(i => [i.lat, i.lng])).pad(.2), { maxZoom: 19 });
       toast(`Import: ${added} nieuw, ${updated} bijgewerkt${skipped ? `, ${skipped} overgeslagen` : ''}`, 4000);
     } catch (err) {
@@ -1757,10 +2451,11 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   } else {
     db().catch(() => showStorageProblem('Items worden wel bewaard, foto\'s niet (IndexedDB niet beschikbaar in deze browser).', 'Foto\'s worden niet bewaard.'));
   }
-  if (!load()) { seedDemo(); save(); }
+  if (!load()) seedDemo();
+  save();   // persists seed data and any migration of older saved data
   renderTypes();
   renderAll();
-  applyPanel($('sheet'), sheetState, false);
+  applyPanel($('sheet'), panelState.sheet, false);
   applyMapTheme();
   if (items.length) map.fitBounds(L.latLngBounds(items.map(i => [i.lat, i.lng])).pad(.25), { maxZoom: 19 });
   startGps();
