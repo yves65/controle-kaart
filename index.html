@@ -24,6 +24,8 @@
   --st-ok: #23854f;
   --st-afwijking: #c98200;
   --st-defect: #c8102e;
+  --st-otv: var(--st-afwijking);
+  --st-nok: var(--st-defect);
   --shadow: 0 6px 24px rgba(16, 28, 24, .16), 0 1px 3px rgba(16, 28, 24, .12);
   --font-ui: "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
@@ -120,6 +122,56 @@ button.brand { border: 0; text-align: left; color: var(--fg); min-width: 0; max-
 .co-form h3 { margin: 0; font: 700 20px/1.1 var(--font-display); letter-spacing: .02em; }
 .dr-foot { border-top: 1px solid var(--line); padding-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
 .no-co { display: flex; flex-direction: column; gap: 10px; }
+.dr-tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); }
+.dr-tabs button { flex: 1; border: 0; background: transparent; border-bottom: 2.5px solid transparent; margin-bottom: -1px; padding: 10px 4px 8px; font-weight: 600; font-size: 14px; color: var(--muted); }
+.dr-tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
+.dr-tabs button:disabled { opacity: .45; cursor: default; }
+.dr-tabs b { display: inline-block; min-width: 18px; padding: 0 5px; margin-left: 4px; border-radius: 9px; background: var(--accent); color: var(--accent-fg); font-size: 11px; line-height: 18px; }
+.dr-back { align-self: flex-start; border: 0; background: none; color: var(--gps); font-weight: 600; padding: 2px 0; }
+.co-card { border: 1.5px solid var(--line); border-radius: var(--radius); padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.co-card h3 { margin: 0; font: 700 21px/1.1 var(--font-display); letter-spacing: .02em; }
+.co-card dl.meta a { color: var(--gps); }
+.lock-note { margin: 0; font-size: 13px; color: var(--muted); background: var(--surface-2); border-radius: 8px; padding: 8px 10px; }
+.bd-form { display: flex; gap: 6px; flex-wrap: wrap; }
+.bd-form input { flex: 1 1 160px; min-width: 0; background: var(--surface-2); border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.bd-form .btn { min-height: 40px; padding: 8px 12px; }
+.co-main small .bad, .bd-list small .bad { color: var(--st-nok); font-weight: 600; }
+.co-main small .warn { color: var(--st-otv); font-weight: 600; }
+.role-row { display: flex; align-items: center; gap: 8px; width: 100%; font-size: 13px; color: var(--muted); }
+.role-row select { flex: 1; min-width: 0; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; color: var(--fg); }
+.del-box { display: flex; flex-direction: column; gap: 8px; padding: 10px; border: 1.5px solid var(--st-defect); border-radius: var(--radius); }
+.del-box p { margin: 0; font-size: 14px; }
+.del-box input { background: var(--surface-2); border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.btn-danger:disabled { opacity: .45; cursor: not-allowed; }
+.rp { display: flex; flex-direction: column; gap: 8px; }
+.rp-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.rp-item { border: 1.5px solid var(--line); border-radius: var(--radius); padding: 9px 10px; display: flex; flex-direction: column; gap: 5px; font-size: 14px; }
+.rp-item .top { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.rp-item .meta { font-size: 12px; color: var(--muted); }
+.rp-item .acts { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.rp-item .acts .btn { min-height: 36px; padding: 6px 10px; font-size: 13px; }
+.rp-item .acts select { background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 7px 8px; font-size: 13px; color: var(--fg); }
+.rp-form { display: flex; flex-direction: column; gap: 8px; padding: 10px; border-radius: var(--radius); background: var(--surface-2); }
+.rp-form .row { display: flex; gap: 8px; flex-wrap: wrap; }
+.chk { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.chk input { width: 18px; height: 18px; }
+.qr-in { display: flex; gap: 6px; }
+.qr-in input { flex: 1; min-width: 0; }
+.qr-in .icon-btn { flex: none; display: grid; place-items: center; }
+.qr-in .icon-btn svg { width: 18px; height: 18px; }
+.field input:disabled, .field select:disabled, .field textarea:disabled { opacity: .7; }
+.ro-note { margin: 0; }
+.qrscan { position: fixed; inset: 0; z-index: 1250; background: #0b0d0c; color: #eef1f0; display: flex; flex-direction: column; }
+.qrscan .lb-info span { display: block; color: #b9c2be; }
+.qr-stage { flex: 1; min-height: 0; position: relative; display: grid; place-items: center; overflow: hidden; background: #000; }
+.qr-stage video { width: 100%; height: 100%; object-fit: cover; }
+.qr-frame { position: absolute; width: min(64vw, 280px); aspect-ratio: 1; border: 3px solid rgba(255,255,255,.85); border-radius: 18px; box-shadow: 0 0 0 100vmax rgba(0,0,0,.35); pointer-events: none; }
+.qr-bottom { padding: 12px max(12px, env(safe-area-inset-left, 0px)) calc(14px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 10px; }
+.qr-manual { display: flex; gap: 8px; }
+.qr-manual input { flex: 1; min-width: 0; background: #171d1b; color: #eef1f0; border: 1.5px solid #3a4440; border-radius: 8px; padding: 10px; font-size: 16px; }
+.qr-result { background: #171d1b; border: 1.5px solid #3a4440; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.qr-result p { margin: 0; }
+.qr-result .row { display: flex; gap: 8px; flex-wrap: wrap; }
 
 .chip {
   display: inline-flex; align-items: center; gap: 7px; border: 0; border-radius: 999px; background: var(--surface);
@@ -286,8 +338,8 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
 .mk span { transform: rotate(45deg); color: #fff; font: 700 12px/1 var(--font-display); letter-spacing: .02em; }
 .mk[data-st="todo"], .gmk[data-st="todo"] { --st: #ffffff; }
 .mk[data-st="ok"], .gmk[data-st="ok"] { --st: #2fb36a; }
-.mk[data-st="afwijking"], .gmk[data-st="afwijking"] { --st: #f0a92a; }
-.mk[data-st="defect"], .gmk[data-st="defect"] { --st: #ffd400; }
+.mk[data-st="otv"], .gmk[data-st="otv"] { --st: #f0a92a; }
+.mk[data-st="nok"], .gmk[data-st="nok"] { --st: #ffd400; }
 .mk.sel { transform: rotate(-45deg) scale(1.3); box-shadow: 0 0 0 3px var(--st), 0 0 0 6px var(--gps), 0 2px 8px rgba(0,0,0,.5); }
 .mk.demo { opacity: .8; }
 /* group marker: two stacked squares, ring = worst status of its items */
@@ -343,7 +395,10 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
 }
 .cl-btns button[aria-pressed="true"][data-r="ok"] { background: var(--st-ok); border-color: var(--st-ok); color: var(--surface); }
 .cl-btns button[aria-pressed="true"][data-r="nok"] { background: var(--st-defect); border-color: var(--st-defect); color: var(--surface); }
-.cl-btns button[aria-pressed="true"][data-r="nvt"] { background: var(--muted); border-color: var(--muted); color: var(--surface); }
+.cl-btns button[aria-pressed="true"][data-r="otv"] { background: var(--st-otv); border-color: var(--st-otv); color: var(--surface); }
+.cl-row[data-r="otv"] { background: var(--surface-2); box-shadow: inset 3px 0 0 var(--st-otv); }
+.cl-row[data-r="otv"] .cl-note { border-color: var(--st-otv); }
+.st-line { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
 .cl-note {
   grid-column: 1 / -1; width: 100%; background: var(--surface); border: 1.5px solid var(--st-defect); border-radius: 8px;
   padding: 7px 10px; font-size: 14px;
@@ -474,6 +529,9 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     <button class="chip icon-chip" id="btnSearch" type="button" aria-label="Zoek adres" aria-expanded="false" aria-controls="searchBar" title="Zoek adres of coördinaten">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>
     </button>
+    <button class="chip icon-chip" id="btnQr" type="button" aria-label="Scan QR-sticker" title="Scan de QR-sticker van een item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5M8 12h8"/></svg>
+    </button>
     <button class="chip gps-chip" id="gpsChip" data-q="none" type="button" title="GPS-status"><span class="dot"></span><span id="gpsText">GPS zoeken…</span></button>
     <div class="seg" role="group" aria-label="Kaartachtergrond">
       <button type="button" data-layer="osm" aria-pressed="true">Kaart</button>
@@ -510,13 +568,14 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       <p><strong id="storageWarnTitle">Wijzigingen worden niet bewaard.</strong><br><span id="storageWarnText"></span></p>
     </div>
     <div class="notice no-co" id="noCompany" hidden>
-      <p><strong>Nog geen bedrijf gekozen.</strong><br>Items horen altijd bij een bedrijf. Maak er eerst een aan.</p>
-      <button class="btn btn-primary" id="noCoAdd" type="button">+ Nieuw bedrijf</button>
+      <p><strong>Nog geen bedrijf gekozen.</strong><br>Items horen altijd bij een bedrijf. Kies in het menu het bedrijf waar je werkt.</p>
+      <button class="btn btn-primary" id="noCoAdd" type="button">Open het menu</button>
     </div>
-    <div class="label">Type item</div>
+    <p class="notice ro-note" id="roNote" hidden></p>
+    <div class="label" id="typeLabel">Type item</div>
     <div class="type-row" id="typeRow" role="group" aria-label="Type item"></div>
 
-    <div class="action-row" data-peek>
+    <div class="action-row" id="actRow" data-peek>
       <button class="btn btn-primary" id="btnCapture" type="button">Plaats op GPS-positie</button>
       <button class="btn btn-secondary" id="btnTap" type="button" aria-pressed="false">Tik op kaart</button>
     </div>
@@ -550,11 +609,12 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       <ul class="items" id="itemList"></ul>
       <div class="io">
         <button class="btn btn-ghost" id="btnExport" type="button">Exporteer dit bedrijf</button>
-        <label class="btn btn-ghost" for="fileImport">Importeer</label>
+        <label class="btn btn-ghost" for="fileImport" id="lblImport">Importeer</label>
         <input type="file" id="fileImport" accept=".geojson,.json,application/geo+json,application/json" hidden>
         <button class="btn btn-ghost" id="btnClearDemo" type="button">Wis voorbeelden</button>
+        <button class="btn btn-ghost" id="btnReDemo" type="button">Voorbeeld opnieuw laden</button>
       </div>
-      <p class="label" style="margin-top:10px">Versie 10</p>
+      <p class="label" style="margin-top:10px">Versie 11</p>
     </details>
   </section>
 
@@ -567,19 +627,31 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       <button class="icon-btn" id="edClose" type="button" aria-label="Sluit">×</button>
     </div>
     <div class="grp-bar" id="edGroupBar"></div>
-    <fieldset class="status-seg" id="edStatus"><legend class="label">Status</legend></fieldset>
-    <p class="st-hint" id="edStatusHint"></p>
+    <div class="st-line" id="edStatus"></div>
     <section class="cl" aria-labelledby="clTitle">
-      <div class="cl-head"><span class="label" id="clTitle">Checklist</span><small id="clCount"></small></div>
+      <div class="cl-head"><span class="label" id="clTitle">Controle</span><small id="clCount"></small></div>
       <div class="meter cl-meter" id="clMeter"><i id="clBar"></i></div>
       <ol class="cl-list" id="clList"></ol>
       <p class="hint" id="clInfo"></p>
+      <p class="hint" id="clDraft">Voorlopige checklist: de echte ABBA-lijst voor dit type wordt nog ingevuld door de admin.</p>
       <div class="cl-actions">
+        <button class="btn btn-ghost" id="clAllOk" type="button">Rest op OK</button>
         <button class="btn btn-secondary" id="clFinish" type="button">Controle afronden</button>
         <button class="btn btn-ghost" id="clNew" type="button">Nieuwe controle</button>
       </div>
     </section>
-    <div class="field"><label class="label" for="edNote">Notitie</label><textarea id="edNote" rows="2" placeholder="bv. deksel vastgeroest, aanduidingsbord ontbreekt"></textarea></div>
+    <section class="rp" aria-labelledby="rpTitle">
+      <div class="cl-head"><span class="label" id="rpTitle">Herstellingen</span><small id="rpCount"></small></div>
+      <ul class="rp-list" id="rpList"></ul>
+      <div class="rp-form" id="rpForm" hidden>
+        <div class="field"><label class="label" for="rpType">Soort herstelling</label><select id="rpType"></select></div>
+        <div class="field"><label class="label" for="rpNote">Omschrijving</label><textarea id="rpNote" rows="2" placeholder="bv. stop 100 vervangen, stang te herstellen"></textarea></div>
+        <label class="chk"><input type="checkbox" id="rpDone"> Ter plaatse hersteld</label>
+        <div class="row"><button class="btn btn-secondary" id="rpSave" type="button">Opslaan</button><button class="btn btn-ghost" id="rpCancel" type="button">Annuleer</button></div>
+      </div>
+      <button class="btn btn-ghost" id="rpAdd" type="button">+ Herstelling</button>
+    </section>
+    <div class="field"><label class="label" for="edNote">Extra informatie</label><textarea id="edNote" rows="2" placeholder="bv. grond, asfalt, bovenstang volledig"></textarea></div>
     <div class="field">
       <div class="photos-head"><span class="label">Foto's</span><small id="phCount"></small></div>
       <div class="photo-grid" id="phGrid" hidden></div>
@@ -597,7 +669,14 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       <div class="field"><label class="label" for="edCode">Code</label><input id="edCode" autocomplete="off" spellcheck="false"><span class="err" id="edCodeErr" hidden></span></div>
       <div class="field"><label class="label" for="edType">Type</label><select id="edType"></select></div>
     </div>
-    <div class="field"><label class="label" for="edCompany">Bedrijf</label><select id="edCompany"></select></div>
+    <div class="field-grid">
+      <div class="field"><label class="label" for="edQr">QR-sticker</label>
+        <div class="qr-in"><input id="edQr" inputmode="numeric" autocomplete="off" placeholder="bv. 10034462">
+          <button class="icon-btn" id="edQrScan" type="button" aria-label="Scan sticker" title="Scan sticker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5M8 12h8"/></svg></button></div>
+        <span class="err" id="edQrErr" hidden></span></div>
+      <div class="field" id="edBuildingField"><label class="label" for="edBuilding">Gebouw</label><select id="edBuilding"></select></div>
+    </div>
+    <div class="field" id="edCompanyField"><label class="label" for="edCompany">Bedrijf (alleen kantoor)</label><select id="edCompany"></select></div>
     <dl class="meta">
       <dt>Positie</dt><dd class="mono" id="edPos"></dd>
       <dt>Nauwkeurigheid</dt><dd id="edAcc"></dd>
@@ -625,10 +704,11 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       <ul class="items" id="gpItems"></ul>
     </div>
     <div class="field">
-      <span class="label">Item toevoegen aan deze groep</span>
+      <span class="label" id="gpAddLabel">Item toevoegen aan deze groep</span>
       <div class="type-row" id="gpTypeRow" role="group" aria-label="Item toevoegen aan deze groep"></div>
     </div>
-    <div class="field"><label class="label" for="gpCompany">Bedrijf</label><select id="gpCompany"></select></div>
+    <div class="field" id="gpBuildingField"><label class="label" for="gpBuilding">Gebouw</label><select id="gpBuilding"></select></div>
+    <div class="field" id="gpCompanyField"><label class="label" for="gpCompany">Bedrijf (alleen kantoor)</label><select id="gpCompany"></select></div>
     <dl class="meta">
       <dt>Positie</dt><dd class="mono" id="gpPos"></dd>
       <dt>Nauwkeurigheid</dt><dd id="gpAcc"></dd>
@@ -654,7 +734,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     </div>
   </div>
 
-  <!-- side menu: companies -->
+  <!-- side menu -->
   <div class="scrim" id="scrim"></div>
   <nav class="drawer" id="drawer" aria-label="Menu" aria-hidden="true" inert>
     <div class="dr-head">
@@ -662,29 +742,90 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       <div><strong>ControleApp</strong><small id="drSub"></small></div>
       <button class="icon-btn" id="drClose" type="button" aria-label="Sluit menu">×</button>
     </div>
-    <div class="dr-body" id="drListView">
-      <span class="label">Bedrijven</span>
+    <div class="dr-tabs" id="drTabs" role="tablist">
+      <button type="button" role="tab" data-view="companies" aria-selected="true">Bedrijven</button>
+      <button type="button" role="tab" data-view="repairs" aria-selected="false">Herstellingen<b id="drRepCount" hidden></b></button>
+      <button type="button" role="tab" disabled title="Volgt in een volgende versie">Servicebon</button>
+    </div>
+
+    <div class="dr-body" id="drCompanies">
+      <span class="label">Jouw bedrijven</span>
       <input class="dr-search" id="drSearch" type="search" placeholder="Zoek bedrijf of adres" autocomplete="off" hidden>
       <ul class="co-list" id="coList"></ul>
       <button class="btn btn-primary" id="coAdd" type="button">+ Nieuw bedrijf</button>
-      <p class="hint">De kaart toont alleen de items van het gekozen bedrijf.</p>
+      <p class="hint" id="coAddHint">Bedrijven worden op kantoor aangemaakt en aan jou toegewezen. Je ziet alleen die bedrijven, en de kaart toont telkens één bedrijf.</p>
     </div>
+
+    <div class="dr-body" id="drCompany" hidden>
+      <button class="dr-back" id="cdBack" type="button">‹ Alle bedrijven</button>
+      <div class="co-card">
+        <h3 id="cdName"></h3>
+        <dl class="meta" id="cdInfo"></dl>
+        <p class="lock-note" id="cdLock">Bedrijfsgegevens worden op kantoor beheerd. Klopt er iets niet, meld het aan de planner.</p>
+        <button class="btn btn-ghost" id="cdEdit" type="button">Bedrijfsgegevens bewerken</button>
+      </div>
+      <span class="label">Gebouwen</span>
+      <p class="hint" id="cdStruct"></p>
+      <ul class="co-list bd-list" id="bdList"></ul>
+      <p class="hint" id="bdEmpty"></p>
+      <form class="bd-form" id="bdForm" autocomplete="off">
+        <input id="bdName" maxlength="60" placeholder="bv. Magazijn A, Buiten hydranten" aria-label="Naam van het gebouw">
+        <button class="btn btn-secondary" id="bdSave" type="submit">+ Gebouw</button>
+        <button class="btn btn-ghost" id="bdCancel" type="button" hidden>Annuleer</button>
+        <button class="btn btn-danger" id="bdDelete" type="button" hidden>Verwijder gebouw</button>
+      </form>
+      <button class="btn btn-primary" id="cdShow" type="button">Toon op kaart</button>
+    </div>
+
     <form class="dr-body co-form" id="coForm" hidden autocomplete="off">
       <h3 id="coFormTitle">Nieuw bedrijf</h3>
-      <div class="field"><label class="label" for="coName">Naam</label><input id="coName" maxlength="80" placeholder="bv. Brouwerij De Molen"><span class="err" id="coNameErr" hidden></span></div>
-      <div class="field"><label class="label" for="coAddr">Adres</label><input id="coAddr" maxlength="120" placeholder="Straat nr, gemeente"></div>
-      <div class="field"><label class="label" for="coNote">Contact / notitie</label><textarea id="coNote" rows="3" placeholder="Contactpersoon, telefoon, toegang, sleutel …"></textarea></div>
+      <div class="field"><label class="label" for="coName">Naam</label><input id="coName" maxlength="80" placeholder="bv. Cargoville"><span class="err" id="coNameErr" hidden></span></div>
+      <div class="field"><label class="label" for="coAddr">Adres</label><input id="coAddr" maxlength="120" placeholder="Straat nr, postcode gemeente"></div>
+      <div class="field"><label class="label" for="coContact">Contactpersoon</label><input id="coContact" maxlength="80"></div>
+      <div class="field-grid">
+        <div class="field"><label class="label" for="coPhone">Telefoon</label><input id="coPhone" type="tel" maxlength="30"></div>
+        <div class="field"><label class="label" for="coMail">E-mail</label><input id="coMail" type="email" maxlength="80"></div>
+      </div>
+      <div class="field"><label class="label" for="coNote">Notitie</label><textarea id="coNote" rows="3" placeholder="Toegang, sleutel, gewenste maand …"></textarea></div>
       <div class="ed-actions">
         <button class="btn btn-primary" type="submit">Opslaan</button>
         <button class="btn btn-ghost" id="coCancel" type="button">Annuleer</button>
       </div>
-      <button class="btn btn-danger" id="coDelete" type="button" hidden>Verwijder bedrijf</button>
+      <button class="btn btn-danger" id="coDelete" type="button" hidden>Bedrijf verwijderen…</button>
+      <div class="del-box" id="coDelBox" hidden>
+        <p id="coDelText"></p>
+        <input id="coDelInput" autocomplete="off" aria-label="Naam van het bedrijf ter bevestiging">
+        <button class="btn btn-danger" id="coDelGo" type="button" disabled>Definitief verwijderen</button>
+      </div>
     </form>
+
+    <div class="dr-body" id="drRepairs" hidden>
+      <span class="label">Aan mij toegewezen</span>
+      <ul class="co-list" id="rpMine"></ul>
+      <span class="label" id="rpHereTitle">Open herstellingen</span>
+      <ul class="co-list" id="rpHere"></ul>
+    </div>
+
     <div class="dr-foot">
+      <label class="role-row">Bekijk als (preview) <select id="roleSel">
+        <option value="tech">Technieker</option><option value="manager">Manager / planner</option>
+        <option value="admin">Admin (kantoor)</option><option value="viewer">Viewer (alleen lezen)</option></select></label>
       <button class="btn btn-ghost" id="btnExportAll" type="button">Back-up alle bedrijven</button>
-      <span class="label">Versie 10</span>
+      <span class="label">Versie 11</span>
     </div>
   </nav>
+
+  <div class="qrscan" id="qrScan" hidden role="dialog" aria-modal="true" aria-label="QR-sticker scannen">
+    <div class="lb-bar lb-top">
+      <div class="lb-info"><strong>Scan QR-sticker</strong><span id="qrHint"></span></div>
+      <button class="lb-btn" id="qrClose" type="button">Sluit</button>
+    </div>
+    <div class="qr-stage"><video id="qrVideo" playsinline muted></video><div class="qr-frame"></div></div>
+    <div class="qr-bottom">
+      <div class="qr-result" id="qrResult" hidden></div>
+      <form class="qr-manual" id="qrManual" autocomplete="off"><input id="qrInput" inputmode="numeric" placeholder="Of typ het stickernummer" aria-label="Stickernummer"><button class="lb-btn" type="submit">Zoek</button></form>
+    </div>
+  </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </div>
@@ -703,143 +844,180 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   const STALE_MS = 10000;          // fix older than this = stale
   const DEMO_CENTER = { lat: 51.05430, lng: 3.72150 }; // fictief voorbeeldterrein
 
+  // Item types. In the real app these are master data managed by the admin (type, code prefix, checks, repair types).
+  // ids stay stable so data saved by older versions keeps working; `legacy` types are not offered for new items.
   const TYPES = [
-    { id: 'hydrant_boven', label: 'Bovengrondse hydrant', short: 'Hydrant boven', prefix: 'HB', glyph: 'H',  color: '#c8102e' },
-    { id: 'hydrant_onder', label: 'Ondergrondse hydrant', short: 'Hydrant onder', prefix: 'HO', glyph: 'HO', color: '#d9541a' },
-    { id: 'muurhydrant',   label: 'Muurhydrant',          short: 'Muurhydrant',   prefix: 'MH', glyph: 'MH', color: '#a8336b' },
-    { id: 'brandhaspel',   label: 'Brandhaspel',          short: 'Haspel',        prefix: 'BH', glyph: 'BH', color: '#7a2c8f' },
-    { id: 'brandslang',    label: 'Brandslang',           short: 'Brandslang',    prefix: 'BS', glyph: 'BS', color: '#8a6a12' },
-    { id: 'lans',          label: 'Lans / straalpijp',    short: 'Lans',          prefix: 'LA', glyph: 'L',  color: '#3a3f8f' },
-    { id: 'blustoestel',   label: 'Blustoestel',          short: 'Blustoestel',   prefix: 'BT', glyph: 'B',  color: '#0b7a75' },
-    { id: 'droge_leiding', label: 'Droge stijgleiding',   short: 'Droge leiding', prefix: 'DL', glyph: 'DL', color: '#2a5bb0' },
-    { id: 'afsluiter',     label: 'Afsluiter',            short: 'Afsluiter',     prefix: 'AF', glyph: 'A',  color: '#5d6b22' },
-    { id: 'overig',        label: 'Overig',               short: 'Overig',        prefix: 'OV', glyph: '?',  color: '#4a4f4d' },
+    { id: 'hydrant_boven', label: 'Hydrant (bovengronds)', short: 'Hydrant',        prefix: 'HY',  glyph: 'HY', color: '#c8102e' },
+    { id: 'hydrant_onder', label: 'Ondergrondse hydrant',  short: 'Ondergronds',    prefix: 'OH',  glyph: 'OH', color: '#d9541a' },
+    { id: 'muurhydrant',   label: 'Muurhydrant',           short: 'Muurhydrant',    prefix: 'MH',  glyph: 'MH', color: '#a8336b' },
+    { id: 'brandhaspel',   label: 'Haspel',                short: 'Haspel',         prefix: 'HA',  glyph: 'HA', color: '#7a2c8f' },
+    { id: 'slang_45',      label: 'Slang 45',              short: 'Slang 45',       prefix: 'SL',  glyph: '45', color: '#8a6a12' },
+    { id: 'slang_70',      label: 'Slang 70',              short: 'Slang 70',       prefix: 'SL',  glyph: '70', color: '#7a5a0c' },
+    { id: 'slang_110',     label: 'Slang 110',             short: 'Slang 110',      prefix: 'SL',  glyph: '110', color: '#6a4a08' },
+    { id: 'lans',          label: 'Lans / straalpijp',     short: 'Lans',           prefix: 'LA',  glyph: 'LA', color: '#3a3f8f' },
+    { id: 'afsluiter',     label: 'Sectie afsluiter',      short: 'Sectie afsl.',   prefix: 'SA',  glyph: 'SA', color: '#5d6b22' },
+    { id: 'piv',           label: 'PIV (post indicator valve)', short: 'PIV',       prefix: 'PIV', glyph: 'PIV', color: '#2f6f4f' },
+    { id: 'blustoestel',   label: 'Blustoestel',           short: 'Blustoestel',    prefix: 'BT',  glyph: 'BT', color: '#0b7a75' },
+    { id: 'droge_leiding', label: 'Droge stijgleiding',    short: 'Droge leiding',  prefix: 'DL',  glyph: 'DL', color: '#2a5bb0' },
+    { id: 'overig',        label: 'Overig',                short: 'Overig',         prefix: 'OV',  glyph: '?',  color: '#4a4f4d' },
+    { id: 'brandslang',    label: 'Brandslang (oud type)', short: 'Brandslang',     prefix: 'SL',  glyph: 'SL', color: '#8a6a12', legacy: true },
   ];
   const TYPE = Object.fromEntries(TYPES.map(t => [t.id, t]));
+  const PICK_TYPES = TYPES.filter(t => !t.legacy);
+  // Item status follows the checks of the running control: the worst answer wins (NOK > OTV > OK), as on the paper report.
   const STATUSES = [
-    { id: 'todo',      label: 'Te controleren' },
-    { id: 'ok',        label: 'In orde' },
-    { id: 'afwijking', label: 'Afwijking' },
-    { id: 'defect',    label: 'Defect' },
+    { id: 'todo', label: 'Te controleren' },
+    { id: 'ok',   label: 'OK' },
+    { id: 'otv',  label: 'OTV' },
+    { id: 'nok',  label: 'NOK' },
   ];
   const STATUS = Object.fromEntries(STATUSES.map(s => [s.id, s]));
-  // Checklists per type. Third value 1 = kritiek: NOK maakt het item "Defect", andere NOK = "Afwijking".
+  // Checks per type. The hydrant list is the one from the ABBA paper report (campagne Cargoville 2024);
+  // the other lists are provisional until the real ABBA lists are filled in by the admin.
   const CHECKS = {
     hydrant_boven: [
-      ['bereikbaar', 'Vrij bereikbaar, geen obstakels rondom', 1],
-      ['signalisatie', 'Signalisatie / aanduidingsbord aanwezig en leesbaar'],
-      ['schade', 'Geen aanrijdschade, scheefstand of corrosie'],
-      ['kappen', 'Kappen aanwezig en sluiten goed'],
-      ['koppelingen', 'Koppelingen in goede staat, dichtingen aanwezig'],
-      ['bediening', 'Bedieningsspil draait vlot (openen en sluiten)', 1],
-      ['spoeling', 'Gespoeld: water helder en voldoende druk', 1],
-      ['aftap', 'Aftapping werkt, geen water in de kolom (vorst)'],
-      ['verf', 'Verf en markering in orde'],
+      ['dichtingsringen', 'Aanwezigheid dichtingsringen in koppelstukken'],
+      ['kenteken', 'Aanwezigheid van kenteken en pictogram hydrant'],
+      ['nummering', 'Nummering aanwezig op hydrant'],
+      ['zijkranen', 'Algemene gangbaarheid zijkranen 2½"'],
+      ['koppelstukken', 'Beschadigingen koppelstukken 2½" en 4"'],
+      ['hoofdspindel', 'Algemene gangbaarheid hoofdspindel hydrant'],
+      ['afsluiters', 'Lekken op afsluiters 2½"'],
+      ['toestand', 'Algemene toestand hydrant'],
+      ['drainage', 'Controle drainage systeem (leegloop) hydrant'],
     ],
     hydrant_onder: [
-      ['bereikbaar', 'Deksel vrij: niet geparkeerd, overbouwd of overgeasfalteerd', 1],
+      ['bereikbaar', 'Deksel vrij: niet geparkeerd, overbouwd of overgeasfalteerd'],
       ['deksel', 'Deksel opent vlot, niet vastgeroest of beschadigd'],
       ['bord', 'Hydrantbord aanwezig, afstanden kloppen met de ligging'],
       ['put', 'Put vrij van vuil, puin en water'],
       ['klauw', 'Klauwstuk / aansluiting standpijp in goede staat'],
-      ['afsluiter', 'Afsluiter opent en sluit vlot', 1],
-      ['spoeling', 'Gespoeld: water helder en voldoende druk', 1],
+      ['afsluiter', 'Afsluiter opent en sluit vlot'],
+      ['spoeling', 'Gespoeld: water helder en voldoende druk'],
       ['aftap', 'Put loopt leeg na sluiten (aftapping werkt)'],
     ],
     muurhydrant: [
-      ['bereikbaar', 'Bereikbaar, niet geblokkeerd', 1],
+      ['bereikbaar', 'Bereikbaar, niet geblokkeerd'],
       ['signalisatie', 'Pictogram / signalisatie aanwezig en zichtbaar'],
       ['kast', 'Kast of nis: deur opent vlot, ruitje en slot in orde'],
-      ['afsluiter', 'Afsluiter opent volledig en sluit dicht, geen lekkage', 1],
+      ['afsluiter', 'Afsluiter opent volledig en sluit dicht, geen lekkage'],
       ['koppeling', 'Koppeling in goede staat, dichting aanwezig'],
       ['druk', 'Statische druk gemeten en voldoende'],
       ['toebehoren', 'Slang en lans aanwezig (indien voorzien)'],
       ['leiding', 'Geen lekkage of corrosie aan de leiding'],
     ],
     brandhaspel: [
-      ['bereikbaar', 'Bereikbaar, niet geblokkeerd', 1],
+      ['bereikbaar', 'Bereikbaar, niet geblokkeerd'],
       ['signalisatie', 'Signalisatie aanwezig en zichtbaar'],
       ['haspel', 'Haspel draait vlot, zwenkarm werkt'],
-      ['slang', 'Slang volledig afgerold: geen scheuren, knikken of slijtage', 1],
-      ['afsluiter', 'Toevoerafsluiter opent volledig, geen lekkage', 1],
+      ['slang', 'Slang volledig afgerold: geen scheuren, knikken of slijtage'],
+      ['afsluiter', 'Toevoerafsluiter opent volledig, geen lekkage'],
       ['straalpijp', 'Straalpijp: volle straal en sproeistraal werken, sluit dicht'],
       ['druk', 'Werkdruk gemeten en voldoende'],
       ['geleider', 'Slanggeleider en bevestiging in orde'],
-      ['klaar', 'Slang opgerold, afsluiter dicht: bedrijfsklaar achtergelaten', 1],
+      ['klaar', 'Slang opgerold, afsluiter dicht: bedrijfsklaar achtergelaten'],
       ['label', 'Onderhoudslabel bijgewerkt'],
     ],
-    brandslang: [
-      ['aanwezig', 'Aanwezig op de voorziene plaats', 1],
+    slang: [
+      ['aanwezig', 'Aanwezig op de voorziene plaats'],
       ['slang', 'Geen scheuren, schaafplekken of schimmel'],
-      ['koppelingen', 'Koppelingen in goede staat, dichtingen aanwezig', 1],
+      ['koppelingen', 'Koppelingen in goede staat, dichtingen aanwezig'],
       ['opgeborgen', 'Droog en correct opgerold of opgeborgen'],
       ['afmeting', 'Lengte en diameter conform de installatie'],
       ['druktest', 'Druktest uitgevoerd (indien vereist)'],
       ['markering', 'Markering / datum leesbaar'],
     ],
     lans: [
-      ['aanwezig', 'Aanwezig bij de slang', 1],
-      ['koppeling', 'Koppeling past op de slang, dichting aanwezig', 1],
+      ['aanwezig', 'Aanwezig bij de slang'],
+      ['koppeling', 'Koppeling past op de slang, dichting aanwezig'],
       ['bediening', 'Opent en sluit vlot'],
       ['straal', 'Straalinstelling (vol / sproei) werkt'],
       ['mondstuk', 'Mondstuk onbeschadigd en niet verstopt'],
     ],
+    afsluiter: [
+      ['bereikbaar', 'Bereikbaar, straatpot of kap vrij'],
+      ['bord', 'Aanduidingsbord aanwezig'],
+      ['bediening', 'Afsluiter bedienbaar (open en dicht)'],
+      ['stand', 'Staat in normale stand (open), vergrendeld of verzegeld'],
+      ['lekkage', 'Geen lekkage'],
+    ],
+    piv: [
+      ['bereikbaar', 'Bereikbaar en zichtbaar'],
+      ['indicator', 'Indicator leesbaar en toont OPEN'],
+      ['vergrendeld', 'Vergrendeld of verzegeld in open stand'],
+      ['bediening', 'Bedienbaar (open en dicht)'],
+      ['toestand', 'Geen schade, corrosie of lekkage'],
+    ],
     blustoestel: [
-      ['bereikbaar', 'Op de voorziene plaats en bereikbaar', 1],
+      ['bereikbaar', 'Op de voorziene plaats en bereikbaar'],
       ['signalisatie', 'Pictogram / signalisatie aanwezig'],
       ['type', 'Type geschikt voor het risico (ABC, CO₂, schuim …)'],
-      ['manometer', 'Manometer in groene zone (n.v.t. bij CO₂)', 1],
-      ['zegel', 'Veiligheidspen en verzegeling intact', 1],
+      ['manometer', 'Manometer in groene zone'],
+      ['zegel', 'Veiligheidspen en verzegeling intact'],
       ['schade', 'Geen schade, corrosie of lekkage'],
       ['slang', 'Slang en spuitmond in orde, niet verstopt'],
-      ['gewicht', 'Gewicht gecontroleerd (CO₂ / patroontoestel)'],
       ['bevestiging', 'Ophanging of sokkel in orde'],
       ['label', 'Onderhoudslabel aanwezig en bijgewerkt'],
-      ['revisie', 'Herbevulling / revisie niet over datum', 1],
+      ['revisie', 'Herbevulling / revisie niet over datum'],
     ],
     droge_leiding: [
-      ['inlaat', 'Inlaat bereikbaar en gesignaleerd', 1],
+      ['inlaat', 'Inlaat bereikbaar en gesignaleerd'],
       ['koppelingen', 'Voedingskoppelingen en kappen aanwezig, in goede staat'],
       ['kast', 'Inlaatkast sluit, slot werkt'],
       ['terugslag', 'Terugslagklep / aftapkraan werkt'],
       ['droog', 'Leiding droog en afgetapt'],
-      ['uitlaten', 'Uitlaten per verdieping: kast en afsluiters in orde', 1],
+      ['uitlaten', 'Uitlaten per verdieping: kast en afsluiters in orde'],
       ['signalisatie', 'Signalisatie op elke verdieping aanwezig'],
-      ['druktest', 'Periodieke druktest uitgevoerd'],
-    ],
-    afsluiter: [
-      ['bereikbaar', 'Bereikbaar, straatpot of kap vrij', 1],
-      ['bord', 'Aanduidingsbord aanwezig'],
-      ['bediening', 'Afsluiter bedienbaar (open en dicht)', 1],
-      ['stand', 'Staat in normale stand (open), vergrendeld of verzegeld', 1],
-      ['lekkage', 'Geen lekkage'],
     ],
     overig: [
-      ['aanwezig', 'Aanwezig en bereikbaar', 1],
+      ['aanwezig', 'Aanwezig en bereikbaar'],
       ['schade', 'Geen zichtbare schade'],
       ['signalisatie', 'Signalisatie aanwezig'],
-      ['werking', 'Werking gecontroleerd', 1],
+      ['werking', 'Werking gecontroleerd'],
     ],
   };
-  const CHECK = Object.fromEntries(Object.entries(CHECKS).map(([t, l]) => [t, l.map(([id, q, k]) => ({ id, q, k: !!k }))]));
-  const RESULTS = ['ok', 'nok', 'nvt'];
-  const STATUS_RANK = { ok: 0, todo: 1, afwijking: 2, defect: 3 };
+  CHECKS.slang_45 = CHECKS.slang_70 = CHECKS.slang_110 = CHECKS.brandslang = CHECKS.slang;
+  const CHECKS_FINAL = new Set(['hydrant_boven']);   // lists taken from a real ABBA report
+  const CHECK = Object.fromEntries(Object.entries(CHECKS).map(([t, l]) => [t, l.map(([id, q]) => ({ id, q }))]));
+  const RESULTS = ['ok', 'otv', 'nok'];
+  const STATUS_RANK = { ok: 0, todo: 1, otv: 2, nok: 3 };
+  // Repair types per item type (master data in the real app; provisional here).
+  const REPAIR_TYPES = {
+    hydrant_boven: ['Dichtingsring(en) vervangen', 'Kap / dop vervangen', 'Kenteken / pictogram plaatsen', 'Nummering aanbrengen',
+      'Zijkraan 2½" herstellen of vervangen', 'Koppelstuk vervangen', 'Hoofdspindel / stang herstellen', 'Afsluiter 2½" vervangen',
+      'Drainage (leegloop) herstellen', 'Hydrant vervangen'],
+    hydrant_onder: ['Deksel vrijmaken of vervangen', 'Hydrantbord plaatsen', 'Put reinigen', 'Klauwstuk vervangen', 'Afsluiter herstellen', 'Hydrant vervangen'],
+    muurhydrant: ['Afsluiter vervangen', 'Koppeling vervangen', 'Kast / deur herstellen', 'Signalisatie plaatsen'],
+    brandhaspel: ['Slang vervangen', 'Straalpijp vervangen', 'Afsluiter vervangen', 'Haspel herstellen', 'Signalisatie plaatsen'],
+    slang: ['Koppeling vervangen', 'Dichting vervangen', 'Slang vervangen', 'Druktest uitvoeren'],
+    lans: ['Lans vervangen', 'Dichting vervangen', 'Mondstuk reinigen'],
+    afsluiter: ['Afsluiter herstellen', 'Afsluiter vervangen', 'Aanduidingsbord plaatsen', 'Straatpot vrijmaken'],
+    piv: ['Indicator herstellen', 'Vergrendeling / zegel plaatsen', 'PIV herstellen'],
+    blustoestel: ['Herbevullen', 'Revisie', 'Toestel vervangen', 'Ophanging herstellen', 'Pictogram plaatsen'],
+    droge_leiding: ['Koppeling / kap vervangen', 'Inlaatkast herstellen', 'Terugslagklep herstellen', 'Signalisatie plaatsen'],
+    overig: ['Herstellen', 'Vervangen'],
+  };
+  REPAIR_TYPES.slang_45 = REPAIR_TYPES.slang_70 = REPAIR_TYPES.slang_110 = REPAIR_TYPES.brandslang = REPAIR_TYPES.slang;
+  const repairTypesOf = type => [...(REPAIR_TYPES[type] || REPAIR_TYPES.overig), 'Andere herstelling'];
 
   function checkSummary(it) {
     const list = CHECK[it.type] || [];
-    let done = 0, nok = 0, nokK = 0;
+    let done = 0, otv = 0, nok = 0;
     for (const c of list) {
       const r = it.checks?.[c.id]?.r; if (!r) continue;
-      done++; if (r === 'nok') { nok++; if (c.k) nokK++; }
+      done++; if (r === 'otv') otv++; else if (r === 'nok') nok++;
     }
-    return { total: list.length, done, nok, nokK, complete: list.length > 0 && done === list.length };
+    return { total: list.length, done, otv, nok, complete: list.length > 0 && done === list.length };
   }
-  const derivedStatus = s => (s.nokK ? 'defect' : s.nok ? 'afwijking' : s.complete ? 'ok' : 'todo');
-  const nokLabels = it => (CHECK[it.type] || []).filter(c => it.checks?.[c.id]?.r === 'nok').map(c => c.q);
+  const derivedStatus = s => (s.nok ? 'nok' : s.otv ? 'otv' : s.complete ? 'ok' : 'todo');
+  // Checks that need attention, for the history and the report: "NOK: …" / "OTV: …".
+  const nokLabels = it => (CHECK[it.type] || []).filter(c => ['otv', 'nok'].includes(it.checks?.[c.id]?.r))
+    .map(c => `${it.checks[c.id].r.toUpperCase()}: ${c.q}`);
   const worstStatus = list => list.reduce((w, i) => (STATUS_RANK[i.status] > STATUS_RANK[w] ? i.status : w), 'ok');
   function progressText(it) {
     const s = checkSummary(it);
-    return s.done ? `${s.done}/${s.total}${s.nok ? ` · ${s.nok} NOK` : ''}` : '';
+    const bad = [s.nok && `${s.nok} NOK`, s.otv && `${s.otv} OTV`].filter(Boolean).join(', ');
+    return s.done ? `${s.done}/${s.total}${bad ? ` · ${bad}` : ''}` : '';
   }
 
   const SOURCE_LABEL = { gps: 'GPS', manueel: 'Manueel op kaart', versleept: 'GPS, manueel gecorrigeerd', import: 'Import', voorbeeld: 'Voorbeelddata', adres: 'Adres (zoekresultaat)' };
@@ -868,6 +1046,9 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   /* ================= state ================= */
   let companies = [];            // every item and group belongs to one company
   let activeCompanyId = null;    // only this company's items are on the map
+  let buildings = [];            // optional per company: items grouped by building or zone
+  let activeBuildingId = null;   // null = all buildings, 'none' = items without building
+  let pendingQr = null;          // scanned sticker waiting for the next placed item
   let items = [];
   let groups = [];               // several items on one spot (e.g. a fire-hose cabinet)
   let selType = TYPES[0].id;
@@ -904,7 +1085,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     } catch { return false; }
   }
   function save() {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ v: 3, companies, activeCompanyId, items, groups, selType, minAcc })); }
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ v: 4, companies, activeCompanyId, buildings, activeBuildingId, items, groups, selType, minAcc })); }
     catch (e) {
       showStorageProblem(e?.name === 'QuotaExceededError'
         ? 'De browseropslag is vol. Exporteer je items en verwijder oude foto\'s.'
@@ -920,16 +1101,20 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       companies = Array.isArray(d.companies) ? d.companies.filter(c => c && typeof c.id === 'string') : [];
       companies.forEach(normalizeCompany);
       activeCompanyId = typeof d.activeCompanyId === 'string' ? d.activeCompanyId : null;
+      buildings = Array.isArray(d.buildings) ? d.buildings.filter(b => b && typeof b.id === 'string' && typeof b.companyId === 'string') : [];
+      buildings.forEach(normalizeBuilding);
+      activeBuildingId = typeof d.activeBuildingId === 'string' ? d.activeBuildingId : null;
       groups = Array.isArray(d.groups) ? d.groups.filter(validPos) : [];
       groups.forEach(normalizeGroup);
       items = d.items.filter(validItem);
       items.forEach(normalizeItem);
       groups.forEach(syncGroup);
       cleanupGroups();
-      if (TYPE[d.selType]) selType = d.selType;
+      if (TYPE[d.selType] && !TYPE[d.selType].legacy) selType = d.selType;
       if ([3, 5, 10, 20].includes(d.minAcc)) minAcc = d.minAcc;
       if ((d.v || 1) < 2 && items.some(i => i.demo)) migrateDemo();
       assignCompanies();
+      fixStructure();
       return true;
     } catch { return false; }
   }
@@ -938,38 +1123,49 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       Math.abs(o.lat) <= 90 && Math.abs(o.lng) <= 180;
   }
   const validItem = i => validPos(i) && !!TYPE[i.type];
+  const OLD_STATUS = { afwijking: 'otv', defect: 'nok' };   // statuses of versions 9 and 10
   function normalizeItem(i) {
     i.photos = Array.isArray(i.photos) ? i.photos.filter(x => typeof x === 'string') : [];
     const raw = i.checks && typeof i.checks === 'object' ? i.checks : {};
     i.checks = {};
-    for (const [k, v] of Object.entries(raw)) {
+    for (const [k, v] of Object.entries(raw)) {   // answers of older versions: 'n.v.t.' no longer exists
       if (v && RESULTS.includes(v.r)) i.checks[k] = { r: v.r, note: typeof v.note === 'string' ? v.note : '' };
     }
-    i.statusManual = !!i.statusManual;
+    delete i.statusManual;
     i.checkDone = typeof i.checkDone === 'string' ? i.checkDone : null;
-    i.history = Array.isArray(i.history) ? i.history.filter(h => h && typeof h.at === 'string' && STATUS[h.status]).slice(0, 10) : [];
+    i.history = Array.isArray(i.history) ? i.history.filter(h => h && typeof h.at === 'string')
+      .map(h => ({ ...h, status: OLD_STATUS[h.status] || h.status })).filter(h => STATUS[h.status]).slice(0, 10) : [];
+    i.status = OLD_STATUS[i.status] || i.status;
     if (!STATUS[i.status]) i.status = 'todo';
+    // The status follows the checks. Answers to an older checklist of this type don't count any more; then the
+    // item keeps the status it had, until it is checked against the current list.
+    if ((CHECK[i.type] || []).some(c => i.checks[c.id])) i.status = derivedStatus(checkSummary(i));
     if (typeof i.note !== 'string') i.note = '';
     i.companyId = typeof i.companyId === 'string' ? i.companyId : null;
-    if (typeof i.code !== 'string' || !i.code) i.code = nextCode(i.type, i.companyId);
+    i.buildingId = typeof i.buildingId === 'string' ? i.buildingId : null;
+    i.qr = typeof i.qr === 'string' ? i.qr : '';
+    i.repairs = normalizeRepairs(i.repairs);
+    if (typeof i.code !== 'string' || !i.code) i.code = nextCode(i.type, i.companyId, i.buildingId);
     i.groupId = typeof i.groupId === 'string' && groups.some(g => g.id === i.groupId) ? i.groupId : null;
   }
   function normalizeGroup(g) {
-    g.code = typeof g.code === 'string' && g.code ? g.code : nextGroupCode();
+    g.number = Number.isFinite(g.number) ? g.number : 0;   // older groups get one in fixStructure()
     g.name = typeof g.name === 'string' ? g.name : '';
     g.acc = Number.isFinite(g.acc) ? g.acc : null;
     g.n = Number.isFinite(g.n) ? g.n : 0;
     g.demo = !!g.demo;
     if (typeof g.createdAt !== 'string') g.createdAt = new Date().toISOString();
     g.companyId = typeof g.companyId === 'string' ? g.companyId : null;
+    g.buildingId = typeof g.buildingId === 'string' ? g.buildingId : null;
   }
   function newItem(p) {
     const companyId = p.companyId ?? activeCompanyId;
     return {
-      id: uid(), type: p.type, code: p.code ?? nextCode(p.type, companyId), status: 'todo',
+      id: uid(), type: p.type, code: p.code ?? nextCode(p.type, companyId, p.buildingId ?? null), status: 'todo',
       lat: p.lat, lng: p.lng, acc: p.acc ?? null, src: p.src || 'manueel', n: p.n ?? 0,
       createdAt: p.createdAt ?? new Date().toISOString(), note: p.note ?? '', demo: !!p.demo, photos: [],
-      checks: {}, statusManual: false, checkDone: null, history: [], groupId: p.groupId ?? null, companyId,
+      checks: {}, checkDone: null, history: [], groupId: p.groupId ?? null, companyId,
+      buildingId: p.buildingId ?? null, qr: '', repairs: [],
     };
   }
 
@@ -982,11 +1178,14 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     c.name = typeof c.name === 'string' && c.name.trim() ? c.name.trim() : 'Bedrijf zonder naam';
     c.address = typeof c.address === 'string' ? c.address : '';
     c.note = typeof c.note === 'string' ? c.note : '';
+    for (const k of ['contactName', 'contactPhone', 'contactEmail']) c[k] = typeof c[k] === 'string' ? c[k] : '';
+    c.structure = ['gebouwen', 'zonder'].includes(c.structure) ? c.structure : null;   // locked once chosen
     c.demo = !!c.demo;
     if (typeof c.createdAt !== 'string') c.createdAt = new Date().toISOString();
   }
   function newCompany(p) {
-    const c = { id: uid(), name: p.name, address: p.address || '', note: p.note || '', demo: !!p.demo, createdAt: new Date().toISOString() };
+    const c = { id: uid(), name: p.name, address: p.address || '', note: p.note || '', contactName: p.contactName || '',
+      contactPhone: p.contactPhone || '', contactEmail: p.contactEmail || '', demo: !!p.demo, createdAt: new Date().toISOString() };
     normalizeCompany(c); companies.push(c);
     return c;
   }
@@ -1026,100 +1225,201 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   }
   const initials = name => (name.match(/[A-Za-zÀ-ÿ0-9]+/g) || ['?']).slice(0, 2).map(w => w[0]).join('').toUpperCase();
 
-  // Example data. Codes, positions and findings are fictitious.
-  const DEMO_ROWS = [
-    // type, code, status, dx m, dy m, accuracy, note, check that failed
-    ['hydrant_boven', 'HB-001', 'ok',        -42,  18, 3.8, ''],
-    ['hydrant_boven', 'HB-002', 'todo',       55, -30, 4.6, ''],
-    ['hydrant_onder', 'HO-001', 'afwijking',  12,  48, 6.2, 'Deksel vastgeroest, aanduidingsbord vervaagd', 'deksel'],
-    ['hydrant_onder', 'HO-002', 'todo',      -70, -45, 4.1, ''],
-    ['brandhaspel',   'BH-001', 'ok',         -8,  -6, 9.5, 'Gevel magazijn, naast poort 3'],
-    ['blustoestel',   'BT-001', 'defect',      6,  -9, 11.0, 'Manometer in rode zone', 'manometer'],
-    ['droge_leiding', 'DL-001', 'todo',       28,   4, 5.0, 'Inlaat voorgevel'],
-    ['afsluiter',     'AF-001', 'ok',         80,  22, 3.2, ''],
-  ];
-  const DEMO_GROUP = {
-    name: 'Brandkast magazijn, poort 1', dx: -24, dy: -16, acc: 4.4,
-    members: [
-      // type, code, status, note, failed check, answered checks (for an unfinished one)
-      ['muurhydrant', 'MH-001', 'ok', ''],
-      ['brandslang', 'BS-001', 'afwijking', 'Schaafplek op ±3 m van de koppeling', 'slang'],
-      ['lans', 'LA-001', 'todo', '', null, 2],
+  /* ================= roles (preview) ================= */
+  // Same rights as backend/app/core/authz.py of the earlier app. In the real app the role comes with the login
+  // and companies are created, edited and assigned on the office side; here the role can be switched to try it.
+  const ROLE_KEY = 'controleapp.preview.role';
+  const PERM = {
+    view:   ['items.view', 'checks.view', 'buildings.view', 'repairs.view', 'bedrijven.view'],
+    field:  ['items.create', 'items.update', 'checks.create', 'checks.update', 'buildings.create', 'buildings.update',
+             'repairs.create', 'repairs.update'],
+    office: ['items.delete', 'checks.delete', 'buildings.delete', 'repairs.delete', 'repairs.assign', 'bedrijven.update', 'data.import'],
+    admin:  ['bedrijven.create', 'bedrijven.delete', 'users.manage'],
+  };
+  const ROLES = {
+    tech:    { label: 'Technieker', user: { id: 'u-tech', naam: 'Jij (technieker)' }, perms: [...PERM.view, ...PERM.field] },
+    manager: { label: 'Manager', user: { id: 'u-mgr', naam: 'Planner' }, perms: [...PERM.view, ...PERM.field, ...PERM.office] },
+    admin:   { label: 'Admin', user: { id: 'u-admin', naam: 'Kantoor (admin)' }, perms: [...PERM.view, ...PERM.field, ...PERM.office, ...PERM.admin] },
+    viewer:  { label: 'Viewer', user: { id: 'u-view', naam: 'Klant (viewer)' }, perms: [...PERM.view] },
+  };
+  // People a repair can be assigned to (example team).
+  const USERS = [ROLES.tech.user, { id: 'u-tech2', naam: 'Collega technieker' }, ROLES.manager.user];
+  const userName = id => [...USERS, ...Object.values(ROLES).map(r => r.user)].find(u => u.id === id)?.naam ?? 'onbekend';
+  let role = 'tech';
+  try { const r = localStorage.getItem(ROLE_KEY); if (ROLES[r]) role = r; } catch { /* no storage */ }
+  const can = p => ROLES[role].perms.includes(p);
+  const me = () => ROLES[role].user;
+  // Office staff steer every repair; a technician only works on the repairs assigned to them.
+  const canWorkRepair = r => can('repairs.assign') || (can('repairs.update') && r.assignedTo === me().id);
+
+  // Example data: a fictitious site with two buildings. Codes, positions, findings and stickers are made up.
+  const DEMO = {
+    company: { name: 'Voorbeeldbedrijf', address: 'Fictief terrein, Gent', contactName: 'Mevr. Voorbeeld (preventieadviseur)',
+      contactPhone: '09 000 00 00', note: 'Sleutel brandkasten aan de receptie. Controle bij voorkeur in maart.' },
+    buildings: [
+      { key: 'buiten', name: 'Buiten hydranten', items: [
+        // type, number, status, dx m, dy m, accuracy, extra info, check with a finding, note on that check, sticker
+        ['hydrant_boven', 1, 'ok',   -42,  18, 3.8, '', null, '', '10034401'],
+        ['hydrant_boven', 2, 'nok',   55, -30, 4.6, 'Grond', 'koppelstukken', 'Koppelstuk 4" ingedeukt', '10034402'],
+        ['hydrant_boven', 3, 'otv',  -70, -45, 4.1, 'Asfalt', 'drainage', 'Leegloop traag, opvolgen na de winter', '10034403'],
+        ['hydrant_boven', 4, 'todo',  80,  22, 3.2, '', null, '', '10034404'],
+        ['hydrant_onder', 5, 'todo',  12,  48, 6.2, 'Deksel naast laadkade', null, '', ''],
+        ['afsluiter',     6, 'ok',    28,   4, 5.0, '', null, '', '10034406'],
+        ['piv',           7, 'todo', -20,  40, 4.4, '', null, '', ''],
+      ] },
+      { key: 'magazijn', name: 'Magazijn A', items: [
+        ['muurhydrant',   2, 'ok',    -8,  -6, 9.5, 'Gevel magazijn, naast poort 3', null, '', '10034412'],
+        ['blustoestel',   3, 'nok',    6,  -9, 11.0, 'Bureau magazijnchef', 'manometer', 'Manometer in rode zone', '10034413'],
+      ], group: { number: 1, name: 'Haspelkast poort 1', dx: -24, dy: -16, acc: 4.4, members: [
+        ['brandhaspel', 'ok', null, '', '10034421'],
+        ['slang_45', 'otv', 'slang', 'Schaafplek op ±3 m van de koppeling', '10034422'],
+        ['lans', 'todo', null, '', '', 2],
+      ] } },
+    ],
+    // repairs on the example items: building key, item number, type, note, status, assigned to
+    repairs: [
+      ['buiten', 2, 'Koppelstuk vervangen', 'Koppelstuk 4" vervangen, stop 100 meenemen', 'toegewezen', 'u-tech'],
+      ['magazijn', 3, 'Herbevullen', 'Toestel meenemen naar werkplaats', 'nieuw', null],
     ],
   };
-  function fillDemoChecks(it, nokId = null, partial = 0) {
+  function fillDemoChecks(it, target, badId = null, badNote = '', partial = 0) {
     const list = CHECK[it.type] || [];
     it.checks = {};
-    const target = it.status;
     if (target === 'todo') { list.slice(0, partial).forEach(c => { it.checks[c.id] = { r: 'ok', note: '' }; }); return; }
     list.forEach(c => { it.checks[c.id] = { r: 'ok', note: '' }; });
-    if (it.type === 'blustoestel' && it.checks.gewicht) it.checks.gewicht.r = 'nvt';
-    const bad = list.find(c => c.id === nokId) || (target === 'defect' ? list.find(c => c.k) : target === 'afwijking' ? list.find(c => !c.k) : null);
-    if (bad && target !== 'ok') it.checks[bad.id] = { r: 'nok', note: it.note || '' };
+    const bad = list.find(c => c.id === badId);
+    if (bad && target !== 'ok') it.checks[bad.id] = { r: target, note: badNote };
     it.status = derivedStatus(checkSummary(it));
     it.checkDone = it.createdAt;
     it.history = [{ at: it.createdAt, status: it.status, nok: nokLabels(it) }];
   }
-  function addDemoGroup(companyId = null) {
-    if (groups.some(g => g.demo) || items.some(i => i.type === 'muurhydrant' && i.demo)) return;
-    const p = offset(DEMO_CENTER, DEMO_GROUP.dx, DEMO_GROUP.dy);
-    const g = { id: uid(), code: nextGroupCode(companyId), name: DEMO_GROUP.name, lat: p.lat, lng: p.lng, acc: DEMO_GROUP.acc,
-      src: 'voorbeeld', n: 5, createdAt: new Date(Date.now() - 30 * 60e3).toISOString(), demo: true, companyId };
-    groups.push(g);
-    for (const [type, code, status, note, nokId, partial] of DEMO_GROUP.members) {
-      const it = newItem({ type, code: items.some(i => i.demo && i.code === code) ? undefined : code, lat: g.lat, lng: g.lng,
-        acc: g.acc, src: 'voorbeeld', n: 5, createdAt: g.createdAt, note, demo: true, groupId: g.id, companyId });
-      it.status = status;
-      fillDemoChecks(it, nokId, partial || 0);
-      items.push(it);
+  // Adds the example company next to whatever is there, and makes it the active one.
+  function addDemoData() {
+    const now = Date.now();
+    const co = newCompany({ ...DEMO.company, demo: true });
+    co.structure = 'gebouwen';
+    const byKey = {};
+    let k = 0;
+    for (const bd of DEMO.buildings) {
+      const b = { id: uid(), companyId: co.id, name: bd.name, createdAt: new Date(now - 5 * 86400e3).toISOString(), demo: true };
+      buildings.push(b); byKey[bd.key] = b;
+      for (const [type, n, status, dx, dy, acc, note, badId, badNote, qr] of bd.items) {
+        const p = offset(DEMO_CENTER, dx, dy);
+        const it = newItem({ type, code: `${TYPE[type].prefix}-${pad2(n)}`, lat: p.lat, lng: p.lng, acc, src: 'voorbeeld', n: 5,
+          createdAt: new Date(now - (++k) * 3600e3).toISOString(), note, demo: true, companyId: co.id, buildingId: b.id });
+        it.qr = qr;
+        fillDemoChecks(it, status, badId, badNote);
+        items.push(it);
+      }
+      const gd = bd.group;
+      if (gd) {
+        const p = offset(DEMO_CENTER, gd.dx, gd.dy);
+        const g = { id: uid(), number: gd.number, code: groupLabel(gd.number), name: gd.name, lat: p.lat, lng: p.lng, acc: gd.acc,
+          src: 'voorbeeld', n: 5, createdAt: new Date(now - 30 * 60e3).toISOString(), demo: true, companyId: co.id, buildingId: b.id };
+        groups.push(g);
+        for (const [type, status, badId, badNote, qr, partial] of gd.members) {
+          const it = newItem({ type, code: codeFor(type, gd.number, co.id, b.id), lat: g.lat, lng: g.lng, acc: g.acc, src: 'voorbeeld', n: 5,
+            createdAt: g.createdAt, demo: true, groupId: g.id, companyId: co.id, buildingId: b.id });
+          it.qr = qr;
+          fillDemoChecks(it, status, badId, badNote, partial || 0);
+          items.push(it);
+        }
+      }
     }
+    for (const [key, n, type, note, status, assignedTo] of DEMO.repairs) {
+      const it = items.find(i => i.demo && i.buildingId === byKey[key].id && numOf(i.code) === n && !i.groupId);
+      if (it) it.repairs.push(newRepair({ type, note, status, assignedTo, createdBy: 'u-tech2', createdAt: it.createdAt }));
+    }
+    activeCompanyId = co.id; activeBuildingId = null;
+    return co;
   }
   function seedDemo() {
-    const now = Date.now();
-    items = []; groups = []; companies = [];
-    const co = newCompany({ name: 'Voorbeeldbedrijf', address: 'Fictief terrein, Gent', demo: true });
-    activeCompanyId = co.id;
-    DEMO_ROWS.forEach(([type, code, status, dx, dy, acc, note, nokId], k) => {
-      const p = offset(DEMO_CENTER, dx, dy);
-      const it = newItem({ type, code, lat: p.lat, lng: p.lng, acc, src: 'voorbeeld', n: 5,
-        createdAt: new Date(now - (k + 1) * 3600e3).toISOString(), note, demo: true, companyId: co.id });
-      it.status = status;
-      fillDemoChecks(it, nokId);
-      items.push(it);
-    });
-    addDemoGroup(co.id);
+    items = []; groups = []; companies = []; buildings = [];
+    addDemoData();
   }
-  // Data saved by the previous version: give the example items a checklist and add the example group.
+  // Data saved by version 1: give the example items a filled-in checklist.
   function migrateDemo() {
-    for (const it of items) {
-      if (!it.demo || Object.keys(it.checks).length) continue;
-      const row = DEMO_ROWS.find(r => r[1] === it.code && r[0] === it.type);
-      fillDemoChecks(it, row?.[7] ?? null);
+    for (const it of items) if (it.demo && !Object.keys(it.checks).length) fillDemoChecks(it, it.status);
+  }
+
+  /* ================= buildings & numbering ================= */
+  const B = id => (id ? buildings.find(b => b.id === id) : undefined);
+  const coBuildings = cid => buildings.filter(b => b.companyId === cid).sort(byName);
+  function normalizeBuilding(b) {
+    b.name = typeof b.name === 'string' && b.name.trim() ? b.name.trim() : 'Gebouw zonder naam';
+    b.demo = !!b.demo;
+    if (typeof b.createdAt !== 'string') b.createdAt = new Date().toISOString();
+  }
+  // What the map and the list show: the active company, narrowed to one building when one is chosen.
+  const inView = o => o.companyId === activeCompanyId &&
+    (!activeBuildingId || (activeBuildingId === 'none' ? !o.buildingId : o.buildingId === activeBuildingId));
+  const viewItems = () => items.filter(inView);
+  const viewGroups = () => groups.filter(inView);
+  // Building that new items go to: the chosen one, none when the company works without buildings.
+  const placeBuilding = () => (activeBuildingId && activeBuildingId !== 'none' ? activeBuildingId : null);
+
+  // Numbering as in the earlier app: one counter per building (or per company without buildings), shared by
+  // all types, two digits: HY-01, SL-02, groep 03 with HA-03, SL-03, LA-03 …
+  const pad2 = n => String(n).padStart(2, '0');
+  const numOf = code => { const m = /-(\d+)[A-Z]?$/.exec(code || ''); return m ? +m[1] : 0; };
+  const inScope = (o, cid, bid) => o.companyId === cid && (o.buildingId || null) === (bid || null);
+  const groupLabel = n => `Groep ${pad2(n)}`;
+  function nextNumber(cid, bid) {
+    const used = [...items.filter(i => inScope(i, cid, bid)).map(i => numOf(i.code)),
+      ...groups.filter(g => inScope(g, cid, bid)).map(g => g.number || 0)];
+    return Math.max(0, ...used) + 1;
+  }
+  // A second item of the same type on the same number gets a letter: two hoses in one cabinet are SL-05 and SL-05B.
+  function codeFor(type, n, cid, bid, self = null) {
+    const base = `${TYPE[type].prefix}-${pad2(n)}`;
+    const taken = c => items.some(o => o !== self && inScope(o, cid, bid) && o.code.toUpperCase() === c);
+    if (!taken(base)) return base;
+    for (const l of 'BCDEFGHJK') if (!taken(base + l)) return base + l;
+    return `${TYPE[type].prefix}-${pad2(nextNumber(cid, bid))}`;
+  }
+  function nextCode(typeId, companyId = activeCompanyId, buildingId = placeBuilding()) {
+    return codeFor(typeId, nextNumber(companyId, buildingId), companyId, buildingId);
+  }
+  // After loading or importing: every link points somewhere valid, and group members share building and number.
+  function fixStructure() {
+    buildings = buildings.filter(b => CO(b.companyId));
+    for (const i of items) if (i.buildingId && B(i.buildingId)?.companyId !== i.companyId) i.buildingId = null;
+    for (const g of groups) {
+      if (g.buildingId && B(g.buildingId)?.companyId !== g.companyId) g.buildingId = null;
+      const mem = membersOf(g.id);
+      mem.forEach(m => { m.buildingId = g.buildingId; });
+      if (!g.number) g.number = numOf(mem[0]?.code) || nextNumber(g.companyId, g.buildingId);
+      g.code = groupLabel(g.number);
     }
-    addDemoGroup();
+    for (const c of companies) if (!c.structure && coBuildings(c.id).length) c.structure = 'gebouwen';
+    if (activeBuildingId && activeBuildingId !== 'none' && B(activeBuildingId)?.companyId !== activeCompanyId) activeBuildingId = null;
   }
 
   /* ================= groups ================= */
   const G = id => (id ? groups.find(g => g.id === id) : undefined);
   const membersOf = gid => items.filter(i => i.groupId === gid);
-  // Codes are numbered per company: every company starts at GR-001, HB-001, …
-  function nextGroupCode(companyId = activeCompanyId) {
-    const max = coGroups(companyId).reduce((m, g) => { const r = /^GR-(\d+)$/.exec(g.code || ''); return r ? Math.max(m, +r[1]) : m; }, 0);
-    return `GR-${String(max + 1).padStart(3, '0')}`;
-  }
   // Items in a group share the group's position.
   function syncGroup(g) {
     for (const m of membersOf(g.id)) Object.assign(m, { lat: g.lat, lng: g.lng, acc: g.acc, src: g.src, n: g.n });
   }
+  // Joining a group: same building, and the group's number with the item's own type prefix.
+  function joinGroup(m, g) {
+    m.groupId = g.id; m.buildingId = g.buildingId;
+    m.code = codeFor(m.type, g.number, g.companyId, g.buildingId, m);
+  }
   // Most accurate position wins; an unknown accuracy (placed by hand) loses to any GPS fix.
   const bestPos = cands => cands.reduce((b, c) => ((c.acc ?? Infinity) < (b.acc ?? Infinity) ? c : b));
+  // The group takes the number of its first item, so that item keeps its code.
   function createGroup(members, posCands) {
     const p = bestPos(posCands);
-    const companyId = members[0]?.companyId ?? activeCompanyId;
-    const g = { id: uid(), code: nextGroupCode(companyId), name: '', lat: p.lat, lng: p.lng, acc: p.acc ?? null,
-      src: p.src || 'manueel', n: p.n || 0, createdAt: new Date().toISOString(), demo: false, companyId };
+    const first = members[0];
+    const companyId = first?.companyId ?? activeCompanyId;
+    const buildingId = first ? (first.buildingId || null) : placeBuilding();
+    const number = numOf(first?.code) || nextNumber(companyId, buildingId);
+    const g = { id: uid(), number, code: groupLabel(number), name: '', lat: p.lat, lng: p.lng, acc: p.acc ?? null,
+      src: p.src || 'manueel', n: p.n || 0, createdAt: new Date().toISOString(), demo: false, companyId, buildingId };
     groups.push(g);
-    members.forEach(m => { m.groupId = g.id; });
+    members.forEach(m => joinGroup(m, g));
     syncGroup(g);
     return g;
   }
@@ -1130,12 +1430,31 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       if (mem.length <= 1) { mem.forEach(m => { m.groupId = null; }); groups = groups.filter(x => x !== g); }
     }
   }
-  // Groups and loose items of the active company within `radius` metres of pos, nearest first.
+  // Groups and loose items in view within `radius` metres of pos, nearest first.
   function nearestEntity(pos, radius, exclude = {}) {
     return [
-      ...coGroups(activeCompanyId).filter(g => g.id !== exclude.groupId).map(g => ({ kind: 'group', e: g, d: dist(g, pos) })),
-      ...coItems(activeCompanyId).filter(i => !i.groupId && i.id !== exclude.itemId).map(i => ({ kind: 'item', e: i, d: dist(i, pos) })),
+      ...viewGroups().filter(g => g.id !== exclude.groupId).map(g => ({ kind: 'group', e: g, d: dist(g, pos) })),
+      ...viewItems().filter(i => !i.groupId && i.id !== exclude.itemId).map(i => ({ kind: 'item', e: i, d: dist(i, pos) })),
     ].filter(x => x.d <= radius).sort((a, b) => a.d - b.d);
+  }
+
+  /* ================= repairs ================= */
+  // Status flow of the earlier app: nieuw → toegewezen → in uitvoering → voltooid (or geannuleerd).
+  const REPAIR_STATUS = { nieuw: 'Nieuw', toegewezen: 'Toegewezen', bezig: 'In uitvoering', voltooid: 'Voltooid', geannuleerd: 'Geannuleerd' };
+  const REPAIR_COLOR = { nieuw: 'var(--st-todo)', toegewezen: 'var(--gps)', bezig: 'var(--st-otv)', voltooid: 'var(--st-ok)', geannuleerd: 'var(--muted)' };
+  const isOpenRepair = r => r.status !== 'voltooid' && r.status !== 'geannuleerd';
+  function newRepair(p) {
+    const at = p.createdAt ?? new Date().toISOString();
+    return { id: uid(), type: p.type, note: p.note || '', status: p.status || 'nieuw', assignedTo: p.assignedTo ?? null,
+      createdBy: p.createdBy ?? null, createdAt: at, completedAt: p.status === 'voltooid' ? at : null, year: new Date(at).getFullYear() };
+  }
+  function normalizeRepairs(list) {
+    return (Array.isArray(list) ? list : []).filter(r => r && typeof r.type === 'string').map(r => ({
+      id: typeof r.id === 'string' ? r.id : uid(), type: r.type, note: typeof r.note === 'string' ? r.note : '',
+      status: REPAIR_STATUS[r.status] ? r.status : 'nieuw', assignedTo: typeof r.assignedTo === 'string' ? r.assignedTo : null,
+      createdBy: typeof r.createdBy === 'string' ? r.createdBy : null, createdAt: typeof r.createdAt === 'string' ? r.createdAt : new Date().toISOString(),
+      completedAt: typeof r.completedAt === 'string' ? r.completedAt : null, year: Number.isFinite(r.year) ? r.year : new Date().getFullYear(),
+    }));
   }
 
   /* ================= map ================= */
@@ -1342,24 +1661,24 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   // Only the active company is on the map: fewer markers, and no mixing up of sites.
   function renderMarkers() {
     const seen = new Set();
-    for (const g of coGroups(activeCompanyId)) {
+    for (const g of viewGroups()) {
       const mem = membersOf(g.id); if (!mem.length) continue;
       const key = 'g:' + g.id; seen.add(key);
       upsertMarker(key, [g.lat, g.lng], groupIcon(g, mem), `${g.code}${g.name ? ' · ' + g.name : ''}`,
-        () => openGroup(g.id, false), ll => onGroupDragged(g.id, ll), g.id === selectedGroupId);
+        () => openGroup(g.id, false), ll => onGroupDragged(g.id, ll), g.id === selectedGroupId && can('items.update'));
     }
-    for (const it of coItems(activeCompanyId)) {
+    for (const it of viewItems()) {
       if (it.groupId) continue;
       const key = 'i:' + it.id; seen.add(key);
       upsertMarker(key, [it.lat, it.lng], itemIcon(it), it.code,
-        () => select(it.id, false), ll => onMarkerDragged(it.id, ll), it.id === selectedId);
+        () => select(it.id, false), ll => onMarkerDragged(it.id, ll), it.id === selectedId && can('items.update'));
     }
     for (const [k, m] of markers) if (!seen.has(k)) { markerLayer.removeLayer(m); markers.delete(k); }
   }
 
   /* ================= type picker ================= */
   function renderTypes() {
-    $('typeRow').innerHTML = TYPES.map(t =>
+    $('typeRow').innerHTML = PICK_TYPES.map(t =>
       `<button type="button" class="type-btn" data-type="${t.id}" aria-pressed="${t.id === selType}" title="${esc(t.label)}">
         <span class="glyph" style="--c:${t.color}">${esc(t.glyph)}</span>${esc(t.short)}</button>`).join('');
   }
@@ -1371,15 +1690,20 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   /* ================= list ================= */
   function renderList() {
     const co = activeCo();
-    const list = coItems(activeCompanyId);
+    const list = viewItems();
     const byStatus = Object.fromEntries(STATUSES.map(s => [s.id, 0]));
     list.forEach(i => { byStatus[i.status] = (byStatus[i.status] || 0) + 1; });
-    $('counts').innerHTML = `<span><b>${list.length}</b> totaal</span><span><b>${byStatus.todo}</b> te doen</span><span><b>${byStatus.afwijking + byStatus.defect}</b> probleem</span>`;
+    $('counts').innerHTML = `<span><b>${list.length}</b> totaal</span><span><b>${byStatus.todo}</b> te doen</span><span><b>${byStatus.otv + byStatus.nok}</b> OTV/NOK</span>`;
     $('btnClearDemo').hidden = !items.some(i => i.demo) && !groups.some(g => g.demo) && !companies.some(c => c.demo);
     $('btnExport').hidden = !co;
+    $('lblImport').hidden = !can('data.import');
     $('noCompany').hidden = !!co;
-    $('brandCo').textContent = co ? co.name : 'Kies een bedrijf';
-    if (!$('drawer').inert) renderCompanies();
+    $('brandCo').textContent = co ? scopeName() : 'Kies een bedrijf';
+    const place = !!co && can('items.create');
+    $('typeLabel').hidden = $('typeRow').hidden = $('actRow').hidden = !place;
+    $('roNote').hidden = !co || place;
+    $('roNote').textContent = `Je bekijkt de app als ${ROLES[role].label.toLowerCase()}: alleen lezen.`;
+    if (drawerOpen()) renderDrawer();
 
     if (!list.length) {
       $('itemList').innerHTML = co
@@ -1389,7 +1713,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     }
     const fix = lastFix && Date.now() - lastFix.t < 60000 ? lastFix : null;
     const rows = [
-      ...coGroups(activeCompanyId).map(g => ({ g, mem: membersOf(g.id), code: g.code, pos: g })).filter(r => r.mem.length),
+      ...viewGroups().map(g => ({ g, mem: membersOf(g.id), code: g.code, pos: g })).filter(r => r.mem.length),
       ...list.filter(i => !i.groupId).map(i => ({ i, code: i.code, pos: i })),
     ].map(r => ({ ...r, d: fix ? dist(fix, r.pos) : null }));
     rows.sort((a, b) => (a.d != null && b.d != null) ? a.d - b.d : a.code.localeCompare(b.code, 'nl', { numeric: true }));
@@ -1399,7 +1723,9 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     const t = TYPE[i.type];
     const prog = progressText(i);
     const n = i.photos?.length || 0;
-    const sub = [esc(t.label), prog && `checklist ${prog}`, n && (n === 1 ? '1 foto' : `${n} foto's`), i.note && esc(i.note)].filter(Boolean).join(' · ');
+    const rp = i.repairs.filter(isOpenRepair).length;
+    const sub = [esc(t.label), prog && `controle ${prog}`, rp && `${rp} herstelling${rp === 1 ? '' : 'en'} open`, n && (n === 1 ? '1 foto' : `${n} foto's`),
+      i.note && esc(i.note)].filter(Boolean).join(' · ');
     return `<li><button type="button" class="item-btn" data-id="${esc(i.id)}">
       <span class="glyph" style="--c:${t.color}">${esc(t.glyph)}</span>
       <span class="item-main"><span class="code">${esc(i.code)}</span>${i.demo ? '<span class="demo-tag">voorbeeld</span>' : ''}
@@ -1728,21 +2054,18 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   }
 
   /* ================= placing ================= */
-  function nextCode(typeId, companyId = activeCompanyId) {
-    const p = TYPE[typeId].prefix; const re = new RegExp(`^${p}-(\\d+)$`);
-    const max = coItems(companyId).reduce((m, i) => { const r = re.exec(i.code); return r ? Math.max(m, +r[1]) : m; }, 0);
-    return `${p}-${String(max + 1).padStart(3, '0')}`;
-  }
-  // Items always belong to a company; without one, ask for it first.
-  function needCompany() {
-    if (activeCo()) return false;
-    openDrawer(); openCompanyForm(null);
-    toast('Maak eerst een bedrijf aan. Items horen altijd bij een bedrijf.', 4000);
-    return true;
+  // Placing needs the right, a company, and in a company with buildings the building you work in.
+  function blockedPlacing() {
+    if (!can('items.create')) { toast(`Als ${ROLES[role].label.toLowerCase()} kan je geen items plaatsen.`); return true; }
+    if (!activeCo()) { openDrawer(); toast('Kies eerst het bedrijf waar je werkt. Items horen altijd bij een bedrijf.', 4000); return true; }
+    if (activeCo().structure === 'gebouwen' && !placeBuilding()) {
+      openDrawer('company'); toast('Kies eerst het gebouw waar je werkt.', 3500); return true;
+    }
+    return false;
   }
   // Something already within the measurement uncertainty? Ask: same item, same spot (group), or separate.
   function placeNew(typeId, pos) {
-    if (needCompany()) return;
+    if (blockedPlacing()) return;
     const radius = Math.max(3, pos.acc || 0);
     const near = nearestEntity(pos, radius)[0];
     if (!near) { commitNew(typeId, pos); return; }
@@ -1789,8 +2112,13 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   function commitNew(typeId, pos, groupId = null) {
     const g = G(groupId);
     const base = g || pos;
+    const cid = g?.companyId ?? activeCompanyId, bid = g ? g.buildingId : placeBuilding();
     const it = newItem({ type: typeId, lat: base.lat, lng: base.lng, acc: base.acc ?? null, src: base.src, n: base.n ?? 0,
-      groupId: g?.id ?? null, companyId: g?.companyId ?? activeCompanyId });
+      code: g ? codeFor(typeId, g.number, cid, bid) : nextCode(typeId, cid, bid), groupId: g?.id ?? null, companyId: cid, buildingId: bid });
+    if (pendingQr && !qrOwner(pendingQr, cid)) it.qr = pendingQr;
+    pendingQr = null;
+    const co = CO(cid);
+    if (co && !co.structure) co.structure = bid ? 'gebouwen' : 'zonder';   // the first item fixes the structure
     items.push(it);
     if (g) syncGroup(g);
     save();
@@ -1798,7 +2126,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     toast(`${it.code} geplaatst${g ? ` in ${g.code}` : it.acc != null ? ` (${fmtAcc(it.acc)})` : ''}`);
   }
 
-  $('btnCapture').addEventListener('click', () => { if (!needCompany()) startCapture(null); });
+  $('btnCapture').addEventListener('click', () => { if (!blockedPlacing()) startCapture(null); });
 
   function setTapMode(on) {
     tapMode = on;
@@ -1806,7 +2134,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     $('map').style.cursor = on ? 'crosshair' : '';
   }
   $('btnTap').addEventListener('click', () => {
-    if (!tapMode && needCompany()) return;
+    if (!tapMode && blockedPlacing()) return;
     setTapMode(!tapMode);
     if (tapMode) toast(`Tik op de kaart om een ${TYPE[selType].label.toLowerCase()} te plaatsen.`);
   });
@@ -1818,7 +2146,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   });
 
   function onMarkerDragged(id, ll) {
-    const it = items.find(i => i.id === id); if (!it) return;
+    const it = items.find(i => i.id === id); if (!it || !can('items.update')) { renderMarkers(); return; }
     const moved = dist(it, ll);
     it.lat = ll.lat; it.lng = ll.lng; it.demo = false;
     if (it.src === 'gps' || it.src === 'voorbeeld') it.src = 'versleept';
@@ -1826,7 +2154,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     toast(`${it.code} ${fmtDist(moved)} verplaatst`);
   }
   function onGroupDragged(gid, ll) {
-    const g = G(gid); if (!g) return;
+    const g = G(gid); if (!g || !can('items.update')) { renderMarkers(); return; }
     const moved = dist(g, ll);
     g.lat = ll.lat; g.lng = ll.lng; g.demo = false;
     if (g.src === 'gps' || g.src === 'voorbeeld') g.src = 'versleept';
@@ -1836,13 +2164,11 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
 
   /* ================= editor ================= */
   $('edType').innerHTML = TYPES.map(t => `<option value="${t.id}">${esc(t.label)}</option>`).join('');
-  $('edStatus').insertAdjacentHTML('beforeend', STATUSES.map(s =>
-    `<button type="button" data-status="${s.id}" style="--st:var(--st-${s.id})" aria-pressed="false"><i></i>${esc(s.label)}</button>`).join(''));
 
   function select(id, fly) {
     const it = items.find(i => i.id === id); if (!it) return;
     clearPending();
-    if (selectedId !== id) { addHereOpen = false; $('editor').scrollTop = 0; }
+    if (selectedId !== id) { addHereOpen = false; $('editor').scrollTop = 0; closeRepairForm(); }
     selectedId = id; selectedGroupId = null;
     $('edDelete').classList.remove('armed'); $('edDelete').textContent = 'Verwijder';
     showPanel('editor');
@@ -1873,12 +2199,9 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     if (document.activeElement !== $('edCode')) $('edCode').value = it.code;
     $('edType').value = it.type;
     if (document.activeElement !== $('edNote')) $('edNote').value = it.note || '';
-    $('edStatus').querySelectorAll('[data-status]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.status === it.status)));
     const s = checkSummary(it);
-    const der = derivedStatus(s);
-    $('edStatusHint').innerHTML = it.statusManual
-      ? `Manueel ingesteld${der !== it.status ? ` (checklist geeft: ${esc(STATUS[der].label.toLowerCase())})` : ''} · <button type="button" class="linkbtn" data-st-auto>Volg checklist</button>`
-      : 'Volgt automatisch de checklist.';
+    $('edStatus').innerHTML = `<span class="pill" style="--st:var(--st-${esc(it.status)})">${esc(STATUS[it.status].label)}</span>
+      <span>Status volgt de controle: het slechtste antwoord telt (NOK › OTV › OK).</span>`;
     renderGroupBar(it);
     renderChecklist(it, s);
     $('edPos').textContent = `${it.lat.toFixed(6)}, ${it.lng.toFixed(6)}`;
@@ -1888,8 +2211,29 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     $('edPosHint').textContent = g
       ? `Positie volgt groep ${g.code}. Sleep de groepsmarker om alles samen te verplaatsen.`
       : 'Sleep de marker op de kaart om de positie te corrigeren.';
-    $('edRegps').hidden = !!g;
+    if (document.activeElement !== $('edQr')) $('edQr').value = it.qr || '';
+    // what this role may change
+    const canEdit = can('items.update');
+    for (const id of ['edCode', 'edType', 'edNote', 'edQr']) $(id).disabled = !canEdit;
+    $('edQrScan').hidden = !canEdit;
+    $('edRegps').hidden = !!g || !canEdit;
+    $('edDelete').hidden = !can('items.delete');
+    $('edPosHint').hidden = !canEdit;
+    $('phCamera').closest('.photo-actions').hidden = !canEdit;
+    // building: only for companies that work with buildings; a group member moves with its group
+    const co = CO(it.companyId);
+    const bl = coBuildings(it.companyId);
+    $('edBuildingField').hidden = !bl.length;
+    if (bl.length && document.activeElement !== $('edBuilding')) {
+      $('edBuilding').innerHTML = (it.buildingId ? '' : '<option value="">Zonder gebouw</option>') +
+        bl.map(b => `<option value="${esc(b.id)}">${esc(b.name)}</option>`).join('');
+      $('edBuilding').value = it.buildingId || '';
+    }
+    $('edBuilding').disabled = !canEdit || !!g;
+    $('edBuilding').title = g ? 'Verplaats de groep in het groepspaneel' : '';
+    $('edCompanyField').hidden = !can('bedrijven.update') || companies.length < 2;
     fillCompanySelect($('edCompany'), it.companyId);
+    renderRepairs(it);
     renderPhotos();
   }
   const byName = (a, b) => a.name.localeCompare(b.name, 'nl', { numeric: true, sensitivity: 'base' });
@@ -1898,11 +2242,11 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     sel.innerHTML = [...companies].sort(byName).map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');
     sel.value = cid;
   }
-  // Moving to another company keeps the code unless that company already uses it.
-  function moveToCompany(list, cid) {
-    for (const it of list) {
-      it.companyId = cid;
-      if (coItems(cid).some(o => o !== it && o.code.toUpperCase() === it.code.toUpperCase())) it.code = nextCode(it.type, cid);
+  // Moving to another company or building keeps the code unless that place already uses it.
+  function moveItem(it, cid, bid) {
+    it.companyId = cid; it.buildingId = bid || null;
+    if (items.some(o => o !== it && inScope(o, cid, bid) && o.code.toUpperCase() === it.code.toUpperCase())) {
+      it.code = codeFor(it.type, nextNumber(cid, bid), cid, bid, it);
     }
   }
   const cur = () => items.find(i => i.id === selectedId);
@@ -1911,22 +2255,25 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   let clKey = '';
   function renderChecklist(it, s = checkSummary(it)) {
     const list = CHECK[it.type] || [];
-    $('clCount').textContent = `${s.done}/${s.total} beantwoord${s.nok ? ` · ${s.nok} NOK` : ''}`;
+    $('clTitle').textContent = `Controle ${new Date().getFullYear()}`;
+    const bad = [s.nok && `${s.nok} NOK`, s.otv && `${s.otv} OTV`].filter(Boolean).join(' · ');
+    $('clCount').textContent = `${s.done}/${s.total} beantwoord${bad ? ` · ${bad}` : ''}`;
     $('clBar').style.width = `${s.total ? (s.done / s.total) * 100 : 0}%`;
-    $('clMeter').style.setProperty('--st', s.nokK ? 'var(--st-defect)' : s.nok ? 'var(--st-afwijking)' : s.complete ? 'var(--st-ok)' : 'var(--gps)');
+    $('clMeter').style.setProperty('--st', s.nok ? 'var(--st-nok)' : s.otv ? 'var(--st-otv)' : s.complete ? 'var(--st-ok)' : 'var(--gps)');
 
     // Only rebuild the rows when answers change, so typing a remark keeps focus.
-    const key = `${it.id}|${it.type}|${list.map(c => it.checks?.[c.id]?.r || '-').join(',')}`;
+    const canCheck = can('checks.update');
+    const key = `${it.id}|${it.type}|${canCheck}|${list.map(c => it.checks?.[c.id]?.r || '-').join(',')}`;
     if (key !== clKey) {
       clKey = key;
       $('clList').innerHTML = list.map(c => {
         const a = it.checks?.[c.id];
         const r = a?.r || '';
         return `<li class="cl-row" data-c="${c.id}" data-r="${r}">
-          <div class="cl-q">${esc(c.q)}${c.k ? '<span class="crit" title="NOK maakt het item defect">kritiek</span>' : ''}</div>
+          <div class="cl-q">${esc(c.q)}</div>
           <div class="cl-btns" role="group" aria-label="${esc(c.q)}">${RESULTS.map(v =>
-            `<button type="button" data-r="${v}" aria-pressed="${r === v}">${v === 'nvt' ? 'n.v.t.' : v.toUpperCase()}</button>`).join('')}</div>
-          ${r === 'nok' ? `<input class="cl-note" type="text" data-note="${c.id}" value="${esc(a.note || '')}" placeholder="Wat is er mis? Komt in het rapport." aria-label="Opmerking bij: ${esc(c.q)}">` : ''}
+            `<button type="button" data-r="${v}" aria-pressed="${r === v}" ${canCheck ? '' : 'disabled'}>${v.toUpperCase()}</button>`).join('')}</div>
+          ${r === 'nok' || r === 'otv' ? `<input class="cl-note" type="text" data-note="${c.id}" value="${esc(a.note || '')}" placeholder="${r === 'nok' ? 'Wat is er mis?' : 'Wat moet opgevolgd worden?'} Komt in het rapport." aria-label="Opmerking bij: ${esc(c.q)}" ${canCheck ? '' : 'readonly'}>` : ''}
         </li>`;
       }).join('');
     }
@@ -1936,26 +2283,37 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       ? `Controle afgerond op ${fmtDate(it.checkDone)}. Wijzig je nog een antwoord, dan wordt ze heropend.`
       : last ? `Vorige controle: ${fmtDate(last.at)} · ${STATUS[last.status]?.label ?? last.status}${last.nok?.length ? ` · ${last.nok.length} NOK` : ''}` : '';
     $('clInfo').textContent = info; $('clInfo').hidden = !info;
-    $('clFinish').hidden = !!it.checkDone;
+    $('clDraft').hidden = CHECKS_FINAL.has(it.type);
+    $('clAllOk').hidden = !canCheck || s.complete;
+    $('clFinish').hidden = !!it.checkDone || !canCheck;
     $('clFinish').disabled = !s.complete;
     $('clFinish').textContent = s.complete ? 'Controle afronden' : `Nog ${s.total - s.done} te beantwoorden`;
-    $('clNew').hidden = !it.checkDone && !s.done;
+    $('clNew').hidden = (!it.checkDone && !s.done) || !canCheck;
     $('clNew').classList.remove('armed');
     $('clNew').textContent = it.checkDone ? 'Nieuwe controle starten' : 'Wis antwoorden';
   }
   function afterChecklistChange(it) {
-    if (!it.statusManual) it.status = derivedStatus(checkSummary(it));
+    it.status = derivedStatus(checkSummary(it));
     save(); renderAll();
   }
   $('clList').addEventListener('click', e => {
-    const b = e.target.closest('.cl-btns [data-r]'); const it = cur(); if (!b || !it) return;
+    const b = e.target.closest('.cl-btns [data-r]'); const it = cur(); if (!b || !it || !can('checks.update')) return;
     const id = b.closest('[data-c]').dataset.c; const r = b.dataset.r;
     const prev = it.checks[id];
     if (prev?.r === r) delete it.checks[id];                 // tap again to clear
     else it.checks[id] = { r, note: prev?.note || '' };
     if (it.checkDone) { it.checkDone = null; it.history.shift(); toast('Afgeronde controle heropend'); }
     afterChecklistChange(it);
-    if (r === 'nok' && it.checks[id] && !it.checks[id].note) $('clList').querySelector(`[data-note="${id}"]`)?.focus();
+    if (r !== 'ok' && it.checks[id] && !it.checks[id].note) $('clList').querySelector(`[data-note="${id}"]`)?.focus();
+  });
+  // Like the old app's "alles OK": fills only the unanswered checks, an NOK or OTV stays.
+  $('clAllOk').addEventListener('click', () => {
+    const it = cur(); if (!it || !can('checks.update')) return;
+    let n = 0;
+    for (const c of CHECK[it.type] || []) if (!it.checks[c.id]) { it.checks[c.id] = { r: 'ok', note: '' }; n++; }
+    if (it.checkDone) { it.checkDone = null; it.history.shift(); }
+    afterChecklistChange(it);
+    toast(`${n} openstaande punten op OK gezet`);
   });
   $('clList').addEventListener('input', e => {
     const inp = e.target.closest('[data-note]'); const it = cur(); if (!inp || !it) return;
@@ -1968,7 +2326,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     const it = cur(); if (!it) return;
     const s = checkSummary(it); if (!s.complete) return;
     const now = new Date().toISOString();
-    if (!it.statusManual) it.status = derivedStatus(s);
+    it.status = derivedStatus(s);
     it.checkDone = now;
     it.history = [{ at: now, status: it.status, nok: nokLabels(it) }, ...it.history].slice(0, 10);
     it.demo = false;
@@ -1979,25 +2337,194 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     const it = cur(); const b = $('clNew'); if (!it) return;
     if (!it.checkDone && !b.classList.contains('armed')) { b.classList.add('armed'); b.textContent = 'Bevestig: alle antwoorden wissen'; return; }
     const started = !!it.checkDone;
-    it.checks = {}; it.checkDone = null; it.statusManual = false; it.status = 'todo';
+    it.checks = {}; it.checkDone = null; it.status = 'todo';
     save(); renderAll();
     toast(started ? 'Nieuwe controle gestart, vorige staat in de historiek' : 'Antwoorden gewist');
   });
 
+  /* ---------- repairs in the item editor ---------- */
+  function renderRepairs(it) {
+    const list = it.repairs;
+    const open = list.filter(isOpenRepair).length;
+    $('rpCount').textContent = list.length ? `${open} open · ${list.length} totaal` : '';
+    $('rpAdd').hidden = !can('repairs.create') || !$('rpForm').hidden;
+    $('rpList').innerHTML = list.length ? list.map(r => {
+      const assign = can('repairs.assign') && isOpenRepair(r)
+        ? `<select data-rp-assign="${esc(r.id)}" aria-label="Toewijzen aan"><option value="">Niet toegewezen</option>${USERS.map(u =>
+            `<option value="${esc(u.id)}" ${u.id === r.assignedTo ? 'selected' : ''}>${esc(u.naam)}</option>`).join('')}</select>` : '';
+      const work = canWorkRepair(r)
+        ? [r.status === 'toegewezen' && `<button type="button" class="btn btn-ghost" data-rp="start" data-id="${esc(r.id)}">Start</button>`,
+           ['toegewezen', 'bezig'].includes(r.status) && `<button type="button" class="btn btn-secondary" data-rp="done" data-id="${esc(r.id)}">Voltooid</button>`,
+           can('repairs.assign') && isOpenRepair(r) && `<button type="button" class="btn btn-ghost" data-rp="cancel" data-id="${esc(r.id)}">Annuleer</button>`].filter(Boolean).join('')
+        : '';
+      const del = can('repairs.delete') ? `<button type="button" class="btn btn-ghost" data-rp="del" data-id="${esc(r.id)}">Verwijder</button>` : '';
+      const wait = !canWorkRepair(r) && isOpenRepair(r)
+        ? `<span class="hint">${r.assignedTo ? `Toegewezen aan ${esc(userName(r.assignedTo))}.` : 'Wacht op toewijzing door de planner.'}</span>` : '';
+      return `<li class="rp-item">
+        <div class="top"><b>${esc(r.type)}</b><span class="pill" style="--st:${REPAIR_COLOR[r.status]}">${REPAIR_STATUS[r.status]}</span></div>
+        ${r.note ? `<div>${esc(r.note)}</div>` : ''}
+        <div class="meta">${fmtDate(r.createdAt)} · gemeld door ${esc(userName(r.createdBy))}${r.assignedTo ? ` · toegewezen aan ${esc(userName(r.assignedTo))}` : ''}${r.completedAt ? ` · voltooid ${fmtDate(r.completedAt)}` : ''}</div>
+        ${assign || work || del || wait ? `<div class="acts">${assign}${work}${del}${wait}</div>` : ''}
+      </li>`;
+    }).join('') : `<li class="hint">Geen herstellingen. Vind je een NOK of OTV, voeg hier dan de herstelling toe.</li>`;
+  }
+  function closeRepairForm() { $('rpForm').hidden = true; $('rpNote').value = ''; $('rpDone').checked = false; }
+  $('rpAdd').addEventListener('click', () => {
+    const it = cur(); if (!it || !can('repairs.create')) return;
+    $('rpType').innerHTML = repairTypesOf(it.type).map(t => `<option>${esc(t)}</option>`).join('');
+    $('rpForm').hidden = false; $('rpAdd').hidden = true;
+    $('rpNote').focus();
+  });
+  $('rpCancel').addEventListener('click', () => { closeRepairForm(); const it = cur(); if (it) renderRepairs(it); });
+  $('rpSave').addEventListener('click', () => {
+    const it = cur(); if (!it || !can('repairs.create')) return;
+    const done = $('rpDone').checked;
+    it.repairs.push(newRepair({ type: $('rpType').value, note: $('rpNote').value.trim(), createdBy: me().id,
+      status: done ? 'voltooid' : 'nieuw', assignedTo: done ? me().id : null }));
+    it.demo = false;
+    closeRepairForm(); save(); renderAll();
+    toast(done ? 'Herstelling geregistreerd als ter plaatse uitgevoerd' : 'Herstelling gemeld. De planner wijst ze toe.', 3500);
+  });
+  $('rpList').addEventListener('change', e => {
+    const sel = e.target.closest('[data-rp-assign]'); const it = cur(); if (!sel || !it || !can('repairs.assign')) return;
+    const r = it.repairs.find(x => x.id === sel.dataset.rpAssign); if (!r) return;
+    r.assignedTo = sel.value || null;
+    if (r.status === 'nieuw' && r.assignedTo) r.status = 'toegewezen';
+    else if (!r.assignedTo) r.status = 'nieuw';
+    save(); renderAll();
+    toast(r.assignedTo ? `Toegewezen aan ${userName(r.assignedTo)}` : 'Toewijzing ingetrokken');
+  });
+  $('rpList').addEventListener('click', e => {
+    const b = e.target.closest('[data-rp]'); const it = cur(); if (!b || !it) return;
+    const r = it.repairs.find(x => x.id === b.dataset.id); if (!r) return;
+    const a = b.dataset.rp;
+    if (a === 'del') {
+      if (!can('repairs.delete')) return;
+      if (!b.classList.contains('armed')) { b.classList.add('armed'); b.textContent = 'Bevestig verwijderen'; return; }
+      it.repairs = it.repairs.filter(x => x !== r);
+    } else {
+      if (!canWorkRepair(r)) return;
+      if (a === 'start') r.status = 'bezig';
+      else if (a === 'done') { r.status = 'voltooid'; r.completedAt = new Date().toISOString(); }
+      else if (a === 'cancel') r.status = 'geannuleerd';
+    }
+    save(); renderAll();
+  });
+
+  /* ---------- QR stickers ---------- */
+  // Every item carries a numbered ABBA QR sticker. Scanning opens the item, or its whole group.
+  // Chrome on Android has a built-in QR detector; elsewhere the sticker number can be typed in.
+  const qrNorm = raw => { const s = String(raw || '').trim(); const d = s.match(/\d{4,}/g); return d ? d[d.length - 1] : s.toUpperCase(); };
+  const qrOwner = (code, cid = null, self = null) => items.find(i => i !== self && i.qr && i.qr === code && (!cid || i.companyId === cid));
+  let qr = null;   // running scan: { linkId, stream, timer, busy, paused }
+  async function openScanner(linkId = null) {
+    if (qr) return;
+    qr = { linkId, stream: null, timer: null, busy: false, paused: false };
+    $('qrScan').hidden = false; $('qrResult').hidden = true; $('qrInput').value = '';
+    const link = items.find(i => i.id === linkId);
+    $('qrHint').textContent = link ? `Scan de sticker die op ${link.code} hangt.` : 'Richt de camera op de QR-sticker.';
+    if (!('BarcodeDetector' in window) || !navigator.mediaDevices?.getUserMedia) {
+      $('qrHint').textContent = 'Deze browser kan geen QR-codes lezen. Typ het nummer onder de QR-code.';
+      return;
+    }
+    try {
+      const det = new BarcodeDetector({ formats: ['qr_code'] });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+      if (!qr) { stream.getTracks().forEach(t => t.stop()); return; }
+      qr.stream = stream;
+      const v = $('qrVideo'); v.srcObject = stream; await v.play();
+      qr.timer = setInterval(async () => {
+        if (!qr || qr.busy || qr.paused || v.readyState < 2) return;
+        qr.busy = true;
+        try { const r = await det.detect(v); if (r[0]?.rawValue) onQr(r[0].rawValue); } catch { /* frame not ready */ }
+        if (qr) qr.busy = false;
+      }, 250);
+    } catch (e) {
+      $('qrHint').textContent = e?.name === 'NotAllowedError'
+        ? 'Geen toegang tot de camera. Typ het nummer onder de QR-code.' : 'Camera niet beschikbaar. Typ het nummer onder de QR-code.';
+    }
+  }
+  function closeScanner() {
+    if (!qr) return;
+    clearInterval(qr.timer); qr.stream?.getTracks().forEach(t => t.stop());
+    $('qrVideo').srcObject = null; qr = null; $('qrScan').hidden = true;
+  }
+  function qrMessage(html, acts) {
+    qr.paused = true;
+    $('qrResult').innerHTML = `<p>${html}</p><div class="row">${acts.map(([a, l]) => `<button type="button" class="lb-btn" data-qr="${a}">${esc(l)}</button>`).join('')}</div>`;
+    $('qrResult').hidden = false;
+  }
+  function onQr(raw) {
+    const code = qrNorm(raw); if (!code || !qr) return;
+    navigator.vibrate?.(60);
+    qr.code = code;
+    const link = items.find(i => i.id === qr.linkId);
+    if (link) { linkQr(link, code); return; }
+    const hit = qrOwner(code, activeCompanyId) || qrOwner(code);
+    if (hit) {
+      closeScanner();
+      if (hit.companyId !== activeCompanyId) setActiveCompany(hit.companyId);
+      if (!inView(hit)) setActiveBuilding(null);
+      const g = G(hit.groupId);
+      if (g) openGroup(g.id, true); else select(hit.id, true);
+      toast(`Sticker ${code}: ${hit.code}${g ? ` in ${g.code}${g.name ? ` (${g.name})` : ''}` : ''}`);
+      return;
+    }
+    const sel = cur();
+    qrMessage(`Sticker <b>${esc(code)}</b> hangt nog aan geen enkel item.`, [
+      can('items.create') && activeCo() && ['new', 'Nieuw item met deze sticker'],
+      sel && can('items.update') && !sel.qr && ['link', `Koppel aan ${sel.code}`],
+      ['again', 'Opnieuw scannen'],
+    ].filter(Boolean));
+  }
+  function linkQr(it, code) {
+    const other = qrOwner(code, it.companyId, it);
+    if (other) { qrMessage(`Sticker <b>${esc(code)}</b> hangt al aan <b>${esc(other.code)}</b>.`, [['again', 'Opnieuw scannen']]); return; }
+    it.qr = code; it.demo = false; save();
+    closeScanner(); renderAll();
+    toast(`Sticker ${code} gekoppeld aan ${it.code}`);
+  }
+  $('qrResult').addEventListener('click', e => {
+    const a = e.target.closest('[data-qr]')?.dataset.qr; if (!a || !qr) return;
+    const code = qr.code;
+    if (a === 'again') { $('qrResult').hidden = true; qr.paused = false; return; }
+    if (a === 'link') { const it = cur(); if (it) linkQr(it, code); return; }
+    if (a === 'new') {
+      closeScanner();
+      pendingQr = code;
+      ensureSheetOpen();
+      toast(`Kies het type en plaats het item (GPS of tik op de kaart). Sticker ${code} wordt eraan gekoppeld.`, 5000);
+    }
+  });
+  $('qrManual').addEventListener('submit', e => { e.preventDefault(); if ($('qrInput').value.trim()) onQr($('qrInput').value); });
+  $('qrClose').addEventListener('click', closeScanner);
+  $('btnQr').addEventListener('click', () => openScanner(null));
+  $('edQrScan').addEventListener('click', () => { const it = cur(); if (it && can('items.update')) openScanner(it.id); });
+  $('edQr').addEventListener('input', () => {
+    const it = cur(); if (!it || !can('items.update')) return;
+    const v = $('edQr').value.replace(/\s+/g, '');
+    const other = v && qrOwner(v, it.companyId, it);
+    $('edQr').classList.toggle('bad', !!other); $('edQrErr').hidden = !other;
+    $('edQrErr').textContent = other ? `Deze sticker hangt al aan ${other.code}` : '';
+    if (!other) { it.qr = v; it.demo = false; save(); throttledList(); }
+  });
+  $('edQr').addEventListener('blur', () => { const it = cur(); if (it) { $('edQr').value = it.qr || ''; $('edQr').classList.remove('bad'); $('edQrErr').hidden = true; } });
+
   /* ---------- group bar in the item editor ---------- */
   function renderGroupBar(it) {
     const g = G(it.groupId);
+    $('edGroupBar').hidden = !g && !can('items.update');
     if (g) {
       const n = membersOf(g.id).length;
       $('edGroupBar').innerHTML = `<span class="stack">${n}</span>
         <div class="txt"><b>${esc(g.code)}</b>${g.name ? ` · ${esc(g.name)}` : ''}<small>${n} items op deze plek</small></div>
         <button type="button" class="btn btn-ghost" data-g="open">Naar groep</button>
-        <button type="button" class="btn btn-ghost" data-g="leave">Uit groep</button>`;
+        ${can('items.update') ? '<button type="button" class="btn btn-ghost" data-g="leave">Uit groep</button>' : ''}`;
       return;
     }
     const near = nearestEntity(it, 15, { itemId: it.id }).slice(0, 3);
-    const typeBtns = TYPES.map(t => `<button type="button" class="type-btn" data-addtype="${t.id}"><span class="glyph" style="--c:${t.color}">${esc(t.glyph)}</span>${esc(t.short)}</button>`).join('');
-    $('edGroupBar').innerHTML = `<div class="txt"><b>Meerdere items op deze plek?</b><small>bv. muurhydrant met slang en lans in één brandkast</small></div>
+    const typeBtns = PICK_TYPES.map(t => `<button type="button" class="type-btn" data-addtype="${t.id}"><span class="glyph" style="--c:${t.color}">${esc(t.glyph)}</span>${esc(t.short)}</button>`).join('');
+    $('edGroupBar').innerHTML = `<div class="txt"><b>Meerdere items op deze plek?</b><small>bv. haspel met slang en lans in één kast: ze krijgen hetzelfde nummer</small></div>
       <button type="button" class="btn btn-ghost" data-g="addhere" aria-expanded="${addHereOpen}">${addHereOpen ? 'Sluit' : '+ Item op deze plek'}</button>
       ${addHereOpen ? `<div class="type-row" role="group" aria-label="Type van het nieuwe item">${typeBtns}</div>` : ''}
       ${near.length ? `<div class="near"><span class="hint">Of groepeer met:</span>${near.map(x =>
@@ -2005,6 +2532,8 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   }
   $('edGroupBar').addEventListener('click', e => {
     const it = cur(); if (!it) return;
+    if (e.target.closest('[data-g="open"]')) { openGroup(it.groupId, false); return; }
+    if (!can('items.update')) return;
     const add = e.target.closest('[data-addtype]');
     if (add) {
       const g = createGroup([it], [it]);
@@ -2023,7 +2552,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       addHereOpen = !addHereOpen; renderGroupBar(it);
     } else if (a === 'join') {
       let g;
-      if (b.dataset.kind === 'group') { g = G(b.dataset.id); if (!g) return; it.groupId = g.id; syncGroup(g); }
+      if (b.dataset.kind === 'group') { g = G(b.dataset.id); if (!g) return; joinGroup(it, g); syncGroup(g); }
       else { const other = items.find(i => i.id === b.dataset.id); if (!other) return; g = createGroup([other, it], [other, it]); }
       save(); renderAll();
       toast(`${it.code} gegroepeerd in ${g.code}`);
@@ -2055,29 +2584,58 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     if (document.activeElement !== $('gpName')) $('gpName').value = g.name || '';
     $('gpCount').textContent = `${mem.length} items`;
     $('gpItems').innerHTML = mem.map(i => itemRowHtml(i)).join('');
-    $('gpTypeRow').innerHTML = TYPES.map(t => `<button type="button" class="type-btn" data-addtype="${t.id}"><span class="glyph" style="--c:${t.color}">${esc(t.glyph)}</span>${esc(t.short)}</button>`).join('');
+    $('gpTypeRow').innerHTML = PICK_TYPES.map(t => `<button type="button" class="type-btn" data-addtype="${t.id}"><span class="glyph" style="--c:${t.color}">${esc(t.glyph)}</span>${esc(t.short)}</button>`).join('');
     $('gpPos').textContent = `${g.lat.toFixed(6)}, ${g.lng.toFixed(6)}`;
     $('gpAcc').textContent = g.acc != null ? `${fmtAcc(g.acc)}${g.n ? ` (${g.n} metingen)` : ''}` : 'onbekend';
     $('gpSrc').textContent = SOURCE_LABEL[g.src] || g.src;
+    const canEdit = can('items.update');
+    $('gpName').disabled = !canEdit;
+    $('gpAddLabel').hidden = $('gpTypeRow').hidden = !can('items.create');
+    $('gpRegps').hidden = $('gpDissolve').hidden = !canEdit;
+    $('gpDissolve').closest('.ed-actions').previousElementSibling.hidden = !canEdit;
+    const bl = coBuildings(g.companyId);
+    $('gpBuildingField').hidden = !bl.length;
+    if (bl.length && document.activeElement !== $('gpBuilding')) {
+      $('gpBuilding').innerHTML = (g.buildingId ? '' : '<option value="">Zonder gebouw</option>') +
+        bl.map(b => `<option value="${esc(b.id)}">${esc(b.name)}</option>`).join('');
+      $('gpBuilding').value = g.buildingId || '';
+    }
+    $('gpBuilding').disabled = !canEdit;
+    $('gpCompanyField').hidden = !can('bedrijven.update') || companies.length < 2;
     fillCompanySelect($('gpCompany'), g.companyId);
   }
-  $('gpCompany').addEventListener('change', () => {
-    const g = curGroup(); const c = CO($('gpCompany').value); if (!g || !c || c.id === g.companyId) return;
+  // A group moves as a whole: it takes a free number at the new place, its items follow with their own prefix.
+  function moveGroup(g, cid, bid) {
     const mem = membersOf(g.id);
-    const code = coGroups(c.id).some(o => o.code === g.code) ? nextGroupCode(c.id) : g.code;
-    g.companyId = c.id; g.code = code; g.demo = false;
-    moveToCompany(mem, c.id);
+    mem.forEach(m => { m.groupId = null; });   // keep them out of the number count while renumbering
+    g.companyId = cid; g.buildingId = bid || null; g.demo = false;
+    if (groups.some(o => o !== g && inScope(o, cid, bid) && o.number === g.number) ||
+        items.some(o => inScope(o, cid, bid) && numOf(o.code) === g.number)) g.number = nextNumber(cid, bid);
+    g.code = groupLabel(g.number);
+    mem.forEach(m => { m.companyId = cid; m.demo = false; joinGroup(m, g); });
+    return mem;
+  }
+  $('gpCompany').addEventListener('change', () => {
+    const g = curGroup(); const c = CO($('gpCompany').value); if (!g || !c || c.id === g.companyId || !can('bedrijven.update')) return;
+    const mem = moveGroup(g, c.id, null);
     save(); toSheet();
     toast(`${g.code} met ${mem.length} items verplaatst naar ${c.name}`, 4000);
+  });
+  $('gpBuilding').addEventListener('change', () => {
+    const g = curGroup(); if (!g || !can('items.update')) return;
+    const b = B($('gpBuilding').value); if (!b || b.id === g.buildingId) return;
+    const mem = moveGroup(g, g.companyId, b.id);
+    save(); if (!inView(g)) toSheet(); else renderAll();
+    toast(`${g.code} met ${mem.length} items verplaatst naar ${b.name}`, 4000);
   });
   $('gpClose').addEventListener('click', toSheet);
   $('gpItems').addEventListener('click', e => { const b = e.target.closest('[data-id]'); if (b) select(b.dataset.id, false); });
   $('gpTypeRow').addEventListener('click', e => {
-    const b = e.target.closest('[data-addtype]'); const g = curGroup(); if (!b || !g) return;
+    const b = e.target.closest('[data-addtype]'); const g = curGroup(); if (!b || !g || !can('items.create')) return;
     commitNew(b.dataset.addtype, null, g.id);
   });
   $('gpName').addEventListener('input', () => {
-    const g = curGroup(); if (!g) return;
+    const g = curGroup(); if (!g || !can('items.update')) return;
     g.name = $('gpName').value; g.demo = false; save(); renderMarkers(); throttledList();
   });
   $('gpName').addEventListener('blur', () => { if (curGroup()) renderGroup(); });
@@ -2086,7 +2644,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     const id = g.id; toSheet(); startCapture({ kind: 'group', id });
   });
   $('gpDissolve').addEventListener('click', () => {
-    const b = $('gpDissolve'); const g = curGroup(); if (!g) return;
+    const b = $('gpDissolve'); const g = curGroup(); if (!g || !can('items.update')) return;
     if (!b.classList.contains('armed')) { b.classList.add('armed'); b.textContent = 'Bevestig: groep opheffen'; return; }
     const mem = membersOf(g.id);
     mem.forEach(m => { m.groupId = null; });
@@ -2096,51 +2654,46 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   });
 
   $('edClose').addEventListener('click', closeEditor);
-  $('edStatus').addEventListener('click', e => {
-    const b = e.target.closest('[data-status]'); const it = cur(); if (!b || !it) return;
-    it.status = b.dataset.status; it.statusManual = true;
-    if (it.checkDone && it.history[0]) it.history[0].status = it.status;
-    save(); renderAll();
-  });
-  $('edStatusHint').addEventListener('click', e => {
-    if (!e.target.closest('[data-st-auto]')) return;
-    const it = cur(); if (!it) return;
-    it.statusManual = false; it.status = derivedStatus(checkSummary(it));
-    if (it.checkDone && it.history[0]) it.history[0].status = it.status;
-    save(); renderAll();
-  });
-  $('edNote').addEventListener('input', () => { const it = cur(); if (!it) return; it.note = $('edNote').value; save(); throttledList(); });
+  $('edNote').addEventListener('input', () => { const it = cur(); if (!it || !can('items.update')) return; it.note = $('edNote').value; save(); throttledList(); });
   $('edType').addEventListener('change', () => {
-    const it = cur(); if (!it) return;
+    const it = cur(); if (!it || !can('items.update')) return;
     const oldPrefix = TYPE[it.type].prefix;
     it.type = $('edType').value;
-    if (it.code.startsWith(oldPrefix + '-')) it.code = nextCode(it.type, it.companyId);
-    if (!it.statusManual) it.status = derivedStatus(checkSummary(it));
+    if (it.code.startsWith(oldPrefix + '-')) it.code = codeFor(it.type, numOf(it.code) || nextNumber(it.companyId, it.buildingId), it.companyId, it.buildingId, it);
+    it.status = derivedStatus(checkSummary(it));
     save(); renderAll();
   });
   $('edCode').addEventListener('input', () => {
-    const it = cur(); if (!it) return;
+    const it = cur(); if (!it || !can('items.update')) return;
     const v = $('edCode').value.trim().toUpperCase();
-    const clash = coItems(it.companyId).some(i => i.id !== it.id && i.code.toUpperCase() === v);
-    const err = !v ? 'Code is verplicht' : clash ? 'Deze code bestaat al bij dit bedrijf' : '';
+    const clash = items.some(i => i.id !== it.id && inScope(i, it.companyId, it.buildingId) && i.code.toUpperCase() === v);
+    const err = !v ? 'Code is verplicht' : clash ? `Deze code bestaat al ${it.buildingId ? 'in dit gebouw' : 'bij dit bedrijf'}` : '';
     $('edCode').classList.toggle('bad', !!err); $('edCodeErr').hidden = !err; $('edCodeErr').textContent = err;
     if (!err) { it.code = v; save(); renderMarkers(); $('edTitle').textContent = v; throttledList(); }
   });
   $('edCode').addEventListener('blur', () => { const it = cur(); if (it) { $('edCode').value = it.code; $('edCode').classList.remove('bad'); $('edCodeErr').hidden = true; } });
   $('edCompany').addEventListener('change', () => {
-    const it = cur(); const c = CO($('edCompany').value); if (!it || !c || c.id === it.companyId) return;
+    const it = cur(); const c = CO($('edCompany').value); if (!it || !c || c.id === it.companyId || !can('bedrijven.update')) return;
     const g = G(it.groupId);
     it.groupId = null; it.demo = false;   // a group stays with its own company
-    moveToCompany([it], c.id);
+    moveItem(it, c.id, null);
     cleanupGroups(); save(); toSheet();
     toast(`${it.code} verplaatst naar ${c.name}${g ? ` (uit ${g.code} gehaald)` : ''}`, 4000);
   });
+  $('edBuilding').addEventListener('change', () => {
+    const it = cur(); if (!it || !can('items.update') || it.groupId) return;
+    const b = B($('edBuilding').value); if (!b || b.id === it.buildingId) return;
+    const old = it.code;
+    moveItem(it, it.companyId, b.id); it.demo = false;
+    save(); if (!inView(it)) toSheet(); else renderAll();
+    toast(`${it.code} verplaatst naar ${b.name}${old !== it.code ? ` (was ${old})` : ''}`, 4000);
+  });
   $('edRegps').addEventListener('click', () => {
-    const it = cur(); if (!it) return;
+    const it = cur(); if (!it || !can('items.update')) return;
     const id = it.id; toSheet(); startCapture({ kind: 'item', id });
   });
   $('edDelete').addEventListener('click', () => {
-    const b = $('edDelete'); const it = cur(); if (!it) return;
+    const b = $('edDelete'); const it = cur(); if (!it || !can('items.delete')) return;
     if (!b.classList.contains('armed')) { b.classList.add('armed'); b.textContent = 'Bevestig verwijderen'; return; }
     deletePhotosOf([it]);
     const gid = it.groupId;
@@ -2157,7 +2710,8 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       return;
     }
     if (e.key !== 'Escape') return;
-    if (!$('drawer').inert) { if (!$('coForm').hidden) showCompanyList(); else closeDrawer(); }
+    if (qr) closeScanner();
+    else if (drawerOpen()) { if (drView === 'form') showDrawerView(editCoId ? 'company' : 'companies'); else if (drView === 'company') showDrawerView('companies'); else closeDrawer(); }
     else if (!$('searchBar').hidden) closeSearch();
     else if (!$('editor').hidden) closeEditor();
     else if (!$('groupPanel').hidden) toSheet();
@@ -2541,13 +3095,16 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     map.once('moveend', () => searchPin?.openPopup());
   }
 
-  /* ================= side menu: companies ================= */
-  function openDrawer() {
+  /* ================= side menu ================= */
+  const DR_VIEWS = { companies: 'drCompanies', company: 'drCompany', form: 'coForm', repairs: 'drRepairs' };
+  let drView = 'companies';
+  const drawerOpen = () => !$('drawer').inert;
+  function openDrawer(view = 'companies') {
     const d = $('drawer');
     d.inert = false; d.setAttribute('aria-hidden', 'false'); d.classList.add('open'); $('scrim').classList.add('open');
     $('btnMenu').setAttribute('aria-expanded', 'true');
     if (!$('searchBar').hidden) closeSearch();
-    showCompanyList();
+    showDrawerView(view);
   }
   function closeDrawer() {
     const d = $('drawer');
@@ -2555,42 +3112,76 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     d.inert = true; d.setAttribute('aria-hidden', 'true'); d.classList.remove('open'); $('scrim').classList.remove('open');
     $('btnMenu').setAttribute('aria-expanded', 'false');
   }
-  $('btnMenu').addEventListener('click', () => ($('drawer').inert ? openDrawer() : closeDrawer()));
+  function showDrawerView(v) {
+    drView = v;
+    for (const [k, id] of Object.entries(DR_VIEWS)) $(id).hidden = k !== v;
+    const tab = v === 'repairs' ? 'repairs' : 'companies';
+    $('drTabs').querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.view === tab)));
+    $(DR_VIEWS[v]).scrollTop = 0;
+    renderDrawer();
+  }
+  // Keeps the menu in step with the data; the company form is left alone while someone types in it.
+  function renderDrawer() {
+    $('drSub').textContent = `${me().naam} · ${ROLES[role].label}`;
+    $('roleSel').value = role;
+    const n = myRepairs().length;
+    $('drRepCount').textContent = n; $('drRepCount').hidden = !n;
+    if (drView === 'companies') renderCompanies();
+    else if (drView === 'company') renderCompanyDetail();
+    else if (drView === 'repairs') renderRepairsOverview();
+  }
+  $('btnMenu').addEventListener('click', () => (drawerOpen() ? closeDrawer() : openDrawer()));
   $('drClose').addEventListener('click', closeDrawer);
   $('scrim').addEventListener('click', closeDrawer);
-  $('noCoAdd').addEventListener('click', () => { openDrawer(); openCompanyForm(null); });
+  $('drTabs').addEventListener('click', e => { const b = e.target.closest('[data-view]'); if (b && !b.disabled) showDrawerView(b.dataset.view); });
+  $('noCoAdd').addEventListener('click', () => openDrawer());
+  $('roleSel').addEventListener('change', () => setRole($('roleSel').value));
 
-  function showCompanyList() {
-    $('coForm').hidden = true; $('drListView').hidden = false;
-    renderCompanies();
+  function setRole(r) {
+    if (!ROLES[r] || r === role) return;
+    role = r;
+    try { localStorage.setItem(ROLE_KEY, r); } catch { /* no storage */ }
+    clearPending(); stopCapture(); setTapMode(false);
+    if (selectedId || selectedGroupId) toSheet(); else renderAll();
+    if (drView === 'form' && !can(editCoId ? 'bedrijven.update' : 'bedrijven.create')) showDrawerView('company');
+    renderDrawer();
+    toast(`Preview: je bekijkt de app nu als ${ROLES[r].label.toLowerCase()}.`);
   }
+
+  /* ---------- companies list ---------- */
   function renderCompanies() {
     const q = $('drSearch').value.trim().toLowerCase();
     $('drSearch').hidden = companies.length < 6 && !q;
-    $('drSub').textContent = companies.length === 1 ? '1 bedrijf' : `${companies.length} bedrijven`;
+    $('coAdd').hidden = !can('bedrijven.create');
+    $('coAddHint').hidden = can('bedrijven.create');
     const list = [...companies].sort(byName).filter(c => !q || `${c.name} ${c.address}`.toLowerCase().includes(q));
-    if (!companies.length) { $('coList').innerHTML = `<li class="empty">Nog geen bedrijven.</li>`; return; }
+    if (!companies.length) { $('coList').innerHTML = `<li class="empty">Nog geen bedrijven toegewezen.</li>`; return; }
     if (!list.length) { $('coList').innerHTML = `<li class="empty">Geen bedrijf gevonden voor “${esc(q)}”.</li>`; return; }
     $('coList').innerHTML = list.map(c => {
       const s = companyStats(c.id);
-      const probs = s.afwijking + s.defect;
+      const probs = s.otv + s.nok;
       const state = !s.n ? 'geen items'
-        : probs ? `<span class="${s.defect ? 'bad' : 'warn'}">${probs} probleem</span>${s.todo ? ` · ${s.todo} te doen` : ''}`
-        : s.todo ? `${s.todo} te doen` : '<span class="good">alles in orde</span>';
-      const sub = [c.address && esc(c.address), s.n ? `${s.n} item${s.n === 1 ? '' : 's'}` : '', state].filter(Boolean).join(' · ');
+        : probs ? `<span class="${s.nok ? 'bad' : 'warn'}">${[s.nok && `${s.nok} NOK`, s.otv && `${s.otv} OTV`].filter(Boolean).join(' · ')}</span>${s.todo ? ` · ${s.todo} te doen` : ''}`
+        : s.todo ? `${s.todo} te doen` : '<span class="good">alles OK</span>';
+      const nb = coBuildings(c.id).length;
+      const sub = [c.address && esc(c.address), nb && `${nb} gebouw${nb === 1 ? '' : 'en'}`, s.n && `${s.n} item${s.n === 1 ? '' : 's'}`, state].filter(Boolean).join(' · ');
       return `<li class="${c.id === activeCompanyId ? 'active' : ''}">
         <button type="button" class="co-btn" data-co="${esc(c.id)}" ${c.id === activeCompanyId ? 'aria-current="true"' : ''}>
           <span class="co-mark">${esc(initials(c.name))}</span>
           <span class="co-main"><b>${esc(c.name)}${c.demo ? '<span class="demo-tag">voorbeeld</span>' : ''}</b><small>${sub}</small></span>
         </button>
-        <button type="button" class="icon-btn co-edit" data-edit="${esc(c.id)}" aria-label="Bewerk ${esc(c.name)}" title="Bewerk">✎</button>
+        <button type="button" class="icon-btn co-edit" data-info="${esc(c.id)}" aria-label="Details van ${esc(c.name)}" title="Details en gebouwen">›</button>
       </li>`;
     }).join('');
   }
   $('drSearch').addEventListener('input', renderCompanies);
+  // Tapping a company opens it; with buildings you first pick the building you work in.
   $('coList').addEventListener('click', e => {
-    const ed = e.target.closest('[data-edit]'); if (ed) { openCompanyForm(ed.dataset.edit); return; }
-    const b = e.target.closest('[data-co]'); if (b) { setActiveCompany(b.dataset.co); closeDrawer(); }
+    const info = e.target.closest('[data-info]');
+    const b = info || e.target.closest('[data-co]'); if (!b) return;
+    const cid = info ? info.dataset.info : b.dataset.co;
+    setActiveCompany(cid);
+    if (info || coBuildings(cid).length) showDrawerView('company'); else closeDrawer();
   });
   $('coAdd').addEventListener('click', () => openCompanyForm(null));
 
@@ -2598,75 +3189,216 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   function setActiveCompany(cid) {
     const c = CO(cid); if (!c) return;
     const changed = cid !== activeCompanyId;
-    activeCompanyId = cid; save();
+    activeCompanyId = cid;
+    if (changed) activeBuildingId = null;
+    save();
     if (!changed) { renderAll(); return; }
     clearPending(); stopCapture(); setTapMode(false);
     if (selectedId || selectedGroupId) toSheet(); else renderAll();
-    frameCompany();
+    frameView();
   }
-  function frameCompany() {
-    const pts = coItems(activeCompanyId).map(i => [i.lat, i.lng]);
-    const name = activeCo()?.name ?? '';
+  function setActiveBuilding(bid) {
+    activeBuildingId = bid || null; save();
+    clearPending(); setTapMode(false);
+    if ((selectedId && !inView(cur() || {})) || (selectedGroupId && !inView(curGroup() || {}))) toSheet(); else renderAll();
+    frameView();
+  }
+  function frameView() {
+    const pts = viewItems().map(i => [i.lat, i.lng]);
+    const name = scopeName();
     if (!pts.length) { toast(`${name}: nog geen items. Plaats het eerste item op je GPS-positie of via de kaart.`, 4000); return; }
     const b = L.latLngBounds(pts);
     const here = lastFix && Date.now() - lastFix.t < 60000 && b.pad(.5).contains([lastFix.lat, lastFix.lng]);
-    if (here && follow) { toast(`${name} · ${pts.length} items`); return; }   // you are on site: keep following
+    toast(`${name} · ${pts.length} item${pts.length === 1 ? '' : 's'}`);
+    if (here && follow) return;   // you are on site: keep following
     setFollow(false);
     map.fitBounds(b.pad(.25), { maxZoom: 19 });
-    toast(`${name} · ${pts.length} items`);
   }
+  const scopeName = () => {
+    const c = activeCo(); if (!c) return '';
+    const b = B(activeBuildingId);
+    return c.name + (b ? ` · ${b.name}` : activeBuildingId === 'none' ? ' · zonder gebouw' : '');
+  };
 
+  /* ---------- company detail: info and buildings ---------- */
+  let bdEditId = null;
+  function renderCompanyDetail() {
+    const c = activeCo(); if (!c) { showDrawerView('companies'); return; }
+    $('cdName').innerHTML = `${esc(c.name)}${c.demo ? '<span class="demo-tag">voorbeeld</span>' : ''}`;
+    const tel = c.contactPhone ? `<a href="tel:${esc(c.contactPhone.replace(/[^\d+]/g, ''))}">${esc(c.contactPhone)}</a>` : '';
+    const mail = c.contactEmail ? `<a href="mailto:${esc(c.contactEmail)}">${esc(c.contactEmail)}</a>` : '';
+    const rows = [['Adres', esc(c.address)], ['Contact', [esc(c.contactName), tel, mail].filter(Boolean).join('<br>')], ['Notitie', esc(c.note)]]
+      .filter(r => r[1]);
+    $('cdInfo').innerHTML = rows.length ? rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('') : '<dt>Gegevens</dt><dd>Nog niet ingevuld</dd>';
+    $('cdEdit').hidden = !can('bedrijven.update');
+    $('cdLock').hidden = can('bedrijven.update');
+    $('cdStruct').textContent = c.structure === 'gebouwen' ? 'Met gebouwen. Ligt vast.'
+      : c.structure === 'zonder' ? 'Zonder gebouwen. Ligt vast sinds het eerste item.'
+      : 'Nog niet gekozen: het eerste gebouw of het eerste item legt dit vast.';
+
+    const bl = coBuildings(c.id);
+    const all = coItems(c.id);
+    const loose = all.filter(i => !i.buildingId).length;
+    const stat = list => {
+      const nok = list.filter(i => i.status === 'nok').length, otv = list.filter(i => i.status === 'otv').length, todo = list.filter(i => i.status === 'todo').length;
+      return [`${list.length} item${list.length === 1 ? '' : 's'}`, nok && `<span class="bad">${nok} NOK</span>`, otv && `<span class="warn">${otv} OTV</span>`, todo && `${todo} te doen`].filter(Boolean).join(' · ');
+    };
+    const row = (key, name, list, editable) => `<li class="${(activeBuildingId || 'all') === key ? 'active' : ''}">
+        <button type="button" class="co-btn" data-bd="${esc(key)}"><span class="co-mark">${key === 'all' ? '★' : key === 'none' ? '–' : esc(initials(name))}</span>
+          <span class="co-main"><b>${esc(name)}</b><small>${stat(list)}</small></span></button>
+        ${editable ? `<button type="button" class="icon-btn co-edit" data-bd-edit="${esc(key)}" aria-label="Hernoem ${esc(name)}" title="Hernoem">✎</button>` : '<span></span>'}
+      </li>`;
+    $('bdList').innerHTML = !bl.length ? '' : [
+      row('all', 'Alle gebouwen', all, false),
+      ...bl.map(b => row(b.id, b.name, all.filter(i => i.buildingId === b.id), can('buildings.update'))),
+      loose ? row('none', 'Zonder gebouw', all.filter(i => !i.buildingId), false) : '',
+    ].join('');
+    $('bdEmpty').hidden = !!bl.length;
+    $('bdEmpty').textContent = c.structure === 'zonder'
+      ? 'Dit bedrijf werkt zonder gebouwen: alle items hangen rechtstreeks aan het bedrijf.'
+      : 'Nog geen gebouwen. Werkt dit bedrijf met meerdere gebouwen of zones, maak ze dan eerst aan.';
+    const canAdd = c.structure !== 'zonder' && can(bdEditId ? 'buildings.update' : 'buildings.create');
+    $('bdForm').hidden = !canAdd;
+    $('bdSave').textContent = bdEditId ? 'Hernoem' : '+ Gebouw';
+    $('bdCancel').hidden = !bdEditId;
+    const bEdit = B(bdEditId);
+    $('bdDelete').hidden = !bEdit || !can('buildings.delete');
+    $('bdDelete').disabled = !!bEdit && all.some(i => i.buildingId === bEdit.id);
+    $('bdDelete').title = $('bdDelete').disabled ? 'Een gebouw met items kan niet verwijderd worden.' : '';
+  }
+  $('cdBack').addEventListener('click', () => showDrawerView('companies'));
+  $('cdEdit').addEventListener('click', () => openCompanyForm(activeCompanyId));
+  $('cdShow').addEventListener('click', () => { closeDrawer(); frameView(); });
+  $('bdList').addEventListener('click', e => {
+    const ed = e.target.closest('[data-bd-edit]');
+    if (ed) { const b = B(ed.dataset.bdEdit); if (!b) return; bdEditId = b.id; $('bdName').value = b.name; renderCompanyDetail(); $('bdName').focus(); return; }
+    const row = e.target.closest('[data-bd]'); if (!row) return;
+    const key = row.dataset.bd;
+    setActiveBuilding(key === 'all' ? null : key);
+    closeDrawer();
+  });
+  function resetBuildingForm() { bdEditId = null; $('bdName').value = ''; }
+  $('bdCancel').addEventListener('click', () => { resetBuildingForm(); renderCompanyDetail(); });
+  $('bdForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const c = activeCo(); if (!c) return;
+    const name = $('bdName').value.trim(); if (!name) { $('bdName').focus(); return; }
+    if (coBuildings(c.id).some(b => b.id !== bdEditId && b.name.toLowerCase() === name.toLowerCase())) { toast('Dit gebouw bestaat al bij dit bedrijf.'); return; }
+    const b = B(bdEditId);
+    if (b) {
+      if (!can('buildings.update')) return;
+      b.name = name; b.demo = false;
+      toast(`Gebouw hernoemd naar ${name}`);
+    } else {
+      if (!can('buildings.create') || c.structure === 'zonder') return;
+      const nb = { id: uid(), companyId: c.id, name, createdAt: new Date().toISOString(), demo: false };
+      buildings.push(nb);
+      c.structure = 'gebouwen';
+      activeBuildingId = nb.id;
+      toast(`${name} aangemaakt. Nieuwe items komen nu in dit gebouw.`, 3500);
+    }
+    resetBuildingForm(); save(); renderAll(); renderCompanyDetail();
+  });
+  $('bdDelete').addEventListener('click', () => {
+    const b = B(bdEditId); if (!b || !can('buildings.delete') || coItems(b.companyId).some(i => i.buildingId === b.id)) return;
+    buildings = buildings.filter(x => x !== b);
+    groups.forEach(g => { if (g.buildingId === b.id) g.buildingId = null; });
+    if (activeBuildingId === b.id) activeBuildingId = null;
+    resetBuildingForm(); save(); renderAll(); renderCompanyDetail();
+    toast(`Gebouw ${b.name} verwijderd`);
+  });
+
+  /* ---------- company form (office only) ---------- */
   let editCoId = null;
+  const CO_FIELDS = { coName: 'name', coAddr: 'address', coContact: 'contactName', coPhone: 'contactPhone', coMail: 'contactEmail', coNote: 'note' };
   function openCompanyForm(cid) {
     const c = CO(cid);
+    if (!can(c ? 'bedrijven.update' : 'bedrijven.create')) return;
     editCoId = c?.id ?? null;
-    $('drListView').hidden = true; $('coForm').hidden = false;
+    showDrawerView('form');
     $('coFormTitle').textContent = c ? 'Bedrijf bewerken' : 'Nieuw bedrijf';
-    $('coName').value = c?.name ?? ''; $('coAddr').value = c?.address ?? ''; $('coNote').value = c?.note ?? '';
+    for (const [id, k] of Object.entries(CO_FIELDS)) $(id).value = c?.[k] ?? '';
     $('coName').classList.remove('bad'); $('coNameErr').hidden = true;
-    const del = $('coDelete'); del.hidden = !c; del.classList.remove('armed');
-    if (c) { const n = coItems(c.id).length; del.textContent = n ? `Verwijder bedrijf en ${n} item${n === 1 ? '' : 's'}` : 'Verwijder bedrijf'; }
+    $('coDelete').hidden = !c || !can('bedrijven.delete');
+    $('coDelBox').hidden = true; $('coDelInput').value = ''; $('coDelGo').disabled = true;
     setTimeout(() => $('coName').focus(), 260);
   }
-  $('coCancel').addEventListener('click', showCompanyList);
+  $('coCancel').addEventListener('click', () => showDrawerView(editCoId ? 'company' : 'companies'));
   $('coForm').addEventListener('submit', e => {
     e.preventDefault();
+    const c = CO(editCoId);
+    if (!can(c ? 'bedrijven.update' : 'bedrijven.create')) return;
     const name = $('coName').value.trim();
-    const dup = companies.find(c => c.id !== editCoId && c.name.toLowerCase() === name.toLowerCase());
+    const dup = companies.find(x => x.id !== editCoId && x.name.toLowerCase() === name.toLowerCase());
     const err = !name ? 'Naam is verplicht' : dup ? 'Er bestaat al een bedrijf met deze naam' : '';
     $('coName').classList.toggle('bad', !!err); $('coNameErr').hidden = !err; $('coNameErr').textContent = err;
     if (err) { $('coName').focus(); return; }
-    const fields = { name, address: $('coAddr').value.trim(), note: $('coNote').value.trim() };
-    const c = CO(editCoId);
+    const fields = Object.fromEntries(Object.entries(CO_FIELDS).map(([id, k]) => [k, $(id).value.trim()]));
     if (c) {
-      Object.assign(c, fields, { demo: false }); save(); renderAll(); showCompanyList();
+      Object.assign(c, fields, { demo: false }); save(); renderAll(); showDrawerView('company');
       toast(`${name} opgeslagen`);
     } else {
       const n = newCompany(fields);
-      setActiveCompany(n.id); closeDrawer();
-      toast(`${name} aangemaakt. Nieuwe items komen nu bij dit bedrijf.`, 4000);
+      setActiveCompany(n.id); showDrawerView('company');
+      toast(`${name} aangemaakt. Kies of het met gebouwen werkt, of plaats meteen items.`, 4500);
     }
   });
+  // Deleting a company removes its whole history: only an admin can, after typing the exact name.
   $('coDelete').addEventListener('click', () => {
-    const b = $('coDelete'); const c = CO(editCoId); if (!c) return;
-    if (!b.classList.contains('armed')) { b.classList.add('armed'); b.textContent = `Bevestig: ${c.name} definitief verwijderen`; return; }
+    const c = CO(editCoId); if (!c || !can('bedrijven.delete')) return;
+    const n = coItems(c.id).length;
+    $('coDelText').textContent = `Dit verwijdert ${c.name} met ${n} item${n === 1 ? '' : 's'}, alle controles, herstellingen en foto's. Dit kan niet ongedaan gemaakt worden. Typ de naam van het bedrijf om te bevestigen.`;
+    $('coDelBox').hidden = false; $('coDelInput').value = ''; $('coDelGo').disabled = true; $('coDelInput').focus();
+  });
+  $('coDelInput').addEventListener('input', () => {
+    const c = CO(editCoId);
+    $('coDelGo').disabled = !c || $('coDelInput').value.trim() !== c.name;
+  });
+  $('coDelGo').addEventListener('click', () => {
+    const c = CO(editCoId); if (!c || !can('bedrijven.delete') || $('coDelInput').value.trim() !== c.name) return;
     removeCompanies([c]);
-    showCompanyList();
+    showDrawerView('companies');
     toast(`${c.name} verwijderd`);
   });
-  // Remove companies with all their items, groups and photos; pick another company if the active one went.
+  // Remove companies with all their items, groups, buildings and photos; pick another company if the active one went.
   function removeCompanies(list) {
     const ids = new Set(list.map(c => c.id));
     const gone = items.filter(i => ids.has(i.companyId));
     deletePhotosOf(gone);
     items = items.filter(i => !ids.has(i.companyId));
     groups = groups.filter(g => !ids.has(g.companyId));
+    buildings = buildings.filter(b => !ids.has(b.companyId));
     companies = companies.filter(c => !ids.has(c.id));
-    if (!activeCo()) activeCompanyId = [...companies].sort(byName)[0]?.id ?? null;
+    if (!activeCo()) { activeCompanyId = [...companies].sort(byName)[0]?.id ?? null; activeBuildingId = null; }
     save();
     if ((selectedId && !cur()) || (selectedGroupId && !curGroup())) toSheet(); else renderAll();
-    if (activeCo()) frameCompany();
+    if (activeCo()) frameView();
   }
+
+  /* ---------- repairs overview ---------- */
+  const allRepairs = () => items.flatMap(it => it.repairs.map(r => ({ it, r })));
+  const myRepairs = () => allRepairs().filter(x => isOpenRepair(x.r) && x.r.assignedTo === me().id);
+  function renderRepairsOverview() {
+    const rowHtml = ({ it, r }, showCo) => `<li><button type="button" class="co-btn" data-rp-item="${esc(it.id)}">
+        <span class="co-mark" style="background:${REPAIR_COLOR[r.status]}">${esc(TYPE[it.type].glyph)}</span>
+        <span class="co-main"><b>${esc(it.code)} · ${esc(r.type)}</b>
+          <small>${showCo ? `${esc(CO(it.companyId)?.name ?? '')} · ` : ''}${B(it.buildingId) ? `${esc(B(it.buildingId).name)} · ` : ''}${REPAIR_STATUS[r.status]}${r.assignedTo ? ` · ${esc(userName(r.assignedTo))}` : ''}${r.note ? ` · ${esc(r.note)}` : ''}</small></span>
+      </button><span></span></li>`;
+    const mine = myRepairs();
+    const here = allRepairs().filter(x => isOpenRepair(x.r) && x.it.companyId === activeCompanyId && x.r.assignedTo !== me().id);
+    const co = activeCo();
+    $('rpMine').innerHTML = mine.length ? mine.map(x => rowHtml(x, true)).join('') : '<li class="empty">Niets aan jou toegewezen.</li>';
+    $('rpHereTitle').textContent = co ? `Open bij ${co.name}` : 'Open herstellingen';
+    $('rpHere').innerHTML = here.length ? here.map(x => rowHtml(x, false)).join('') : '<li class="empty">Geen andere open herstellingen.</li>';
+  }
+  $('drRepairs').addEventListener('click', e => {
+    const b = e.target.closest('[data-rp-item]'); if (!b) return;
+    const it = items.find(i => i.id === b.dataset.rpItem); if (!it) return;
+    if (it.companyId !== activeCompanyId) setActiveCompany(it.companyId);
+    if (!inView(it)) setActiveBuilding(null);
+    closeDrawer();
+    select(it.id, true);
+  });
 
   /* ================= settings / io ================= */
   $('accSel').value = String(minAcc);
@@ -2679,11 +3411,25 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     groups = groups.filter(g => !g.demo);
     items.forEach(i => { if (i.groupId && !G(i.groupId)) i.groupId = null; });
     cleanupGroups();
+    buildings = buildings.filter(b => !b.demo || items.some(i => i.buildingId === b.id));
     // the example company goes too, unless real items were added to it
     const emptyDemo = companies.filter(c => c.demo && !coItems(c.id).length);
     if (emptyDemo.length) removeCompanies(emptyDemo);
     else { save(); if ((selectedId && !cur()) || (selectedGroupId && !curGroup())) toSheet(); else renderAll(); }
     toast(`${n} voorbeelditems verwijderd${emptyDemo.length ? ', samen met het voorbeeldbedrijf' : ''}`);
+  });
+  // Preview tool: put the example company back as in a fresh install, next to your own data.
+  $('btnReDemo').addEventListener('click', () => {
+    const demo = items.filter(i => i.demo);
+    deletePhotosOf(demo);
+    items = items.filter(i => !i.demo); groups = groups.filter(g => !g.demo);
+    buildings = buildings.filter(b => !b.demo);
+    items.forEach(i => { if (i.groupId && !G(i.groupId)) i.groupId = null; });
+    companies = companies.filter(c => !c.demo || coItems(c.id).length);
+    cleanupGroups(); fixStructure();
+    addDemoData(); save();
+    clearPending(); stopCapture(); setTapMode(false);
+    toSheet(); frameView();
   });
 
   const slug = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'bedrijf';
@@ -2702,13 +3448,15 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
         properties: {
           id: i.id, code: i.code, type: i.type, type_label: TYPE[i.type].label, status: i.status,
           bedrijf_id: i.companyId, bedrijf: CO(i.companyId)?.name ?? null, bedrijf_adres: CO(i.companyId)?.address || null,
+          gebouw_id: i.buildingId, gebouw: B(i.buildingId)?.name ?? null, qr_sticker: i.qr || null,
+          herstellingen: i.repairs.map(r => ({ ...r, status_label: REPAIR_STATUS[r.status] })),
           notitie: i.note || null, nauwkeurigheid_m: i.acc, bron: i.src, metingen: i.n,
           aangemaakt: i.createdAt, voorbeeld: !!i.demo, fotos: i.photos?.length || 0, // blobs blijven lokaal
           groep_id: i.groupId, groep_code: G(i.groupId)?.code ?? null, groep_naam: G(i.groupId)?.name || null,
           checklist: (CHECK[i.type] || []).map(c => ({
-            id: c.id, vraag: c.q, kritiek: c.k, resultaat: i.checks?.[c.id]?.r || null, opmerking: i.checks?.[c.id]?.note || null,
+            id: c.id, vraag: c.q, resultaat: i.checks?.[c.id]?.r || null, opmerking: i.checks?.[c.id]?.note || null,
           })),
-          controle_afgerond: i.checkDone, status_manueel: !!i.statusManual, historiek: i.history || [],
+          controle_afgerond: i.checkDone, historiek: i.history || [],
         },
       })),
     };
@@ -2721,6 +3469,19 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     toast(`${list.length} items geëxporteerd`);
   }
 
+  // Building for an imported item: by id, then by name within its company, else a new one.
+  function importBuilding(p, cid) {
+    const byId = typeof p.gebouw_id === 'string' ? B(p.gebouw_id) : null;
+    if (byId && byId.companyId === cid) return byId.id;
+    const name = typeof p.gebouw === 'string' ? p.gebouw.trim() : '';
+    if (!name) return null;
+    const found = coBuildings(cid).find(b => b.name.toLowerCase() === name.toLowerCase());
+    if (found) return found.id;
+    const b = { id: typeof p.gebouw_id === 'string' && p.gebouw_id && !B(p.gebouw_id) ? p.gebouw_id : uid(), companyId: cid, name,
+      createdAt: new Date().toISOString(), demo: false };
+    buildings.push(b);
+    return b.id;
+  }
   // Company for an imported item: by id, then by name, else a new one; no company info = the active company.
   function importCompany(p) {
     const byId = typeof p.bedrijf_id === 'string' ? CO(p.bedrijf_id) : null;
@@ -2738,7 +3499,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   }
 
   $('fileImport').addEventListener('change', async e => {
-    const f = e.target.files?.[0]; e.target.value = ''; if (!f) return;
+    const f = e.target.files?.[0]; e.target.value = ''; if (!f || !can('data.import')) return;
     try {
       const d = JSON.parse(await f.text());
       const feats = d?.type === 'FeatureCollection' ? d.features : Array.isArray(d) ? d : null;
@@ -2750,7 +3511,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
         const it = {
           id: typeof p.id === 'string' ? p.id : uid(),
           type: TYPE[p.type] ? p.type : 'overig',
-          code: '', status: STATUS[p.status] ? p.status : 'todo',
+          code: '', status: OLD_STATUS[p.status] || (STATUS[p.status] ? p.status : 'todo'),
           lat: c ? +c[1] : NaN, lng: c ? +c[0] : NaN,
           acc: Number.isFinite(+p.nauwkeurigheid_m) && p.nauwkeurigheid_m !== null ? +p.nauwkeurigheid_m : null,
           src: typeof p.bron === 'string' ? p.bron : 'import', n: +p.metingen || 0,
@@ -2759,24 +3520,25 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
           checks: Object.fromEntries((Array.isArray(p.checklist) ? p.checklist : [])
             .filter(c => c && typeof c.id === 'string' && RESULTS.includes(c.resultaat))
             .map(c => [c.id, { r: c.resultaat, note: typeof c.opmerking === 'string' ? c.opmerking : '' }])),
-          statusManual: !!p.status_manueel,
           checkDone: typeof p.controle_afgerond === 'string' ? p.controle_afgerond : null,
           history: Array.isArray(p.historiek) ? p.historiek : [],
-          groupId: null, companyId: null,
+          groupId: null, companyId: null, buildingId: null,
+          qr: typeof p.qr_sticker === 'string' ? p.qr_sticker : '', repairs: normalizeRepairs(p.herstellingen),
         };
         if (!validItem(it)) { skipped++; continue; }
         const idx = items.findIndex(x => x.id === it.id);
         // an older export without company info keeps an existing item where it is
         it.companyId = idx >= 0 && !p.bedrijf_id && !p.bedrijf ? items[idx].companyId : importCompany(p);
-        it.code = typeof p.code === 'string' && p.code.trim() ? p.code.trim().toUpperCase() : (idx >= 0 ? items[idx].code : nextCode(it.type, it.companyId));
-        if (items.some(x => x.id !== it.id && x.companyId === it.companyId && x.code.toUpperCase() === it.code)) it.code = nextCode(it.type, it.companyId);
+        it.buildingId = importBuilding(p, it.companyId);
+        it.code = typeof p.code === 'string' && p.code.trim() ? p.code.trim().toUpperCase() : (idx >= 0 ? items[idx].code : nextCode(it.type, it.companyId, it.buildingId));
+        if (items.some(x => x.id !== it.id && inScope(x, it.companyId, it.buildingId) && x.code.toUpperCase() === it.code)) it.code = nextCode(it.type, it.companyId, it.buildingId);
+        if (it.qr && qrOwner(it.qr, it.companyId, idx >= 0 ? items[idx] : null)) it.qr = '';
         it.photos = idx >= 0 ? (items[idx].photos || []) : [];   // keep locally stored photos of existing items
         if (typeof p.groep_id === 'string' && p.groep_id) {
           let g = G(p.groep_id);
           if (!g) {
-            g = { id: p.groep_id, code: typeof p.groep_code === 'string' && p.groep_code ? p.groep_code : nextGroupCode(it.companyId),
-              name: typeof p.groep_naam === 'string' ? p.groep_naam : '', lat: it.lat, lng: it.lng, acc: it.acc,
-              src: it.src, n: it.n, createdAt: it.createdAt, demo: it.demo, companyId: it.companyId };
+            g = { id: p.groep_id, number: numOf(it.code), name: typeof p.groep_naam === 'string' ? p.groep_naam : '', lat: it.lat, lng: it.lng,
+              acc: it.acc, src: it.src, n: it.n, createdAt: it.createdAt, demo: it.demo, companyId: it.companyId, buildingId: it.buildingId };
             groups.push(g);
           }
           it.groupId = g.id;
@@ -2784,10 +3546,10 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
         normalizeItem(it);
         if (idx >= 0) { items[idx] = it; updated++; } else { items.push(it); added++; }
       }
-      groups.forEach(syncGroup); cleanupGroups(); assignCompanies();
+      groups.forEach(syncGroup); cleanupGroups(); assignCompanies(); fixStructure();
       save();
       if ((selectedId && !cur()) || (selectedGroupId && !curGroup())) toSheet(); else renderAll();
-      const shown = coItems(activeCompanyId);
+      const shown = viewItems();
       if (shown.length) { setFollow(false); map.fitBounds(L.latLngBounds(shown.map(i => [i.lat, i.lng])).pad(.2), { maxZoom: 19 }); }
       toast(`Import: ${added} nieuw, ${updated} bijgewerkt${skipped ? `, ${skipped} overgeslagen` : ''}. Wissel van bedrijf via ☰.`, 4500);
     } catch (err) {
@@ -2803,13 +3565,13 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   } else {
     db().catch(() => showStorageProblem('Items worden wel bewaard, foto\'s niet (IndexedDB niet beschikbaar in deze browser).', 'Foto\'s worden niet bewaard.'));
   }
-  if (!load()) seedDemo();
+  if (!load()) { seedDemo(); fixStructure(); }
   save();   // persists seed data and any migration of older saved data
   renderTypes();
   renderAll();
   applyPanel($('sheet'), panelState.sheet, false);
   applyMapTheme();
-  { const shown = coItems(activeCompanyId); if (shown.length) map.fitBounds(L.latLngBounds(shown.map(i => [i.lat, i.lng])).pad(.25), { maxZoom: 19 }); }
+  { const shown = viewItems(); if (shown.length) map.fitBounds(L.latLngBounds(shown.map(i => [i.lat, i.lng])).pad(.25), { maxZoom: 19 }); }
   startGps();
 })();
 </script>
