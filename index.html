@@ -665,7 +665,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
         <button class="btn btn-ghost" id="btnClearDemo" type="button">Wis voorbeelden</button>
         <button class="btn btn-ghost" id="btnReDemo" type="button">Voorbeeld opnieuw laden</button>
       </div>
-      <p class="label" style="margin-top:10px">Versie 12</p>
+      <p class="label" style="margin-top:10px">Versie 13</p>
     </details>
   </section>
 
@@ -716,7 +716,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       </div>
     </div>
     <div class="field-grid">
-      <div class="field"><label class="label" for="edCode">Code</label><input id="edCode" autocomplete="off" spellcheck="false"><span class="err" id="edCodeErr" hidden></span></div>
+      <div class="field"><label class="label" for="edCode">Naam</label><input id="edCode" autocomplete="off" spellcheck="false"><span class="err" id="edCodeErr" hidden></span></div>
       <div class="field"><label class="label" for="edType">Type</label><select id="edType"></select></div>
     </div>
     <div class="field-grid">
@@ -871,7 +871,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
         <option value="tech">Technieker</option><option value="manager">Manager / planner</option>
         <option value="admin">Admin (kantoor)</option><option value="viewer">Viewer (alleen lezen)</option></select></label>
       <button class="btn btn-ghost" id="btnExportAll" type="button">Back-up alle bedrijven</button>
-      <span class="label">Versie 12</span>
+      <span class="label">Versie 13</span>
     </div>
   </nav>
 
@@ -950,23 +950,24 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   const STALE_MS = 10000;          // fix older than this = stale
   const DEMO_CENTER = { lat: 51.05430, lng: 3.72150 }; // fictief voorbeeldterrein
 
-  // Item types. In the real app these are master data managed by the admin (type, code prefix, checks, repair types).
+  // Item types. In the real app these are master data managed by the admin (type, name, checks, repair types).
+  // `name` + number names the item as on the paper report: Hydrant 1, Muurhydrant 3, Slang 45 nr 2.
   // ids stay stable so data saved by older versions keeps working; `legacy` types are not offered for new items.
   const TYPES = [
-    { id: 'hydrant_boven', label: 'Hydrant (bovengronds)', short: 'Hydrant',        prefix: 'HY',  glyph: 'HY', color: '#c8102e' },
-    { id: 'hydrant_onder', label: 'Ondergrondse hydrant',  short: 'Ondergronds',    prefix: 'OH',  glyph: 'OH', color: '#d9541a' },
-    { id: 'muurhydrant',   label: 'Muurhydrant',           short: 'Muurhydrant',    prefix: 'MH',  glyph: 'MH', color: '#a8336b' },
-    { id: 'brandhaspel',   label: 'Haspel',                short: 'Haspel',         prefix: 'HA',  glyph: 'HA', color: '#7a2c8f' },
-    { id: 'slang_45',      label: 'Slang 45',              short: 'Slang 45',       prefix: 'SL',  glyph: '45', color: '#8a6a12' },
-    { id: 'slang_70',      label: 'Slang 70',              short: 'Slang 70',       prefix: 'SL',  glyph: '70', color: '#7a5a0c' },
-    { id: 'slang_110',     label: 'Slang 110',             short: 'Slang 110',      prefix: 'SL',  glyph: '110', color: '#6a4a08' },
-    { id: 'lans',          label: 'Lans / straalpijp',     short: 'Lans',           prefix: 'LA',  glyph: 'LA', color: '#3a3f8f' },
-    { id: 'afsluiter',     label: 'Sectie afsluiter',      short: 'Sectie afsl.',   prefix: 'SA',  glyph: 'SA', color: '#5d6b22' },
-    { id: 'piv',           label: 'PIV (post indicator valve)', short: 'PIV',       prefix: 'PIV', glyph: 'PIV', color: '#2f6f4f' },
-    { id: 'blustoestel',   label: 'Blustoestel',           short: 'Blustoestel',    prefix: 'BT',  glyph: 'BT', color: '#0b7a75' },
-    { id: 'droge_leiding', label: 'Droge stijgleiding',    short: 'Droge leiding',  prefix: 'DL',  glyph: 'DL', color: '#2a5bb0' },
-    { id: 'overig',        label: 'Overig',                short: 'Overig',         prefix: 'OV',  glyph: '?',  color: '#4a4f4d' },
-    { id: 'brandslang',    label: 'Brandslang (oud type)', short: 'Brandslang',     prefix: 'SL',  glyph: 'SL', color: '#8a6a12', legacy: true },
+    { id: 'hydrant_boven', label: 'Hydrant (bovengronds)', short: 'Hydrant',        name: 'Hydrant',  glyph: 'HY', color: '#c8102e' },
+    { id: 'hydrant_onder', label: 'Ondergrondse hydrant',  short: 'Ondergronds',    name: 'Ondergrondse hydrant',  glyph: 'OH', color: '#d9541a' },
+    { id: 'muurhydrant',   label: 'Muurhydrant',           short: 'Muurhydrant',    name: 'Muurhydrant',  glyph: 'MH', color: '#a8336b' },
+    { id: 'brandhaspel',   label: 'Haspel',                short: 'Haspel',         name: 'Haspel',  glyph: 'HA', color: '#7a2c8f' },
+    { id: 'slang_45',      label: 'Slang 45',              short: 'Slang 45',       name: 'Slang 45',  glyph: '45', color: '#8a6a12' },
+    { id: 'slang_70',      label: 'Slang 70',              short: 'Slang 70',       name: 'Slang 70',  glyph: '70', color: '#7a5a0c' },
+    { id: 'slang_110',     label: 'Slang 110',             short: 'Slang 110',      name: 'Slang 110',  glyph: '110', color: '#6a4a08' },
+    { id: 'lans',          label: 'Lans / straalpijp',     short: 'Lans',           name: 'Lans',  glyph: 'LA', color: '#3a3f8f' },
+    { id: 'afsluiter',     label: 'Sectie afsluiter',      short: 'Sectie afsl.',   name: 'Sectie afsluiter',  glyph: 'SA', color: '#5d6b22' },
+    { id: 'piv',           label: 'PIV (post indicator valve)', short: 'PIV',       name: 'PIV', glyph: 'PIV', color: '#2f6f4f' },
+    { id: 'blustoestel',   label: 'Blustoestel',           short: 'Blustoestel',    name: 'Blustoestel',  glyph: 'BT', color: '#0b7a75' },
+    { id: 'droge_leiding', label: 'Droge stijgleiding',    short: 'Droge leiding',  name: 'Droge leiding',  glyph: 'DL', color: '#2a5bb0' },
+    { id: 'overig',        label: 'Overig',                short: 'Overig',         name: 'Item',  glyph: '?',  color: '#4a4f4d' },
+    { id: 'brandslang',    label: 'Brandslang (oud type)', short: 'Brandslang',     name: 'Brandslang',  glyph: 'SL', color: '#8a6a12', legacy: true },
   ];
   const TYPE = Object.fromEntries(TYPES.map(t => [t.id, t]));
   const PICK_TYPES = TYPES.filter(t => !t.legacy);
@@ -1287,23 +1288,23 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
         ['hydrant_boven', 2, 'nok',   55, -30, 4.6, 'Grond', 'koppelstukken', 'Koppelstuk 4" ingedeukt', '10034402'],
         ['hydrant_boven', 3, 'otv',  -70, -45, 4.1, 'Asfalt', 'drainage', 'Leegloop traag, opvolgen na de winter', '10034403'],
         ['hydrant_boven', 4, 'todo',  80,  22, 3.2, '', null, '', '10034404'],
-        ['hydrant_onder', 5, 'todo',  12,  48, 6.2, 'Deksel naast laadkade', null, '', ''],
-        ['afsluiter',     6, 'ok',    28,   4, 5.0, '', null, '', '10034406'],
-        ['piv',           7, 'todo', -20,  40, 4.4, '', null, '', ''],
+        ['hydrant_onder', 1, 'todo',  12,  48, 6.2, 'Deksel naast laadkade', null, '', ''],
+        ['afsluiter',     1, 'ok',    28,   4, 5.0, '', null, '', '10034406'],
+        ['piv',           1, 'todo', -20,  40, 4.4, '', null, '', ''],
       ] },
       { key: 'magazijn', name: 'Magazijn A', items: [
-        ['muurhydrant',   2, 'ok',    -8,  -6, 9.5, 'Gevel magazijn, naast poort 3', null, '', '10034412'],
-        ['blustoestel',   3, 'nok',    6,  -9, 11.0, 'Bureau magazijnchef', 'c4', 'Manometer in rode zone', '10034413'],
+        ['muurhydrant',   1, 'ok',    -8,  -6, 9.5, 'Gevel magazijn, naast poort 3', null, '', '10034412'],
+        ['blustoestel',   1, 'nok',    6,  -9, 11.0, 'Bureau magazijnchef', 'c4', 'Manometer in rode zone', '10034413'],
       ], group: { number: 1, name: 'Haspelkast poort 1', dx: -24, dy: -16, acc: 4.4, members: [
         ['brandhaspel', 'ok', null, '', '10034421'],
         ['slang_45', 'otv', 'c2', 'Schaafplek op ±3 m van de koppeling', '10034422'],
         ['lans', 'todo', null, '', '', 2],
       ] } },
     ],
-    // repairs on the example items: building key, item number, type, note, status, assigned to
+    // repairs on the example items: building key, item name, repair type, note, status, assigned to
     repairs: [
-      ['buiten', 2, 'Koppelstuk vervangen', 'Koppelstuk 4" vervangen, stop 100 meenemen', 'toegewezen', 'u-tech'],
-      ['magazijn', 3, 'Herbevullen', 'Toestel meenemen naar werkplaats', 'nieuw', null],
+      ['buiten', 'Hydrant 2', 'Koppelstuk vervangen', 'Koppelstuk 4" vervangen, stop 100 meenemen', 'toegewezen', 'u-tech'],
+      ['magazijn', 'Blustoestel 1', 'Herbevullen', 'Toestel meenemen naar werkplaats', 'nieuw', null],
     ],
   };
   function fillDemoChecks(it, target, badId = null, badNote = '', partial = 0) {
@@ -1330,7 +1331,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       buildings.push(b); byKey[bd.key] = b;
       for (const [type, n, status, dx, dy, acc, note, badId, badNote, qr] of bd.items) {
         const p = offset(DEMO_CENTER, dx, dy);
-        const it = newItem({ type, code: `${TYPE[type].prefix}-${pad2(n)}`, lat: p.lat, lng: p.lng, acc, src: 'voorbeeld', n: 5,
+        const it = newItem({ type, code: itemName(type, n), lat: p.lat, lng: p.lng, acc, src: 'voorbeeld', n: 5,
           createdAt: new Date(now - (++k) * 3600e3).toISOString(), note, demo: true, companyId: co.id, buildingId: b.id });
         it.qr = qr;
         fillDemoChecks(it, status, badId, badNote);
@@ -1343,7 +1344,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
           src: 'voorbeeld', n: 5, createdAt: new Date(now - 30 * 60e3).toISOString(), demo: true, companyId: co.id, buildingId: b.id };
         groups.push(g);
         for (const [type, status, badId, badNote, qr, partial] of gd.members) {
-          const it = newItem({ type, code: codeFor(type, gd.number, co.id, b.id), lat: g.lat, lng: g.lng, acc: g.acc, src: 'voorbeeld', n: 5,
+          const it = newItem({ type, code: nextCode(type, co.id, b.id), lat: g.lat, lng: g.lng, acc: g.acc, src: 'voorbeeld', n: 5,
             createdAt: g.createdAt, demo: true, groupId: g.id, companyId: co.id, buildingId: b.id });
           it.qr = qr;
           fillDemoChecks(it, status, badId, badNote, partial || 0);
@@ -1351,8 +1352,8 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
         }
       }
     }
-    for (const [key, n, type, note, status, assignedTo] of DEMO.repairs) {
-      const it = items.find(i => i.demo && i.buildingId === byKey[key].id && numOf(i.code) === n && !i.groupId);
+    for (const [key, code, type, note, status, assignedTo] of DEMO.repairs) {
+      const it = items.find(i => i.demo && i.buildingId === byKey[key].id && i.code === code);
       if (it) it.repairs.push(newRepair({ type, note, status, assignedTo, createdBy: 'u-tech2', createdAt: it.createdAt }));
     }
     activeCompanyId = co.id; activeBuildingId = null;
@@ -1383,27 +1384,27 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   // Building that new items go to: the chosen one, none when the company works without buildings.
   const placeBuilding = () => (activeBuildingId && activeBuildingId !== 'none' ? activeBuildingId : null);
 
-  // Numbering as in the earlier app: one counter per building (or per company without buildings), shared by
-  // all types, two digits: HY-01, SL-02, groep 03 with HA-03, SL-03, LA-03 …
+  // Every item is counted on its own, as on the paper report: each type has its own numbering per building
+  // (or per company without buildings): Hydrant 1, Hydrant 2, Slang 45 nr 1 … A group only says where items hang
+  // together (a cabinet), it does not change their names.
   const pad2 = n => String(n).padStart(2, '0');
-  const numOf = code => { const m = /-(\d+)[A-Z]?$/.exec(code || ''); return m ? +m[1] : 0; };
+  const numOf = code => { const m = /(?:-|\s)(\d+)[A-Z]?$/.exec(code || ''); return m ? +m[1] : 0; };
   const inScope = (o, cid, bid) => o.companyId === cid && (o.buildingId || null) === (bid || null);
-  const groupLabel = n => `Groep ${pad2(n)}`;
-  function nextNumber(cid, bid) {
-    const used = [...items.filter(i => inScope(i, cid, bid)).map(i => numOf(i.code)),
-      ...groups.filter(g => inScope(g, cid, bid)).map(g => g.number || 0)];
-    return Math.max(0, ...used) + 1;
+  const groupLabel = n => `Groep ${n}`;
+  const itemName = (type, n) => { const nm = TYPE[type].name; return /\d$/.test(nm) ? `${nm} nr ${n}` : `${nm} ${n}`; };
+  function nextNumber(cid, bid, type) {
+    return Math.max(0, ...items.filter(i => i.type === type && inScope(i, cid, bid)).map(i => numOf(i.code))) + 1;
   }
-  // A second item of the same type on the same number gets a letter: two hoses in one cabinet are SL-05 and SL-05B.
+  const nextGroupNumber = (cid, bid) => Math.max(0, ...groups.filter(g => inScope(g, cid, bid)).map(g => g.number || 0)) + 1;
+  // Name for an item at number n; when that name is taken at this place the next free number is used.
   function codeFor(type, n, cid, bid, self = null) {
-    const base = `${TYPE[type].prefix}-${pad2(n)}`;
-    const taken = c => items.some(o => o !== self && inScope(o, cid, bid) && o.code.toUpperCase() === c);
-    if (!taken(base)) return base;
-    for (const l of 'BCDEFGHJK') if (!taken(base + l)) return base + l;
-    return `${TYPE[type].prefix}-${pad2(nextNumber(cid, bid))}`;
+    const taken = c => items.some(o => o !== self && inScope(o, cid, bid) && o.code.toUpperCase() === c.toUpperCase());
+    let k = n;
+    while (taken(itemName(type, k))) k++;
+    return itemName(type, k);
   }
   function nextCode(typeId, companyId = activeCompanyId, buildingId = placeBuilding()) {
-    return codeFor(typeId, nextNumber(companyId, buildingId), companyId, buildingId);
+    return codeFor(typeId, nextNumber(companyId, buildingId, typeId), companyId, buildingId);
   }
   // After loading or importing: every link points somewhere valid, and group members share building and number.
   function fixStructure() {
@@ -1413,7 +1414,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       if (g.buildingId && B(g.buildingId)?.companyId !== g.companyId) g.buildingId = null;
       const mem = membersOf(g.id);
       mem.forEach(m => { m.buildingId = g.buildingId; });
-      if (!g.number) g.number = numOf(mem[0]?.code) || nextNumber(g.companyId, g.buildingId);
+      if (!g.number) g.number = nextGroupNumber(g.companyId, g.buildingId);
       g.code = groupLabel(g.number);
     }
     for (const c of companies) if (!c.structure && coBuildings(c.id).length) c.structure = 'gebouwen';
@@ -1427,20 +1428,20 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   function syncGroup(g) {
     for (const m of membersOf(g.id)) Object.assign(m, { lat: g.lat, lng: g.lng, acc: g.acc, src: g.src, n: g.n });
   }
-  // Joining a group: same building, and the group's number with the item's own type prefix.
+  // Joining a group: the item comes to the group's building and keeps its own name (renamed only on a clash there).
   function joinGroup(m, g) {
+    const moved = (m.buildingId || null) !== (g.buildingId || null);
     m.groupId = g.id; m.buildingId = g.buildingId;
-    m.code = codeFor(m.type, g.number, g.companyId, g.buildingId, m);
+    if (moved) m.code = codeFor(m.type, numOf(m.code) || 1, g.companyId, g.buildingId, m);
   }
   // Most accurate position wins; an unknown accuracy (placed by hand) loses to any GPS fix.
   const bestPos = cands => cands.reduce((b, c) => ((c.acc ?? Infinity) < (b.acc ?? Infinity) ? c : b));
-  // The group takes the number of its first item, so that item keeps its code.
   function createGroup(members, posCands) {
     const p = bestPos(posCands);
     const first = members[0];
     const companyId = first?.companyId ?? activeCompanyId;
     const buildingId = first ? (first.buildingId || null) : placeBuilding();
-    const number = numOf(first?.code) || nextNumber(companyId, buildingId);
+    const number = nextGroupNumber(companyId, buildingId);
     const g = { id: uid(), number, code: groupLabel(number), name: '', lat: p.lat, lng: p.lng, acc: p.acc ?? null,
       src: p.src || 'manueel', n: p.n || 0, createdAt: new Date().toISOString(), demo: false, companyId, buildingId };
     groups.push(g);
@@ -2139,7 +2140,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     const base = g || pos;
     const cid = g?.companyId ?? activeCompanyId, bid = g ? g.buildingId : placeBuilding();
     const it = newItem({ type: typeId, lat: base.lat, lng: base.lng, acc: base.acc ?? null, src: base.src, n: base.n ?? 0,
-      code: g ? codeFor(typeId, g.number, cid, bid) : nextCode(typeId, cid, bid), groupId: g?.id ?? null, companyId: cid, buildingId: bid });
+      code: nextCode(typeId, cid, bid), groupId: g?.id ?? null, companyId: cid, buildingId: bid });
     if (pendingQr && !qrOwner(pendingQr, cid)) it.qr = pendingQr;
     pendingQr = null;
     const co = CO(cid);
@@ -2271,7 +2272,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   function moveItem(it, cid, bid) {
     it.companyId = cid; it.buildingId = bid || null;
     if (items.some(o => o !== it && inScope(o, cid, bid) && o.code.toUpperCase() === it.code.toUpperCase())) {
-      it.code = codeFor(it.type, nextNumber(cid, bid), cid, bid, it);
+      it.code = codeFor(it.type, nextNumber(cid, bid, it.type), cid, bid, it);
     }
   }
   const cur = () => items.find(i => i.id === selectedId);
@@ -2549,7 +2550,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     }
     const near = nearestEntity(it, 15, { itemId: it.id }).slice(0, 3);
     const typeBtns = PICK_TYPES.map(t => `<button type="button" class="type-btn" data-addtype="${t.id}"><span class="glyph" style="--c:${t.color}">${esc(t.glyph)}</span>${esc(t.short)}</button>`).join('');
-    $('edGroupBar').innerHTML = `<div class="txt"><b>Meerdere items op deze plek?</b><small>bv. haspel met slang en lans in één kast: ze krijgen hetzelfde nummer</small></div>
+    $('edGroupBar').innerHTML = `<div class="txt"><b>Meerdere items op deze plek?</b><small>bv. haspel met slang en lans in één kast</small></div>
       <button type="button" class="btn btn-ghost" data-g="addhere" aria-expanded="${addHereOpen}">${addHereOpen ? 'Sluit' : '+ Item op deze plek'}</button>
       ${addHereOpen ? `<div class="type-row" role="group" aria-label="Type van het nieuwe item">${typeBtns}</div>` : ''}
       ${near.length ? `<div class="near"><span class="hint">Of groepeer met:</span>${near.map(x =>
@@ -2629,15 +2630,15 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     $('gpCompanyField').hidden = !can('bedrijven.update') || companies.length < 2;
     fillCompanySelect($('gpCompany'), g.companyId);
   }
-  // A group moves as a whole: it takes a free number at the new place, its items follow with their own prefix.
+  // A group moves as a whole: it takes a free group number at the new place, its items follow.
   function moveGroup(g, cid, bid) {
     const mem = membersOf(g.id);
-    mem.forEach(m => { m.groupId = null; });   // keep them out of the number count while renumbering
     g.companyId = cid; g.buildingId = bid || null; g.demo = false;
-    if (groups.some(o => o !== g && inScope(o, cid, bid) && o.number === g.number) ||
-        items.some(o => inScope(o, cid, bid) && numOf(o.code) === g.number)) g.number = nextNumber(cid, bid);
+    if (groups.some(o => o !== g && inScope(o, cid, bid) && o.number === g.number)) g.number = nextGroupNumber(cid, bid);
     g.code = groupLabel(g.number);
-    mem.forEach(m => { m.companyId = cid; m.demo = false; joinGroup(m, g); });
+    // items keep their name unless it is already used at the new place
+    mem.forEach(m => { m.companyId = cid; m.buildingId = g.buildingId; m.demo = false;
+      if (items.some(o => o !== m && inScope(o, cid, bid) && o.code === m.code)) m.code = nextCode(m.type, cid, bid); });
     return mem;
   }
   $('gpCompany').addEventListener('change', () => {
@@ -2682,17 +2683,17 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   $('edNote').addEventListener('input', () => { const it = cur(); if (!it || !can('items.update')) return; it.note = $('edNote').value; save(); throttledList(); });
   $('edType').addEventListener('change', () => {
     const it = cur(); if (!it || !can('items.update')) return;
-    const oldPrefix = TYPE[it.type].prefix;
+    const oldName = TYPE[it.type].name;
     it.type = $('edType').value;
-    if (it.code.startsWith(oldPrefix + '-')) it.code = codeFor(it.type, numOf(it.code) || nextNumber(it.companyId, it.buildingId), it.companyId, it.buildingId, it);
+    if (it.code.startsWith(oldName + ' ') || /^[A-Z]{1,4}-\d/.test(it.code)) it.code = nextCode(it.type, it.companyId, it.buildingId);
     it.status = derivedStatus(checkSummary(it));
     save(); renderAll();
   });
   $('edCode').addEventListener('input', () => {
     const it = cur(); if (!it || !can('items.update')) return;
-    const v = $('edCode').value.trim().toUpperCase();
-    const clash = items.some(i => i.id !== it.id && inScope(i, it.companyId, it.buildingId) && i.code.toUpperCase() === v);
-    const err = !v ? 'Code is verplicht' : clash ? `Deze code bestaat al ${it.buildingId ? 'in dit gebouw' : 'bij dit bedrijf'}` : '';
+    const v = $('edCode').value.trim();
+    const clash = items.some(i => i.id !== it.id && inScope(i, it.companyId, it.buildingId) && i.code.toUpperCase() === v.toUpperCase());
+    const err = !v ? 'Naam is verplicht' : clash ? `Deze naam bestaat al ${it.buildingId ? 'in dit gebouw' : 'bij dit bedrijf'}` : '';
     $('edCode').classList.toggle('bad', !!err); $('edCodeErr').hidden = !err; $('edCodeErr').textContent = err;
     if (!err) { it.code = v; save(); renderMarkers(); $('edTitle').textContent = v; throttledList(); }
   });
@@ -3849,7 +3850,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
         if (typeof p.groep_id === 'string' && p.groep_id) {
           let g = G(p.groep_id);
           if (!g) {
-            g = { id: p.groep_id, number: numOf(it.code), name: typeof p.groep_naam === 'string' ? p.groep_naam : '', lat: it.lat, lng: it.lng,
+            g = { id: p.groep_id, number: 0, name: typeof p.groep_naam === 'string' ? p.groep_naam : '', lat: it.lat, lng: it.lng,
               acc: it.acc, src: it.src, n: it.n, createdAt: it.createdAt, demo: it.demo, companyId: it.companyId, buildingId: it.buildingId };
             groups.push(g);
           }
