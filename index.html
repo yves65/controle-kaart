@@ -81,6 +81,45 @@ button { cursor: pointer; }
 }
 .brand strong { display: block; font: 700 17px/1 var(--font-display); letter-spacing: .02em; text-transform: uppercase; }
 .brand small { display: block; color: var(--muted); font-size: 12px; line-height: 1.2; }
+/* the brand doubles as the menu button; it shows the active company */
+button.brand { border: 0; text-align: left; color: var(--fg); min-width: 0; max-width: min(62vw, 300px); }
+.brand-txt { min-width: 0; }
+.brand-txt small { margin-top: 3px; font-weight: 600; color: var(--fg); opacity: .75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.brand-mark svg { width: 18px; height: 18px; }
+
+/* ---------- side menu (companies) ---------- */
+.scrim { position: absolute; inset: 0; z-index: 1140; background: rgba(8, 14, 12, .45); opacity: 0; visibility: hidden; transition: opacity .22s, visibility 0s .22s; }
+.scrim.open { opacity: 1; visibility: visible; transition: opacity .22s; }
+.drawer {
+  position: absolute; z-index: 1150; top: 0; bottom: 0; left: 0; width: min(360px, 88vw);
+  background: var(--surface); color: var(--fg); box-shadow: var(--shadow); display: flex; flex-direction: column;
+  padding-top: calc(12px + env(safe-area-inset-top, 0px)); padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(14px, env(safe-area-inset-left, 0px)); padding-right: 14px;
+  transform: translateX(-105%); visibility: hidden; transition: transform .25s cubic-bezier(.2, .8, .2, 1), visibility 0s .25s;
+}
+.drawer.open { transform: none; visibility: visible; transition: transform .25s cubic-bezier(.2, .8, .2, 1); }
+.dr-head { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.dr-head strong { display: block; font: 700 19px/1 var(--font-display); letter-spacing: .02em; text-transform: uppercase; }
+.dr-head small { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; }
+.dr-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 10px; padding: 12px 2px; }
+.dr-search { width: 100%; background: var(--surface-2); border: 1.5px solid var(--line); border-radius: 8px; padding: 9px 10px; font-size: 16px; }
+.co-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.co-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px; border-radius: var(--radius); }
+.co-list li.active { background: var(--surface-2); box-shadow: inset 3px 0 0 var(--accent); }
+.co-btn { border: 0; background: transparent; text-align: left; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: center; padding: 9px 6px 9px 8px; border-radius: var(--radius); min-width: 0; }
+.co-btn:hover { background: var(--surface-2); }
+.co-mark { width: 34px; height: 34px; border-radius: 8px; background: var(--fg); color: var(--bg); display: grid; place-items: center; font: 700 15px/1 var(--font-display); letter-spacing: .02em; }
+.co-main { min-width: 0; }
+.co-main b { display: block; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.co-main small { display: block; color: var(--muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.co-main small .bad { color: var(--st-defect); font-weight: 600; }
+.co-main small .warn { color: var(--st-afwijking); font-weight: 600; }
+.co-main small .good { color: var(--st-ok); font-weight: 600; }
+.co-edit { width: 36px; height: 36px; font-size: 15px; margin-right: 4px; }
+.co-form { display: flex; flex-direction: column; gap: 10px; }
+.co-form h3 { margin: 0; font: 700 20px/1.1 var(--font-display); letter-spacing: .02em; }
+.dr-foot { border-top: 1px solid var(--line); padding-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.no-co { display: flex; flex-direction: column; gap: 10px; }
 
 .chip {
   display: inline-flex; align-items: center; gap: 7px; border: 0; border-radius: 999px; background: var(--surface);
@@ -428,10 +467,10 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   <div id="map" role="application" aria-label="Kaart met controle-items"></div>
 
   <header class="topbar" id="topbar">
-    <div class="brand">
-      <span class="brand-mark" aria-hidden="true">C</span>
-      <div><strong>ControleApp</strong></div>
-    </div>
+    <button class="brand" id="btnMenu" type="button" aria-label="Menu: bedrijven" aria-controls="drawer" aria-expanded="false">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span>
+      <span class="brand-txt"><strong>ControleApp</strong><small id="brandCo"></small></span>
+    </button>
     <button class="chip icon-chip" id="btnSearch" type="button" aria-label="Zoek adres" aria-expanded="false" aria-controls="searchBar" title="Zoek adres of coördinaten">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>
     </button>
@@ -470,6 +509,10 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     <div class="notice warn" id="storageWarn" hidden role="alert">
       <p><strong id="storageWarnTitle">Wijzigingen worden niet bewaard.</strong><br><span id="storageWarnText"></span></p>
     </div>
+    <div class="notice no-co" id="noCompany" hidden>
+      <p><strong>Nog geen bedrijf gekozen.</strong><br>Items horen altijd bij een bedrijf. Maak er eerst een aan.</p>
+      <button class="btn btn-primary" id="noCoAdd" type="button">+ Nieuw bedrijf</button>
+    </div>
     <div class="label">Type item</div>
     <div class="type-row" id="typeRow" role="group" aria-label="Type item"></div>
 
@@ -503,15 +546,15 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     </div>
 
     <details class="list" id="listWrap" open>
-      <summary><span class="label">Items op de kaart</span><span class="counts" id="counts"></span></summary>
+      <summary><span class="label">Items van dit bedrijf</span><span class="counts" id="counts"></span></summary>
       <ul class="items" id="itemList"></ul>
       <div class="io">
-        <button class="btn btn-ghost" id="btnExport" type="button">Exporteer GeoJSON</button>
+        <button class="btn btn-ghost" id="btnExport" type="button">Exporteer dit bedrijf</button>
         <label class="btn btn-ghost" for="fileImport">Importeer</label>
         <input type="file" id="fileImport" accept=".geojson,.json,application/geo+json,application/json" hidden>
         <button class="btn btn-ghost" id="btnClearDemo" type="button">Wis voorbeelden</button>
       </div>
-      <p class="label" style="margin-top:10px">Versie 9</p>
+      <p class="label" style="margin-top:10px">Versie 10</p>
     </details>
   </section>
 
@@ -554,6 +597,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       <div class="field"><label class="label" for="edCode">Code</label><input id="edCode" autocomplete="off" spellcheck="false"><span class="err" id="edCodeErr" hidden></span></div>
       <div class="field"><label class="label" for="edType">Type</label><select id="edType"></select></div>
     </div>
+    <div class="field"><label class="label" for="edCompany">Bedrijf</label><select id="edCompany"></select></div>
     <dl class="meta">
       <dt>Positie</dt><dd class="mono" id="edPos"></dd>
       <dt>Nauwkeurigheid</dt><dd id="edAcc"></dd>
@@ -584,6 +628,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       <span class="label">Item toevoegen aan deze groep</span>
       <div class="type-row" id="gpTypeRow" role="group" aria-label="Item toevoegen aan deze groep"></div>
     </div>
+    <div class="field"><label class="label" for="gpCompany">Bedrijf</label><select id="gpCompany"></select></div>
     <dl class="meta">
       <dt>Positie</dt><dd class="mono" id="gpPos"></dd>
       <dt>Nauwkeurigheid</dt><dd id="gpAcc"></dd>
@@ -608,6 +653,38 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       <button class="lb-btn" id="lbNext" type="button" aria-label="Volgende foto">Volgende ›</button>
     </div>
   </div>
+
+  <!-- side menu: companies -->
+  <div class="scrim" id="scrim"></div>
+  <nav class="drawer" id="drawer" aria-label="Menu" aria-hidden="true" inert>
+    <div class="dr-head">
+      <span class="brand-mark" aria-hidden="true">C</span>
+      <div><strong>ControleApp</strong><small id="drSub"></small></div>
+      <button class="icon-btn" id="drClose" type="button" aria-label="Sluit menu">×</button>
+    </div>
+    <div class="dr-body" id="drListView">
+      <span class="label">Bedrijven</span>
+      <input class="dr-search" id="drSearch" type="search" placeholder="Zoek bedrijf of adres" autocomplete="off" hidden>
+      <ul class="co-list" id="coList"></ul>
+      <button class="btn btn-primary" id="coAdd" type="button">+ Nieuw bedrijf</button>
+      <p class="hint">De kaart toont alleen de items van het gekozen bedrijf.</p>
+    </div>
+    <form class="dr-body co-form" id="coForm" hidden autocomplete="off">
+      <h3 id="coFormTitle">Nieuw bedrijf</h3>
+      <div class="field"><label class="label" for="coName">Naam</label><input id="coName" maxlength="80" placeholder="bv. Brouwerij De Molen"><span class="err" id="coNameErr" hidden></span></div>
+      <div class="field"><label class="label" for="coAddr">Adres</label><input id="coAddr" maxlength="120" placeholder="Straat nr, gemeente"></div>
+      <div class="field"><label class="label" for="coNote">Contact / notitie</label><textarea id="coNote" rows="3" placeholder="Contactpersoon, telefoon, toegang, sleutel …"></textarea></div>
+      <div class="ed-actions">
+        <button class="btn btn-primary" type="submit">Opslaan</button>
+        <button class="btn btn-ghost" id="coCancel" type="button">Annuleer</button>
+      </div>
+      <button class="btn btn-danger" id="coDelete" type="button" hidden>Verwijder bedrijf</button>
+    </form>
+    <div class="dr-foot">
+      <button class="btn btn-ghost" id="btnExportAll" type="button">Back-up alle bedrijven</button>
+      <span class="label">Versie 10</span>
+    </div>
+  </nav>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </div>
@@ -789,6 +866,8 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   }
 
   /* ================= state ================= */
+  let companies = [];            // every item and group belongs to one company
+  let activeCompanyId = null;    // only this company's items are on the map
   let items = [];
   let groups = [];               // several items on one spot (e.g. a fire-hose cabinet)
   let selType = TYPES[0].id;
@@ -825,7 +904,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     } catch { return false; }
   }
   function save() {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ v: 2, items, groups, selType, minAcc })); }
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ v: 3, companies, activeCompanyId, items, groups, selType, minAcc })); }
     catch (e) {
       showStorageProblem(e?.name === 'QuotaExceededError'
         ? 'De browseropslag is vol. Exporteer je items en verwijder oude foto\'s.'
@@ -838,6 +917,9 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       if (!raw) return false;
       const d = JSON.parse(raw);
       if (!d || !Array.isArray(d.items)) return false;
+      companies = Array.isArray(d.companies) ? d.companies.filter(c => c && typeof c.id === 'string') : [];
+      companies.forEach(normalizeCompany);
+      activeCompanyId = typeof d.activeCompanyId === 'string' ? d.activeCompanyId : null;
       groups = Array.isArray(d.groups) ? d.groups.filter(validPos) : [];
       groups.forEach(normalizeGroup);
       items = d.items.filter(validItem);
@@ -847,6 +929,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       if (TYPE[d.selType]) selType = d.selType;
       if ([3, 5, 10, 20].includes(d.minAcc)) minAcc = d.minAcc;
       if ((d.v || 1) < 2 && items.some(i => i.demo)) migrateDemo();
+      assignCompanies();
       return true;
     } catch { return false; }
   }
@@ -867,7 +950,8 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     i.history = Array.isArray(i.history) ? i.history.filter(h => h && typeof h.at === 'string' && STATUS[h.status]).slice(0, 10) : [];
     if (!STATUS[i.status]) i.status = 'todo';
     if (typeof i.note !== 'string') i.note = '';
-    if (typeof i.code !== 'string' || !i.code) i.code = nextCode(i.type);
+    i.companyId = typeof i.companyId === 'string' ? i.companyId : null;
+    if (typeof i.code !== 'string' || !i.code) i.code = nextCode(i.type, i.companyId);
     i.groupId = typeof i.groupId === 'string' && groups.some(g => g.id === i.groupId) ? i.groupId : null;
   }
   function normalizeGroup(g) {
@@ -877,15 +961,70 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     g.n = Number.isFinite(g.n) ? g.n : 0;
     g.demo = !!g.demo;
     if (typeof g.createdAt !== 'string') g.createdAt = new Date().toISOString();
+    g.companyId = typeof g.companyId === 'string' ? g.companyId : null;
   }
   function newItem(p) {
+    const companyId = p.companyId ?? activeCompanyId;
     return {
-      id: uid(), type: p.type, code: p.code ?? nextCode(p.type), status: 'todo',
+      id: uid(), type: p.type, code: p.code ?? nextCode(p.type, companyId), status: 'todo',
       lat: p.lat, lng: p.lng, acc: p.acc ?? null, src: p.src || 'manueel', n: p.n ?? 0,
       createdAt: p.createdAt ?? new Date().toISOString(), note: p.note ?? '', demo: !!p.demo, photos: [],
-      checks: {}, statusManual: false, checkDone: null, history: [], groupId: p.groupId ?? null,
+      checks: {}, statusManual: false, checkDone: null, history: [], groupId: p.groupId ?? null, companyId,
     };
   }
+
+  /* ================= companies ================= */
+  const CO = id => (id ? companies.find(c => c.id === id) : undefined);
+  const activeCo = () => CO(activeCompanyId);
+  const coItems = cid => items.filter(i => i.companyId === cid);
+  const coGroups = cid => groups.filter(g => g.companyId === cid);
+  function normalizeCompany(c) {
+    c.name = typeof c.name === 'string' && c.name.trim() ? c.name.trim() : 'Bedrijf zonder naam';
+    c.address = typeof c.address === 'string' ? c.address : '';
+    c.note = typeof c.note === 'string' ? c.note : '';
+    c.demo = !!c.demo;
+    if (typeof c.createdAt !== 'string') c.createdAt = new Date().toISOString();
+  }
+  function newCompany(p) {
+    const c = { id: uid(), name: p.name, address: p.address || '', note: p.note || '', demo: !!p.demo, createdAt: new Date().toISOString() };
+    normalizeCompany(c); companies.push(c);
+    return c;
+  }
+  const findCompanyByName = name => companies.find(c => c.name.toLowerCase() === String(name).trim().toLowerCase());
+  // Data from before companies existed: example items go to the example company, the rest to "Bestaande items".
+  // Afterwards every item and group points at an existing company, and a group's items share its company.
+  function assignCompanies() {
+    const loose = items.filter(i => !CO(i.companyId));
+    if (loose.length) {
+      const demo = loose.filter(i => i.demo), own = loose.filter(i => !i.demo);
+      if (demo.length) {
+        const c = companies.find(x => x.demo) || newCompany({ name: 'Voorbeeldbedrijf', address: 'Fictief terrein, Gent', demo: true });
+        demo.forEach(i => { i.companyId = c.id; });
+      }
+      if (own.length) {
+        const c = findCompanyByName('Bestaande items') || newCompany({ name: 'Bestaande items', note: 'Items van vóór de bedrijvenindeling. Hernoem dit bedrijf of verplaats de items.' });
+        own.forEach(i => { i.companyId = c.id; });
+      }
+    }
+    for (const g of groups) {
+      const mem = membersOf(g.id);
+      if (!CO(g.companyId)) g.companyId = mem[0]?.companyId ?? null;
+      mem.forEach(m => { m.companyId = g.companyId; });
+    }
+    groups = groups.filter(g => CO(g.companyId));
+    if (!activeCo()) {
+      // prefer a real company with items over the example one
+      const withItems = companies.filter(c => coItems(c.id).length);
+      activeCompanyId = (withItems.find(c => !c.demo) || withItems[0] || companies[0])?.id ?? null;
+    }
+  }
+  function companyStats(cid) {
+    const list = coItems(cid);
+    const st = Object.fromEntries(STATUSES.map(s => [s.id, 0]));
+    list.forEach(i => { st[i.status]++; });
+    return { n: list.length, ...st };
+  }
+  const initials = name => (name.match(/[A-Za-zÀ-ÿ0-9]+/g) || ['?']).slice(0, 2).map(w => w[0]).join('').toUpperCase();
 
   // Example data. Codes, positions and findings are fictitious.
   const DEMO_ROWS = [
@@ -921,15 +1060,15 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     it.checkDone = it.createdAt;
     it.history = [{ at: it.createdAt, status: it.status, nok: nokLabels(it) }];
   }
-  function addDemoGroup() {
+  function addDemoGroup(companyId = null) {
     if (groups.some(g => g.demo) || items.some(i => i.type === 'muurhydrant' && i.demo)) return;
     const p = offset(DEMO_CENTER, DEMO_GROUP.dx, DEMO_GROUP.dy);
-    const g = { id: uid(), code: nextGroupCode(), name: DEMO_GROUP.name, lat: p.lat, lng: p.lng, acc: DEMO_GROUP.acc,
-      src: 'voorbeeld', n: 5, createdAt: new Date(Date.now() - 30 * 60e3).toISOString(), demo: true };
+    const g = { id: uid(), code: nextGroupCode(companyId), name: DEMO_GROUP.name, lat: p.lat, lng: p.lng, acc: DEMO_GROUP.acc,
+      src: 'voorbeeld', n: 5, createdAt: new Date(Date.now() - 30 * 60e3).toISOString(), demo: true, companyId };
     groups.push(g);
     for (const [type, code, status, note, nokId, partial] of DEMO_GROUP.members) {
-      const it = newItem({ type, code: items.some(i => i.code === code) ? undefined : code, lat: g.lat, lng: g.lng,
-        acc: g.acc, src: 'voorbeeld', n: 5, createdAt: g.createdAt, note, demo: true, groupId: g.id });
+      const it = newItem({ type, code: items.some(i => i.demo && i.code === code) ? undefined : code, lat: g.lat, lng: g.lng,
+        acc: g.acc, src: 'voorbeeld', n: 5, createdAt: g.createdAt, note, demo: true, groupId: g.id, companyId });
       it.status = status;
       fillDemoChecks(it, nokId, partial || 0);
       items.push(it);
@@ -937,16 +1076,18 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   }
   function seedDemo() {
     const now = Date.now();
-    items = []; groups = [];
+    items = []; groups = []; companies = [];
+    const co = newCompany({ name: 'Voorbeeldbedrijf', address: 'Fictief terrein, Gent', demo: true });
+    activeCompanyId = co.id;
     DEMO_ROWS.forEach(([type, code, status, dx, dy, acc, note, nokId], k) => {
       const p = offset(DEMO_CENTER, dx, dy);
       const it = newItem({ type, code, lat: p.lat, lng: p.lng, acc, src: 'voorbeeld', n: 5,
-        createdAt: new Date(now - (k + 1) * 3600e3).toISOString(), note, demo: true });
+        createdAt: new Date(now - (k + 1) * 3600e3).toISOString(), note, demo: true, companyId: co.id });
       it.status = status;
       fillDemoChecks(it, nokId);
       items.push(it);
     });
-    addDemoGroup();
+    addDemoGroup(co.id);
   }
   // Data saved by the previous version: give the example items a checklist and add the example group.
   function migrateDemo() {
@@ -961,8 +1102,9 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   /* ================= groups ================= */
   const G = id => (id ? groups.find(g => g.id === id) : undefined);
   const membersOf = gid => items.filter(i => i.groupId === gid);
-  function nextGroupCode() {
-    const max = groups.reduce((m, g) => { const r = /^GR-(\d+)$/.exec(g.code || ''); return r ? Math.max(m, +r[1]) : m; }, 0);
+  // Codes are numbered per company: every company starts at GR-001, HB-001, …
+  function nextGroupCode(companyId = activeCompanyId) {
+    const max = coGroups(companyId).reduce((m, g) => { const r = /^GR-(\d+)$/.exec(g.code || ''); return r ? Math.max(m, +r[1]) : m; }, 0);
     return `GR-${String(max + 1).padStart(3, '0')}`;
   }
   // Items in a group share the group's position.
@@ -973,8 +1115,9 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   const bestPos = cands => cands.reduce((b, c) => ((c.acc ?? Infinity) < (b.acc ?? Infinity) ? c : b));
   function createGroup(members, posCands) {
     const p = bestPos(posCands);
-    const g = { id: uid(), code: nextGroupCode(), name: '', lat: p.lat, lng: p.lng, acc: p.acc ?? null,
-      src: p.src || 'manueel', n: p.n || 0, createdAt: new Date().toISOString(), demo: false };
+    const companyId = members[0]?.companyId ?? activeCompanyId;
+    const g = { id: uid(), code: nextGroupCode(companyId), name: '', lat: p.lat, lng: p.lng, acc: p.acc ?? null,
+      src: p.src || 'manueel', n: p.n || 0, createdAt: new Date().toISOString(), demo: false, companyId };
     groups.push(g);
     members.forEach(m => { m.groupId = g.id; });
     syncGroup(g);
@@ -987,11 +1130,11 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       if (mem.length <= 1) { mem.forEach(m => { m.groupId = null; }); groups = groups.filter(x => x !== g); }
     }
   }
-  // Groups and loose items within `radius` metres of pos, nearest first.
+  // Groups and loose items of the active company within `radius` metres of pos, nearest first.
   function nearestEntity(pos, radius, exclude = {}) {
     return [
-      ...groups.filter(g => g.id !== exclude.groupId).map(g => ({ kind: 'group', e: g, d: dist(g, pos) })),
-      ...items.filter(i => !i.groupId && i.id !== exclude.itemId).map(i => ({ kind: 'item', e: i, d: dist(i, pos) })),
+      ...coGroups(activeCompanyId).filter(g => g.id !== exclude.groupId).map(g => ({ kind: 'group', e: g, d: dist(g, pos) })),
+      ...coItems(activeCompanyId).filter(i => !i.groupId && i.id !== exclude.itemId).map(i => ({ kind: 'item', e: i, d: dist(i, pos) })),
     ].filter(x => x.d <= radius).sort((a, b) => a.d - b.d);
   }
 
@@ -1196,15 +1339,16 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     m._onClick = onClick; m._onDrag = onDrag; m.options.title = title;
     if (active) { m.dragging?.enable(); m.setZIndexOffset(1000); } else { m.dragging?.disable(); m.setZIndexOffset(0); }
   }
+  // Only the active company is on the map: fewer markers, and no mixing up of sites.
   function renderMarkers() {
     const seen = new Set();
-    for (const g of groups) {
+    for (const g of coGroups(activeCompanyId)) {
       const mem = membersOf(g.id); if (!mem.length) continue;
       const key = 'g:' + g.id; seen.add(key);
       upsertMarker(key, [g.lat, g.lng], groupIcon(g, mem), `${g.code}${g.name ? ' · ' + g.name : ''}`,
         () => openGroup(g.id, false), ll => onGroupDragged(g.id, ll), g.id === selectedGroupId);
     }
-    for (const it of items) {
+    for (const it of coItems(activeCompanyId)) {
       if (it.groupId) continue;
       const key = 'i:' + it.id; seen.add(key);
       upsertMarker(key, [it.lat, it.lng], itemIcon(it), it.code,
@@ -1226,19 +1370,27 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
 
   /* ================= list ================= */
   function renderList() {
+    const co = activeCo();
+    const list = coItems(activeCompanyId);
     const byStatus = Object.fromEntries(STATUSES.map(s => [s.id, 0]));
-    items.forEach(i => { byStatus[i.status] = (byStatus[i.status] || 0) + 1; });
-    $('counts').innerHTML = `<span><b>${items.length}</b> totaal</span><span><b>${byStatus.todo}</b> te doen</span><span><b>${byStatus.afwijking + byStatus.defect}</b> probleem</span>`;
-    $('btnClearDemo').hidden = !items.some(i => i.demo) && !groups.some(g => g.demo);
+    list.forEach(i => { byStatus[i.status] = (byStatus[i.status] || 0) + 1; });
+    $('counts').innerHTML = `<span><b>${list.length}</b> totaal</span><span><b>${byStatus.todo}</b> te doen</span><span><b>${byStatus.afwijking + byStatus.defect}</b> probleem</span>`;
+    $('btnClearDemo').hidden = !items.some(i => i.demo) && !groups.some(g => g.demo) && !companies.some(c => c.demo);
+    $('btnExport').hidden = !co;
+    $('noCompany').hidden = !!co;
+    $('brandCo').textContent = co ? co.name : 'Kies een bedrijf';
+    if (!$('drawer').inert) renderCompanies();
 
-    if (!items.length) {
-      $('itemList').innerHTML = `<li class="empty">Nog geen items. Kies een type en druk op <b>Plaats op GPS-positie</b>, of tik op de kaart.</li>`;
+    if (!list.length) {
+      $('itemList').innerHTML = co
+        ? `<li class="empty">Nog geen items bij <b>${esc(co.name)}</b>. Kies een type en druk op <b>Plaats op GPS-positie</b>, of tik op de kaart.</li>`
+        : `<li class="empty">Open het menu <b>☰</b> linksboven en kies of maak een bedrijf.</li>`;
       return;
     }
     const fix = lastFix && Date.now() - lastFix.t < 60000 ? lastFix : null;
     const rows = [
-      ...groups.map(g => ({ g, mem: membersOf(g.id), code: g.code, pos: g })).filter(r => r.mem.length),
-      ...items.filter(i => !i.groupId).map(i => ({ i, code: i.code, pos: i })),
+      ...coGroups(activeCompanyId).map(g => ({ g, mem: membersOf(g.id), code: g.code, pos: g })).filter(r => r.mem.length),
+      ...list.filter(i => !i.groupId).map(i => ({ i, code: i.code, pos: i })),
     ].map(r => ({ ...r, d: fix ? dist(fix, r.pos) : null }));
     rows.sort((a, b) => (a.d != null && b.d != null) ? a.d - b.d : a.code.localeCompare(b.code, 'nl', { numeric: true }));
     $('itemList').innerHTML = rows.map(r => (r.g ? groupRowHtml(r.g, r.mem, r.d) : itemRowHtml(r.i, r.d))).join('');
@@ -1576,13 +1728,21 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   }
 
   /* ================= placing ================= */
-  function nextCode(typeId) {
+  function nextCode(typeId, companyId = activeCompanyId) {
     const p = TYPE[typeId].prefix; const re = new RegExp(`^${p}-(\\d+)$`);
-    const max = items.reduce((m, i) => { const r = re.exec(i.code); return r ? Math.max(m, +r[1]) : m; }, 0);
+    const max = coItems(companyId).reduce((m, i) => { const r = re.exec(i.code); return r ? Math.max(m, +r[1]) : m; }, 0);
     return `${p}-${String(max + 1).padStart(3, '0')}`;
+  }
+  // Items always belong to a company; without one, ask for it first.
+  function needCompany() {
+    if (activeCo()) return false;
+    openDrawer(); openCompanyForm(null);
+    toast('Maak eerst een bedrijf aan. Items horen altijd bij een bedrijf.', 4000);
+    return true;
   }
   // Something already within the measurement uncertainty? Ask: same item, same spot (group), or separate.
   function placeNew(typeId, pos) {
+    if (needCompany()) return;
     const radius = Math.max(3, pos.acc || 0);
     const near = nearestEntity(pos, radius)[0];
     if (!near) { commitNew(typeId, pos); return; }
@@ -1629,7 +1789,8 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   function commitNew(typeId, pos, groupId = null) {
     const g = G(groupId);
     const base = g || pos;
-    const it = newItem({ type: typeId, lat: base.lat, lng: base.lng, acc: base.acc ?? null, src: base.src, n: base.n ?? 0, groupId: g?.id ?? null });
+    const it = newItem({ type: typeId, lat: base.lat, lng: base.lng, acc: base.acc ?? null, src: base.src, n: base.n ?? 0,
+      groupId: g?.id ?? null, companyId: g?.companyId ?? activeCompanyId });
     items.push(it);
     if (g) syncGroup(g);
     save();
@@ -1637,7 +1798,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     toast(`${it.code} geplaatst${g ? ` in ${g.code}` : it.acc != null ? ` (${fmtAcc(it.acc)})` : ''}`);
   }
 
-  $('btnCapture').addEventListener('click', () => startCapture(null));
+  $('btnCapture').addEventListener('click', () => { if (!needCompany()) startCapture(null); });
 
   function setTapMode(on) {
     tapMode = on;
@@ -1645,6 +1806,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     $('map').style.cursor = on ? 'crosshair' : '';
   }
   $('btnTap').addEventListener('click', () => {
+    if (!tapMode && needCompany()) return;
     setTapMode(!tapMode);
     if (tapMode) toast(`Tik op de kaart om een ${TYPE[selType].label.toLowerCase()} te plaatsen.`);
   });
@@ -1727,7 +1889,21 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       ? `Positie volgt groep ${g.code}. Sleep de groepsmarker om alles samen te verplaatsen.`
       : 'Sleep de marker op de kaart om de positie te corrigeren.';
     $('edRegps').hidden = !!g;
+    fillCompanySelect($('edCompany'), it.companyId);
     renderPhotos();
+  }
+  const byName = (a, b) => a.name.localeCompare(b.name, 'nl', { numeric: true, sensitivity: 'base' });
+  function fillCompanySelect(sel, cid) {
+    if (document.activeElement === sel) return;
+    sel.innerHTML = [...companies].sort(byName).map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');
+    sel.value = cid;
+  }
+  // Moving to another company keeps the code unless that company already uses it.
+  function moveToCompany(list, cid) {
+    for (const it of list) {
+      it.companyId = cid;
+      if (coItems(cid).some(o => o !== it && o.code.toUpperCase() === it.code.toUpperCase())) it.code = nextCode(it.type, cid);
+    }
   }
   const cur = () => items.find(i => i.id === selectedId);
 
@@ -1883,7 +2059,17 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     $('gpPos').textContent = `${g.lat.toFixed(6)}, ${g.lng.toFixed(6)}`;
     $('gpAcc').textContent = g.acc != null ? `${fmtAcc(g.acc)}${g.n ? ` (${g.n} metingen)` : ''}` : 'onbekend';
     $('gpSrc').textContent = SOURCE_LABEL[g.src] || g.src;
+    fillCompanySelect($('gpCompany'), g.companyId);
   }
+  $('gpCompany').addEventListener('change', () => {
+    const g = curGroup(); const c = CO($('gpCompany').value); if (!g || !c || c.id === g.companyId) return;
+    const mem = membersOf(g.id);
+    const code = coGroups(c.id).some(o => o.code === g.code) ? nextGroupCode(c.id) : g.code;
+    g.companyId = c.id; g.code = code; g.demo = false;
+    moveToCompany(mem, c.id);
+    save(); toSheet();
+    toast(`${g.code} met ${mem.length} items verplaatst naar ${c.name}`, 4000);
+  });
   $('gpClose').addEventListener('click', toSheet);
   $('gpItems').addEventListener('click', e => { const b = e.target.closest('[data-id]'); if (b) select(b.dataset.id, false); });
   $('gpTypeRow').addEventListener('click', e => {
@@ -1928,19 +2114,27 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     const it = cur(); if (!it) return;
     const oldPrefix = TYPE[it.type].prefix;
     it.type = $('edType').value;
-    if (it.code.startsWith(oldPrefix + '-')) it.code = nextCode(it.type);
+    if (it.code.startsWith(oldPrefix + '-')) it.code = nextCode(it.type, it.companyId);
     if (!it.statusManual) it.status = derivedStatus(checkSummary(it));
     save(); renderAll();
   });
   $('edCode').addEventListener('input', () => {
     const it = cur(); if (!it) return;
     const v = $('edCode').value.trim().toUpperCase();
-    const clash = items.some(i => i.id !== it.id && i.code.toUpperCase() === v);
-    const err = !v ? 'Code is verplicht' : clash ? 'Deze code bestaat al' : '';
+    const clash = coItems(it.companyId).some(i => i.id !== it.id && i.code.toUpperCase() === v);
+    const err = !v ? 'Code is verplicht' : clash ? 'Deze code bestaat al bij dit bedrijf' : '';
     $('edCode').classList.toggle('bad', !!err); $('edCodeErr').hidden = !err; $('edCodeErr').textContent = err;
     if (!err) { it.code = v; save(); renderMarkers(); $('edTitle').textContent = v; throttledList(); }
   });
   $('edCode').addEventListener('blur', () => { const it = cur(); if (it) { $('edCode').value = it.code; $('edCode').classList.remove('bad'); $('edCodeErr').hidden = true; } });
+  $('edCompany').addEventListener('change', () => {
+    const it = cur(); const c = CO($('edCompany').value); if (!it || !c || c.id === it.companyId) return;
+    const g = G(it.groupId);
+    it.groupId = null; it.demo = false;   // a group stays with its own company
+    moveToCompany([it], c.id);
+    cleanupGroups(); save(); toSheet();
+    toast(`${it.code} verplaatst naar ${c.name}${g ? ` (uit ${g.code} gehaald)` : ''}`, 4000);
+  });
   $('edRegps').addEventListener('click', () => {
     const it = cur(); if (!it) return;
     const id = it.id; toSheet(); startCapture({ kind: 'item', id });
@@ -1963,7 +2157,8 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
       return;
     }
     if (e.key !== 'Escape') return;
-    if (!$('searchBar').hidden) closeSearch();
+    if (!$('drawer').inert) { if (!$('coForm').hidden) showCompanyList(); else closeDrawer(); }
+    else if (!$('searchBar').hidden) closeSearch();
     else if (!$('editor').hidden) closeEditor();
     else if (!$('groupPanel').hidden) toSheet();
     else if (tapMode) setTapMode(false);
@@ -2346,6 +2541,133 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     map.once('moveend', () => searchPin?.openPopup());
   }
 
+  /* ================= side menu: companies ================= */
+  function openDrawer() {
+    const d = $('drawer');
+    d.inert = false; d.setAttribute('aria-hidden', 'false'); d.classList.add('open'); $('scrim').classList.add('open');
+    $('btnMenu').setAttribute('aria-expanded', 'true');
+    if (!$('searchBar').hidden) closeSearch();
+    showCompanyList();
+  }
+  function closeDrawer() {
+    const d = $('drawer');
+    if (d.contains(document.activeElement)) document.activeElement.blur();
+    d.inert = true; d.setAttribute('aria-hidden', 'true'); d.classList.remove('open'); $('scrim').classList.remove('open');
+    $('btnMenu').setAttribute('aria-expanded', 'false');
+  }
+  $('btnMenu').addEventListener('click', () => ($('drawer').inert ? openDrawer() : closeDrawer()));
+  $('drClose').addEventListener('click', closeDrawer);
+  $('scrim').addEventListener('click', closeDrawer);
+  $('noCoAdd').addEventListener('click', () => { openDrawer(); openCompanyForm(null); });
+
+  function showCompanyList() {
+    $('coForm').hidden = true; $('drListView').hidden = false;
+    renderCompanies();
+  }
+  function renderCompanies() {
+    const q = $('drSearch').value.trim().toLowerCase();
+    $('drSearch').hidden = companies.length < 6 && !q;
+    $('drSub').textContent = companies.length === 1 ? '1 bedrijf' : `${companies.length} bedrijven`;
+    const list = [...companies].sort(byName).filter(c => !q || `${c.name} ${c.address}`.toLowerCase().includes(q));
+    if (!companies.length) { $('coList').innerHTML = `<li class="empty">Nog geen bedrijven.</li>`; return; }
+    if (!list.length) { $('coList').innerHTML = `<li class="empty">Geen bedrijf gevonden voor “${esc(q)}”.</li>`; return; }
+    $('coList').innerHTML = list.map(c => {
+      const s = companyStats(c.id);
+      const probs = s.afwijking + s.defect;
+      const state = !s.n ? 'geen items'
+        : probs ? `<span class="${s.defect ? 'bad' : 'warn'}">${probs} probleem</span>${s.todo ? ` · ${s.todo} te doen` : ''}`
+        : s.todo ? `${s.todo} te doen` : '<span class="good">alles in orde</span>';
+      const sub = [c.address && esc(c.address), s.n ? `${s.n} item${s.n === 1 ? '' : 's'}` : '', state].filter(Boolean).join(' · ');
+      return `<li class="${c.id === activeCompanyId ? 'active' : ''}">
+        <button type="button" class="co-btn" data-co="${esc(c.id)}" ${c.id === activeCompanyId ? 'aria-current="true"' : ''}>
+          <span class="co-mark">${esc(initials(c.name))}</span>
+          <span class="co-main"><b>${esc(c.name)}${c.demo ? '<span class="demo-tag">voorbeeld</span>' : ''}</b><small>${sub}</small></span>
+        </button>
+        <button type="button" class="icon-btn co-edit" data-edit="${esc(c.id)}" aria-label="Bewerk ${esc(c.name)}" title="Bewerk">✎</button>
+      </li>`;
+    }).join('');
+  }
+  $('drSearch').addEventListener('input', renderCompanies);
+  $('coList').addEventListener('click', e => {
+    const ed = e.target.closest('[data-edit]'); if (ed) { openCompanyForm(ed.dataset.edit); return; }
+    const b = e.target.closest('[data-co]'); if (b) { setActiveCompany(b.dataset.co); closeDrawer(); }
+  });
+  $('coAdd').addEventListener('click', () => openCompanyForm(null));
+
+  // Switch company: close what was open and show that company's items (or keep following you when you are there).
+  function setActiveCompany(cid) {
+    const c = CO(cid); if (!c) return;
+    const changed = cid !== activeCompanyId;
+    activeCompanyId = cid; save();
+    if (!changed) { renderAll(); return; }
+    clearPending(); stopCapture(); setTapMode(false);
+    if (selectedId || selectedGroupId) toSheet(); else renderAll();
+    frameCompany();
+  }
+  function frameCompany() {
+    const pts = coItems(activeCompanyId).map(i => [i.lat, i.lng]);
+    const name = activeCo()?.name ?? '';
+    if (!pts.length) { toast(`${name}: nog geen items. Plaats het eerste item op je GPS-positie of via de kaart.`, 4000); return; }
+    const b = L.latLngBounds(pts);
+    const here = lastFix && Date.now() - lastFix.t < 60000 && b.pad(.5).contains([lastFix.lat, lastFix.lng]);
+    if (here && follow) { toast(`${name} · ${pts.length} items`); return; }   // you are on site: keep following
+    setFollow(false);
+    map.fitBounds(b.pad(.25), { maxZoom: 19 });
+    toast(`${name} · ${pts.length} items`);
+  }
+
+  let editCoId = null;
+  function openCompanyForm(cid) {
+    const c = CO(cid);
+    editCoId = c?.id ?? null;
+    $('drListView').hidden = true; $('coForm').hidden = false;
+    $('coFormTitle').textContent = c ? 'Bedrijf bewerken' : 'Nieuw bedrijf';
+    $('coName').value = c?.name ?? ''; $('coAddr').value = c?.address ?? ''; $('coNote').value = c?.note ?? '';
+    $('coName').classList.remove('bad'); $('coNameErr').hidden = true;
+    const del = $('coDelete'); del.hidden = !c; del.classList.remove('armed');
+    if (c) { const n = coItems(c.id).length; del.textContent = n ? `Verwijder bedrijf en ${n} item${n === 1 ? '' : 's'}` : 'Verwijder bedrijf'; }
+    setTimeout(() => $('coName').focus(), 260);
+  }
+  $('coCancel').addEventListener('click', showCompanyList);
+  $('coForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const name = $('coName').value.trim();
+    const dup = companies.find(c => c.id !== editCoId && c.name.toLowerCase() === name.toLowerCase());
+    const err = !name ? 'Naam is verplicht' : dup ? 'Er bestaat al een bedrijf met deze naam' : '';
+    $('coName').classList.toggle('bad', !!err); $('coNameErr').hidden = !err; $('coNameErr').textContent = err;
+    if (err) { $('coName').focus(); return; }
+    const fields = { name, address: $('coAddr').value.trim(), note: $('coNote').value.trim() };
+    const c = CO(editCoId);
+    if (c) {
+      Object.assign(c, fields, { demo: false }); save(); renderAll(); showCompanyList();
+      toast(`${name} opgeslagen`);
+    } else {
+      const n = newCompany(fields);
+      setActiveCompany(n.id); closeDrawer();
+      toast(`${name} aangemaakt. Nieuwe items komen nu bij dit bedrijf.`, 4000);
+    }
+  });
+  $('coDelete').addEventListener('click', () => {
+    const b = $('coDelete'); const c = CO(editCoId); if (!c) return;
+    if (!b.classList.contains('armed')) { b.classList.add('armed'); b.textContent = `Bevestig: ${c.name} definitief verwijderen`; return; }
+    removeCompanies([c]);
+    showCompanyList();
+    toast(`${c.name} verwijderd`);
+  });
+  // Remove companies with all their items, groups and photos; pick another company if the active one went.
+  function removeCompanies(list) {
+    const ids = new Set(list.map(c => c.id));
+    const gone = items.filter(i => ids.has(i.companyId));
+    deletePhotosOf(gone);
+    items = items.filter(i => !ids.has(i.companyId));
+    groups = groups.filter(g => !ids.has(g.companyId));
+    companies = companies.filter(c => !ids.has(c.id));
+    if (!activeCo()) activeCompanyId = [...companies].sort(byName)[0]?.id ?? null;
+    save();
+    if ((selectedId && !cur()) || (selectedGroupId && !curGroup())) toSheet(); else renderAll();
+    if (activeCo()) frameCompany();
+  }
+
   /* ================= settings / io ================= */
   $('accSel').value = String(minAcc);
   $('accSel').addEventListener('change', () => { minAcc = +$('accSel').value; save(); });
@@ -2356,20 +2678,30 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     items = items.filter(i => !i.demo);
     groups = groups.filter(g => !g.demo);
     items.forEach(i => { if (i.groupId && !G(i.groupId)) i.groupId = null; });
-    cleanupGroups(); save();
-    if ((selectedId && !cur()) || (selectedGroupId && !curGroup())) toSheet(); else renderAll();
-    toast(`${n} voorbeelditems verwijderd`);
+    cleanupGroups();
+    // the example company goes too, unless real items were added to it
+    const emptyDemo = companies.filter(c => c.demo && !coItems(c.id).length);
+    if (emptyDemo.length) removeCompanies(emptyDemo);
+    else { save(); if ((selectedId && !cur()) || (selectedGroupId && !curGroup())) toSheet(); else renderAll(); }
+    toast(`${n} voorbeelditems verwijderd${emptyDemo.length ? ', samen met het voorbeeldbedrijf' : ''}`);
   });
 
+  const slug = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'bedrijf';
   $('btnExport').addEventListener('click', () => {
-    if (!items.length) { toast('Geen items om te exporteren.'); return; }
+    const c = activeCo(); if (!c) return;
+    exportItems(coItems(c.id), slug(c.name));
+  });
+  $('btnExportAll').addEventListener('click', () => exportItems(items, 'alle-bedrijven'));
+  function exportItems(list, name) {
+    if (!list.length) { toast('Geen items om te exporteren.'); return; }
     const fc = {
       type: 'FeatureCollection',
-      features: items.map(i => ({
+      features: list.map(i => ({
         type: 'Feature',
         geometry: { type: 'Point', coordinates: [round(i.lng, 7), round(i.lat, 7)] }, // GeoJSON = [lng, lat]
         properties: {
           id: i.id, code: i.code, type: i.type, type_label: TYPE[i.type].label, status: i.status,
+          bedrijf_id: i.companyId, bedrijf: CO(i.companyId)?.name ?? null, bedrijf_adres: CO(i.companyId)?.address || null,
           notitie: i.note || null, nauwkeurigheid_m: i.acc, bron: i.src, metingen: i.n,
           aangemaakt: i.createdAt, voorbeeld: !!i.demo, fotos: i.photos?.length || 0, // blobs blijven lokaal
           groep_id: i.groupId, groep_code: G(i.groupId)?.code ?? null, groep_naam: G(i.groupId)?.name || null,
@@ -2383,11 +2715,27 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
     const blob = new Blob([JSON.stringify(fc, null, 2)], { type: 'application/geo+json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `controle-items-${new Date().toISOString().slice(0, 10)}.geojson`;
+    a.download = `controle-${name}-${new Date().toISOString().slice(0, 10)}.geojson`;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-    toast(`${items.length} items geëxporteerd`);
-  });
+    toast(`${list.length} items geëxporteerd`);
+  }
+
+  // Company for an imported item: by id, then by name, else a new one; no company info = the active company.
+  function importCompany(p) {
+    const byId = typeof p.bedrijf_id === 'string' ? CO(p.bedrijf_id) : null;
+    if (byId) return byId.id;
+    const name = typeof p.bedrijf === 'string' ? p.bedrijf.trim() : '';
+    if (name) {
+      const found = findCompanyByName(name);
+      if (found) return found.id;
+      const c = newCompany({ name, address: typeof p.bedrijf_adres === 'string' ? p.bedrijf_adres : '' });
+      if (typeof p.bedrijf_id === 'string' && p.bedrijf_id) c.id = p.bedrijf_id;   // same id as on the other phone
+      return c.id;
+    }
+    if (!activeCo()) activeCompanyId = newCompany({ name: 'Geïmporteerd' }).id;
+    return activeCompanyId;
+  }
 
   $('fileImport').addEventListener('change', async e => {
     const f = e.target.files?.[0]; e.target.value = ''; if (!f) return;
@@ -2414,18 +2762,21 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
           statusManual: !!p.status_manueel,
           checkDone: typeof p.controle_afgerond === 'string' ? p.controle_afgerond : null,
           history: Array.isArray(p.historiek) ? p.historiek : [],
-          groupId: null,
+          groupId: null, companyId: null,
         };
         if (!validItem(it)) { skipped++; continue; }
         const idx = items.findIndex(x => x.id === it.id);
-        it.code = typeof p.code === 'string' && p.code.trim() ? p.code.trim().toUpperCase() : (idx >= 0 ? items[idx].code : nextCode(it.type));
+        // an older export without company info keeps an existing item where it is
+        it.companyId = idx >= 0 && !p.bedrijf_id && !p.bedrijf ? items[idx].companyId : importCompany(p);
+        it.code = typeof p.code === 'string' && p.code.trim() ? p.code.trim().toUpperCase() : (idx >= 0 ? items[idx].code : nextCode(it.type, it.companyId));
+        if (items.some(x => x.id !== it.id && x.companyId === it.companyId && x.code.toUpperCase() === it.code)) it.code = nextCode(it.type, it.companyId);
         it.photos = idx >= 0 ? (items[idx].photos || []) : [];   // keep locally stored photos of existing items
         if (typeof p.groep_id === 'string' && p.groep_id) {
           let g = G(p.groep_id);
           if (!g) {
-            g = { id: p.groep_id, code: typeof p.groep_code === 'string' && p.groep_code ? p.groep_code : nextGroupCode(),
+            g = { id: p.groep_id, code: typeof p.groep_code === 'string' && p.groep_code ? p.groep_code : nextGroupCode(it.companyId),
               name: typeof p.groep_naam === 'string' ? p.groep_naam : '', lat: it.lat, lng: it.lng, acc: it.acc,
-              src: it.src, n: it.n, createdAt: it.createdAt, demo: it.demo };
+              src: it.src, n: it.n, createdAt: it.createdAt, demo: it.demo, companyId: it.companyId };
             groups.push(g);
           }
           it.groupId = g.id;
@@ -2433,11 +2784,12 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
         normalizeItem(it);
         if (idx >= 0) { items[idx] = it; updated++; } else { items.push(it); added++; }
       }
-      groups.forEach(syncGroup); cleanupGroups();
+      groups.forEach(syncGroup); cleanupGroups(); assignCompanies();
       save();
       if ((selectedId && !cur()) || (selectedGroupId && !curGroup())) toSheet(); else renderAll();
-      if (items.length) map.fitBounds(L.latLngBounds(items.map(i => [i.lat, i.lng])).pad(.2), { maxZoom: 19 });
-      toast(`Import: ${added} nieuw, ${updated} bijgewerkt${skipped ? `, ${skipped} overgeslagen` : ''}`, 4000);
+      const shown = coItems(activeCompanyId);
+      if (shown.length) { setFollow(false); map.fitBounds(L.latLngBounds(shown.map(i => [i.lat, i.lng])).pad(.2), { maxZoom: 19 }); }
+      toast(`Import: ${added} nieuw, ${updated} bijgewerkt${skipped ? `, ${skipped} overgeslagen` : ''}. Wissel van bedrijf via ☰.`, 4500);
     } catch (err) {
       toast(`Import mislukt: ${err.message}`, 5000);
     }
@@ -2457,7 +2809,7 @@ dl.meta dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; overfl
   renderAll();
   applyPanel($('sheet'), panelState.sheet, false);
   applyMapTheme();
-  if (items.length) map.fitBounds(L.latLngBounds(items.map(i => [i.lat, i.lng])).pad(.25), { maxZoom: 19 });
+  { const shown = coItems(activeCompanyId); if (shown.length) map.fitBounds(L.latLngBounds(shown.map(i => [i.lat, i.lng])).pad(.25), { maxZoom: 19 }); }
   startGps();
 })();
 </script>
